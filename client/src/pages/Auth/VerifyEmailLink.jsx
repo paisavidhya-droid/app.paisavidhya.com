@@ -55,7 +55,6 @@ export default function VerifyEmailLink() {
               Your phone number is verified.
             </Alert>
             <Alert type="success" title="Email verified">
-              {" "}
               Your Email is verified.
             </Alert>
             <Button onClick={() => navigate("/start", { replace: true })}>
