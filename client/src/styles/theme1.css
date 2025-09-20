@@ -1,0 +1,113 @@
+/* === Base (light) ========================================================= */
+:root {
+    /* Neutrals */
+    --pv-bg: #faf9f7;
+    /* page background */
+    --pv-surface: #ffffff;
+    /* cards, panels, inputs, tabpanel, accordion */
+    --pv-card: #ffffff;
+    --pv-border: #e6e1dc;
+    --pv-text: #2d2a26;
+    --pv-dim: #6f6a65;
+
+    /* Accent (overridable by [data-accent]) — default “Chai” */
+    --pv-primary: #7a4b39;
+    /* warm chai brown */
+    --pv-primary-ink: #fff7f2;
+
+    /* Semantic */
+    --pv-danger: #c93d2b;
+    --pv-warning: #e58e1d;
+    --pv-success: #2e9e62;
+
+    /* Layout / effects */
+    --pv-radius: 12px;
+    --pv-shadow: 0 6px 24px rgba(0, 0, 0, .08);
+    --pv-fast: 150ms;
+    --pv-focus: 0 0 0 3px color-mix(in oklab, var(--pv-primary) 35%, transparent);
+
+    /* Components (light) */
+    /* Tabs */
+    --pv-tab-bg: var(--pv-surface);
+    --pv-tab-ink: var(--pv-text);
+    --pv-tab-active-bg: var(--pv-primary);
+    --pv-tab-active-ink: var(--pv-primary-ink);
+    --pv-tab-border: var(--pv-border);
+
+    /* Inputs */
+    --pv-input-bg: var(--pv-surface);
+    --pv-input-ink: var(--pv-text);
+    --pv-input-border: var(--pv-border);
+    --pv-input-placeholder: color-mix(in oklab, var(--pv-text) 50%, transparent);
+
+    /* Badges */
+    --pv-badge-bg: color-mix(in oklab, var(--pv-primary) 12%, #fff);
+    --pv-badge-ink: color-mix(in oklab, var(--pv-primary) 92%, #111);
+    --pv-badge-border: color-mix(in oklab, var(--pv-primary) 18%, #eae7e4);
+
+    /* Accordion */
+    --pv-acc-bg: var(--pv-surface);
+    --pv-acc-ink: var(--pv-text);
+    --pv-acc-border: var(--pv-border);
+
+
+    /* Skeleton (softer in light, subtle in dark) */
+    --pv-skel-base: #eef1f4;
+    /* base fill */
+    --pv-skel-mid: #f6f8fb;
+    /* lighter center */
+    --pv-skel-edge: #e5e9ef;
+    /* edges for depth */
+    --pv-skel-speed: 1200ms;
+    /* shimmer duration */
+
+}
+
+/* === Dark mode ============================================================ */
+[data-theme="dark"] {
+    --pv-bg: #0d1117;
+    --pv-surface: #111827;
+    /* primary UI surfaces in dark */
+    --pv-card: #0f172a;
+    --pv-border: #243042;
+    --pv-text: #e5e7eb;
+    --pv-dim: #9aa3af;
+
+    /* Keep accents readable on dark */
+    --pv-primary-ink: #fffaf7;
+
+    /* Components (dark) */
+    --pv-tab-bg: var(--pv-surface);
+    --pv-tab-ink: var(--pv-text);
+    --pv-tab-active-bg: var(--pv-primary);
+    --pv-tab-active-ink: var(--pv-primary-ink);
+    --pv-tab-border: var(--pv-border);
+
+    --pv-input-bg: #0f1623;
+    --pv-input-ink: var(--pv-text);
+    --pv-input-border: color-mix(in oklab, var(--pv-border) 80%, transparent);
+    --pv-input-placeholder: color-mix(in oklab, var(--pv-text) 45%, transparent);
+
+    --pv-badge-bg: color-mix(in oklab, var(--pv-primary) 18%, #0f1623);
+    --pv-badge-ink: #ffffff;
+    --pv-badge-border: color-mix(in oklab, var(--pv-primary) 28%, #162133);
+
+    --pv-acc-bg: var(--pv-surface);
+    --pv-acc-ink: var(--pv-text);
+    --pv-acc-border: color-mix(in oklab, var(--pv-border) 80%, transparent);
+
+
+    /* Skeleton  */
+    --pv-skel-base: #111829;
+    --pv-skel-mid: #1a2540;
+    --pv-skel-edge: #0e1526;
+}
+
+
+
+
+
+
+
+
+

@@ -1,19 +1,29 @@
+// main.jsx
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./index.css";
+import "./styles/index.css";
 import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { store } from "./app/store.js";
+import { setupAxiosInterceptors } from "./api/axios";
+import { Provider } from "react-redux";
+import AuthBootstrap from "./context/AuthBootstrap.jsx";
+import { DeviceSizeProvider } from "./context/DeviceSizeContext.jsx";
+
+setupAxiosInterceptors(store);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    {/* <BrowserRouter>
-      <AuthProvider>
+    <Provider store={store}>
+      <BrowserRouter>
         <DeviceSizeProvider>
-          <BrowserRouter> */}
-            <App />
-            {/* <Toaster position="top-right" /> global toaster */}
-          {/* </BrowserRouter>
+          <AuthBootstrap />
+          <App />
+          <Toaster position="top-right" reverseOrder={false} />
         </DeviceSizeProvider>
-      </AuthProvider>
-    </BrowserRouter> */}
+      </BrowserRouter>{" "}
+    </Provider>
   </StrictMode>
 );

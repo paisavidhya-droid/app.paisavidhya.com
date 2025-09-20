@@ -1,4 +1,29 @@
+# [build]
+#   base    = "client"
+#   publish = "dist"
+#   command = "npm run build"
+
+
+
 [build]
   base    = "client"
   publish = "dist"
-  command = "npm run build"
+  command = "npm ci && npm run build"
+  # Optional: have Netlify skip rebuilds if only server/ changed
+  ignore  = "bash ../.netlifyignore.sh"
+
+# React Router / Vite SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"

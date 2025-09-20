@@ -1,0 +1,120 @@
+/* === FloatField ========================================================= */
+.pv-float {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pv-float .pv-float-field {
+  position: relative;
+}
+
+.pv-float .pv-float-input {
+  width: 100%;
+  background: var(--pv-input-bg);
+  color: var(--pv-input-ink);
+  border: 1px solid var(--pv-input-border);
+  border-radius: var(--pv-radius);
+  outline: none;
+  transition: border var(--pv-fast), box-shadow var(--pv-fast), background var(--pv-fast);
+  padding: 14px 14px; /* updated by size rules */
+}
+
+/* Left/right icon gutters (reserve space if icons present) */
+.pv-float .pv-float-icon.left + .pv-float-field .pv-float-input,
+.pv-float .pv-float-field .pv-float-input.has-left {
+  padding-left: 40px;
+}
+.pv-float .pv-float-field .pv-float-input.has-right {
+  padding-right: 40px;
+}
+
+.pv-float .pv-float-label {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--pv-dim);
+  transition: transform var(--pv-fast), color var(--pv-fast), background var(--pv-fast), padding var(--pv-fast);
+  padding: 0 6px;
+  background: transparent;
+  /* prevent text selection flicker on animation */
+  user-select: none;
+}
+
+/* Float condition: when focused OR has value (via placeholder-shown trick) */
+.pv-float .pv-float-input:focus + .pv-float-label,
+.pv-float[data-has-value="1"] .pv-float-label,
+.pv-float .pv-float-input:not(:placeholder-shown) + .pv-float-label {
+  transform: translateY(-155%) scale(0.86);
+  color: var(--pv-primary);
+  background: var(--pv-surface);
+}
+
+/* Focus ring & border */
+.pv-float .pv-float-input:focus {
+  border-color: var(--pv-primary);
+  box-shadow: var(--pv-focus);
+}
+
+/* Error state */
+.pv-float.is-error .pv-float-input {
+  border-color: color-mix(in oklab, var(--pv-danger) 75%, var(--pv-input-border));
+}
+.pv-float.is-error .pv-float-input:focus {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--pv-danger) 35%, transparent);
+}
+.pv-float.is-error .pv-float-label {
+  color: var(--pv-danger);
+}
+
+/* Disabled */
+.pv-float.is-disabled .pv-float-input {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* Helper text */
+.pv-float .pv-float-hint {
+  color: var(--pv-dim);
+  font-size: 12px;
+}
+.pv-float .pv-float-error {
+  color: var(--pv-danger);
+  font-size: 12px;
+}
+
+/* Icons */
+.pv-float .pv-float-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--pv-dim);
+  z-index: 1;
+}
+.pv-float .pv-float-icon.left { left: 12px; }
+.pv-float .pv-float-icon.right { right: 12px; }
+.pv-float .pv-float-eye { background: none; border: 0; cursor: pointer; }
+
+/* Sizes */
+.pv-float.size-sm .pv-float-input { padding: 10px 12px; font-size: 14px; }
+.pv-float.size-sm .pv-float-label { left: 12px; }
+
+.pv-float.size-md .pv-float-input { padding: 14px 14px; font-size: 16px; }
+.pv-float.size-md .pv-float-label { left: 14px; }
+
+.pv-float.size-lg .pv-float-input { padding: 16px 16px; font-size: 17px; }
+.pv-float.size-lg .pv-float-label { left: 16px; }
+
+/* Variant: ghost */
+.pv-float.ghost .pv-float-input {
+  background: transparent;
+}
+
+/* When icons are actually passed, reserve space automatically */
+.pv-float .pv-float-icon.left ~ .pv-float-field .pv-float-input { padding-left: 42px; }
+.pv-float .pv-float-field .pv-float-input + .pv-float-label + .pv-float-icon.right,
+.pv-float .pv-float-icon.right { /* already right-aligned */ }
+.pv-float .pv-float-icon.right ~ .pv-float-input,
+.pv-float .pv-float-field .pv-float-input { /* for clarity */ }

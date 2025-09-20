@@ -1,16 +1,17 @@
-// import { useState } from 'react'
-import './App.css'
+// App.jsx
+
+import "./styles/App.css";
+import "./styles/ui.css";
+import "./styles/theme.css";
+import "./Layout/Layout.css";
+import AppRoutes from "./router/App.Routes";
 
 function App() {
-
   return (
-   <div className="App">
-      {/* <MainLayout>
-        <AppRoutes />
-      </MainLayout> */}
-      <h1>Paisavidhya</h1>
+    <div className="App">
+      <AppRoutes />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

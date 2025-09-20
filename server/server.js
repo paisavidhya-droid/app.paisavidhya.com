@@ -3,9 +3,9 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const connectDb = require("./db/conn");
-// const errorMiddleware = require("./middlewares/errorMiddleware");
-// const userRoutes = require('./router/user.routes');
-// const logRoutes = require('./router/log.routes');
+const errorMiddleware = require("./middlewares/errorMiddleware");
+const authRoutes = require('./router/auth.routes');
+const userRoutes = require('./router/user.routes');
 
 const PORT = process.env.PORT || 5000;
 
@@ -23,8 +23,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // Routes
-// app.use('/api/user', userRoutes);
-// app.use("/api/activityLogs", logRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+app.use('/api/audit', require('./router/audit.routes'));
+
 
 
 // // Routes
@@ -32,7 +35,7 @@ app.use(express.json());
 
 
 // Error handling middleware
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
 // Start the server
 connectDb().then(() => {

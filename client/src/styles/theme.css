@@ -1,0 +1,115 @@
+/* === Base (light) ========================================================= */
+:root {
+    /* Neutrals */
+    --pv-bg: #f9fafb;
+    /* page background */
+    --pv-surface: #ffffff;
+    /* cards, panels, inputs */
+    --pv-card: #ffffff;
+    --pv-border: #e5e7eb;
+    --pv-text: #111827;
+    /* almost black */
+    --pv-dim: #6b7280;
+    /* muted gray text */
+
+    /* Accent (blue — can swap later) */
+    --pv-primary: #2563eb;
+    /* bright but not harsh */
+    --pv-primary-ink: #ffffff;
+
+    /* Semantic */
+    --pv-danger: #dc2626;
+    --pv-warning: #f59e0b;
+    --pv-success: #16a34a;
+
+    /* Layout / effects */
+    --pv-radius: 8px;
+    --pv-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    --pv-fast: 150ms;
+    --pv-focus: 0 0 0 3px color-mix(in oklab, var(--pv-primary) 40%, transparent);
+
+    /* Tabs */
+    --pv-tab-bg: var(--pv-surface);
+    --pv-tab-ink: var(--pv-text);
+    --pv-tab-active-bg: var(--pv-primary);
+    --pv-tab-active-ink: var(--pv-primary-ink);
+    --pv-tab-border: var(--pv-border);
+
+    /* Inputs */
+    --pv-input-bg: var(--pv-surface);
+    --pv-input-ink: var(--pv-text);
+    --pv-input-border: var(--pv-border);
+    --pv-input-placeholder: color-mix(in oklab, var(--pv-text) 50%, transparent);
+
+    /* Badges */
+    --pv-badge-bg: color-mix(in oklab, var(--pv-primary) 15%, #fff);
+    --pv-badge-ink: color-mix(in oklab, var(--pv-primary) 90%, #111);
+    --pv-badge-border: color-mix(in oklab, var(--pv-primary) 20%, #e5e7eb);
+
+    /* Accordion */
+    --pv-acc-bg: var(--pv-surface);
+    --pv-acc-ink: var(--pv-text);
+    --pv-acc-border: var(--pv-border);
+
+    /* Skeleton */
+    --pv-skel-base: #e5e7eb;
+    --pv-skel-mid: #f3f4f6;
+    --pv-skel-edge: #d1d5db;
+    --pv-skel-speed: 1200ms;
+
+    /* Spinner */
+    --pv-spinner-base: color-mix(in oklab, var(--pv-text) 18%, transparent);
+    --pv-spinner-top: var(--pv-primary);
+
+
+}
+
+/* === Dark mode ============================================================ */
+[data-theme="dark"] {
+    --pv-bg: #0f172a;
+    --pv-surface: #1e293b;
+    --pv-card: #111827;
+    --pv-border: #334155;
+    --pv-text: #f3f4f6;
+    --pv-dim: #9ca3af;
+
+    --pv-primary-ink: #ffffff;
+
+    --pv-tab-bg: var(--pv-surface);
+    --pv-tab-ink: var(--pv-text);
+    --pv-tab-active-bg: var(--pv-primary);
+    --pv-tab-active-ink: var(--pv-primary-ink);
+    --pv-tab-border: var(--pv-border);
+
+    --pv-input-bg: #0f172a;
+    --pv-input-ink: var(--pv-text);
+    --pv-input-border: color-mix(in oklab, var(--pv-border) 70%, transparent);
+    --pv-input-placeholder: color-mix(in oklab, var(--pv-text) 45%, transparent);
+
+    --pv-badge-bg: color-mix(in oklab, var(--pv-primary) 20%, #1e293b);
+    --pv-badge-ink: #ffffff;
+    --pv-badge-border: color-mix(in oklab, var(--pv-primary) 30%, #1e293b);
+
+    --pv-acc-bg: var(--pv-surface);
+    --pv-acc-ink: var(--pv-text);
+    --pv-acc-border: color-mix(in oklab, var(--pv-border) 70%, transparent);
+
+    /* Skeleton */
+    --pv-skel-base: #1e293b;
+    --pv-skel-mid: #2c3e58;
+    --pv-skel-edge: #142033;
+
+    /* Spinner */
+    --pv-spinner-base: color-mix(in oklab, #fff 22%, transparent);
+    --pv-spinner-top: var(--pv-primary);
+}
+
+/* High-contrast users: strengthen visibility */
+@media (prefers-contrast: more) {
+
+    :root,
+    [data-theme="dark"] {
+        --pv-spinner-base: color-mix(in oklab, var(--pv-text) 30%, transparent);
+        --pv-spinner-top: color-mix(in oklab, var(--pv-primary) 90%, #fff);
+    }
+}

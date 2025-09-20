@@ -1,0 +1,447 @@
+/*old theme*/
+/* :root {
+    --pv-bg: #0b0f19;
+    --pv-surface: #111827;
+    --pv-card: #151c2f;
+    --pv-border: #25324a;
+    --pv-text: #e5e7eb;
+    --pv-dim: #9ca3af;
+    --pv-primary: #00c2a8;
+    Paisavidhya vibe 
+    --pv-primary-ink: #052d2a;
+    --pv-danger: #ef4444;
+    --pv-warning: #f59e0b;
+    --pv-success: #22c55e;
+    --pv-radius: 14px;
+    --pv-focus: 0 0 0 3px rgba(0, 194, 168, 0.25);
+    --pv-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    --pv-fast: 150ms;
+}*/
+
+
+a {
+    color: var(--pv-primary);
+    text-decoration: none
+}
+
+a:hover {
+    text-decoration: underline
+}
+
+.pv-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px
+}
+
+/* primitives */
+.pv-card {
+    background: var(--pv-card);
+    border: 1px solid var(--pv-border);
+    border-radius: var(--pv-radius);
+    box-shadow: var(--pv-shadow);
+}
+
+.pv-row {
+    display: flex;
+    gap: 12px;
+    align-items: center
+}
+
+.pv-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+/* inputs */
+.pv-input,
+.pv-select,
+.pv-textarea {
+    width: 100%;
+    background: var(--pv-input-bg);
+    color: var(--pv-input-ink);
+    border: 1px solid var(--pv-input-border);
+    border-radius: var(--pv-radius);
+    padding: 12px 14px;
+    outline: none;
+    transition: border var(--pv-fast), box-shadow var(--pv-fast), background var(--pv-fast);
+}
+
+.pv-input::placeholder,
+.pv-textarea::placeholder {
+    color: var(--pv-input-placeholder);
+}
+
+.pv-input:focus,
+.pv-select:focus,
+.pv-textarea:focus {
+    box-shadow: var(--pv-focus);
+    border-color: var(--pv-primary);
+}
+
+label.pv-label {
+    font-size: 13px;
+    color: var(--pv-dim)
+}
+
+/* buttons */
+.pv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: transform var(--pv-fast), box-shadow var(--pv-fast), background var(--pv-fast);
+    font-weight: 600;
+}
+
+.pv-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+.pv-btn.primary {
+    background: var(--pv-primary);
+    color: var(--pv-primary-ink);
+}
+
+
+
+.pv-btn.primary:hover {
+    transform: translateY(-1px)
+}
+
+
+.pv-btn.ghost {
+    background: transparent;
+    border-color: var(--pv-border);
+    color: var(--pv-text);
+}
+
+.pv-btn.ghost:hover {
+    background: color-mix(in oklab, var(--pv-primary) 6%, transparent);
+}
+
+.pv-btn.danger {
+    background: var(--pv-danger);
+    color: white
+}
+
+/* chips/badges */
+.pv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--pv-badge-border);
+    background: var(--pv-badge-bg);
+    color: var(--pv-badge-ink);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+/* overlay */
+.pv-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.pv-modal {
+    width: min(720px, 92vw);
+    background: var(--pv-surface);
+    border: 1px solid var(--pv-border);
+    border-radius: 18px;
+    box-shadow: var(--pv-shadow);
+}
+
+.pv-modal-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--pv-border);
+    font-weight: 700
+}
+
+.pv-modal-body {
+    padding: 18px 20px
+}
+
+.pv-modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--pv-border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end
+}
+
+/* drawer */
+.pv-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: min(420px, 92vw);
+    background: var(--pv-surface);
+    border-left: 1px solid var(--pv-border);
+    z-index: 60;
+    right: 0;
+    box-shadow: var(--pv-shadow)
+}
+
+
+/* Tabs */
+.pv-tabs {
+    display: inline-flex;
+    gap: 8px;
+    background: var(--pv-tab-bg);
+    border: 1px solid var(--pv-tab-border);
+    border-radius: var(--pv-radius) var(--pv-radius) 0 0;
+    padding: 6px;
+    border-bottom: none;
+}
+
+.pv-tab {
+    appearance: none;
+    background: transparent;
+    color: var(--pv-tab-ink);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background var(--pv-fast), color var(--pv-fast), border var(--pv-fast), transform var(--pv-fast);
+}
+
+.pv-tab:hover {
+    background: rgba(0, 0, 0, .04);
+}
+
+.pv-tab:focus-visible {
+    box-shadow: var(--pv-focus);
+}
+
+.pv-tab.active {
+    background: var(--pv-tab-active-bg);
+    color: var(--pv-tab-active-ink);
+    border-color: var(--pv-tab-active-bg);
+    transform: translateY(-1px);
+}
+
+
+.pv-tabpanel {
+    padding: 16px;
+    border: 1px solid var(--pv-tab-border);
+    border-radius: 0 0 var(--pv-radius) var(--pv-radius);
+    background: var(--pv-surface);
+    color: var(--pv-text);
+}
+
+/* accordion */
+.pv-acc-item {
+    border: 1px solid var(--pv-acc-border);
+    border-radius: var(--pv-radius);
+    overflow: hidden;
+    background: var(--pv-acc-bg);
+    color: var(--pv-acc-ink);
+}
+
+.pv-acc-head {
+    all: unset; /* nukes browser defaults */
+      width: 97%;    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pv-acc-head:hover {
+    background: color-mix(in oklab, var(--pv-primary) 6%, transparent);
+}
+
+
+.pv-acc-body {
+    padding: 12px 14px;
+    border-top: 1px solid var(--pv-acc-border);
+}
+
+/* table-ish */
+.pv-pagination {
+    display: flex;
+    gap: 6px;
+    align-items: center
+}
+.pv-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg,
+      var(--pv-skel-edge) 0%,
+      var(--pv-skel-base) 12%,
+      var(--pv-skel-base) 88%,
+      var(--pv-skel-edge) 100%
+    );
+  /* shimmer pass layered above the base: */
+  --sheen: linear-gradient(90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--pv-skel-mid) 85%, transparent) 45%,
+    color-mix(in oklab, var(--pv-skel-mid) 100%, transparent) 50%,
+    color-mix(in oklab, var(--pv-skel-mid) 85%, transparent) 55%,
+    transparent 100%
+  );
+  background-image:
+    var(--sheen),
+    linear-gradient(180deg,
+      var(--pv-skel-edge) 0%,
+      var(--pv-skel-base) 12%,
+      var(--pv-skel-base) 88%,
+      var(--pv-skel-edge) 100%
+    );
+  background-repeat: no-repeat, no-repeat;
+
+  /* Make the sheen wide so it “glides” smoothly */
+  background-size: 200% 100%, 100% 100%;
+  background-position: -150% 0, 0 0;
+
+  animation: pv-skeleton-shimmer var(--pv-skel-speed) ease-in-out infinite;
+  will-change: background-position;
+}
+
+/* Optional: a subtle specular glare overlay for extra realism */
+.pv-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0.00) 50%,
+    rgba(0, 0, 0, 0.06) 85%,
+    transparent 100%
+  );
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+@keyframes pv-skeleton-shimmer {
+  0%   { background-position: -150% 0, 0 0; }
+  60%  { background-position: 130% 0, 0 0; }
+  100% { background-position: 130% 0, 0 0; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pv-skeleton { animation: none; }
+}
+
+.pv-spinner {
+  display: inline-block;
+  box-sizing: border-box;
+  border-style: solid;
+  border-color: var(--pv-spinner-base);
+  border-top-color: var(--pv-spinner-top);
+  border-radius: 50%;
+  animation: pv-spin 1s linear infinite;
+}
+
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-spinner { animation: none; }
+}
+
+/* Optional: inverted spinner for use on primary buttons or dark chips */
+.pv-spinner.inverted {
+  border-color: color-mix(in oklab, var(--pv-primary-ink) 35%, transparent);
+  border-top-color: var(--pv-primary-ink);
+}
+
+
+/* === PIN / OTP =========================================================== */
+.pv-pin {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: start;
+  position: relative;
+}
+
+.pv-pin .pv-pin-help {
+  position: absolute;
+  left: 0;
+  bottom: -22px;
+  font-size: 12px;
+  color: var(--pv-dim);
+}
+
+.pv-pin-error-text { color: var(--pv-danger); }
+
+.pv-pin-cell {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border: 1px solid var(--pv-input-border);
+  background: var(--pv-input-bg);
+  color: var(--pv-input-ink);
+  border-radius: calc(var(--pv-radius) + 2px);
+  box-shadow: 0 1px 0 rgba(0,0,0,.02);
+  outline: none;
+  transition: border var(--pv-fast), box-shadow var(--pv-fast), transform var(--pv-fast), background var(--pv-fast);
+  caret-color: transparent; /* hide caret—feels like boxes */
+}
+
+.pv-pin-cell:focus {
+  border-color: var(--pv-primary);
+  box-shadow: var(--pv-focus);
+  transform: translateY(-1px);
+  background: color-mix(in oklab, var(--pv-primary) 6%, var(--pv-input-bg));
+}
+
+.pv-pin-cell.filled {
+  border-color: color-mix(in oklab, var(--pv-primary) 35%, var(--pv-input-border));
+  background: color-mix(in oklab, var(--pv-primary) 8%, var(--pv-input-bg));
+}
+
+.pv-pin.is-error .pv-pin-cell {
+  border-color: color-mix(in oklab, var(--pv-danger) 70%, var(--pv-input-border));
+}
+.pv-pin.is-error .pv-pin-cell:focus {
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--pv-danger) 35%, transparent);
+}
+
+.pv-pin.is-success .pv-pin-cell {
+  border-color: color-mix(in oklab, var(--pv-success) 55%, var(--pv-input-border));
+  background: color-mix(in oklab, var(--pv-success) 8%, var(--pv-input-bg));
+}
+
+.pv-pin.is-disabled .pv-pin-cell {
+  opacity: .6;
+  pointer-events: none;
+}
+
+/* sizes */
+.pv-pin.size-sm .pv-pin-cell { width: 38px; height: 44px; font-size: 18px; }
+.pv-pin.size-lg .pv-pin-cell { width: 56px; height: 64px; font-size: 24px; }
+
+/* subtle “shake” helper class if you want to animate on wrong code */
+@keyframes pv-shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+.pv-pin.is-error { animation: pv-shake 400ms ease-in-out; }
+
+
+
