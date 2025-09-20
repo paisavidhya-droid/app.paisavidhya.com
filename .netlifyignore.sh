@@ -1,21 +1,20 @@
 #!/usr/bin/env bash
-# Netlify runs this before building. 
-# exit 0 = build, exit 1 = skip build
+# Netlify ignore: exit 0 = SKIP build, non-zero = RUN build
 
-# On first build or if Netlify has no cached ref, just build
+# If Netlify has no cached base commit, FORCE a build
 if [ -z "$CACHED_COMMIT_REF" ]; then
-  echo "No cached commit ref; building."
-  exit 0
+  echo "No cached commit ref; forcing build."
+  exit 1
 fi
 
-# Compare from last cached commit to current commit
-CHANGED_FILES=$(git diff --name-only "$CACHED_COMMIT_REF" "$COMMIT_REF")
+CHANGED_FILES="$(git diff --name-only "$CACHED_COMMIT_REF" "$COMMIT_REF")"
 
-# Build if anything in client/ changed, or FE-related files
-if echo "$CHANGED_FILES" | grep -Eq '^client/|^netlify\.toml$|^client/package\.json$|^client/pnpm-lock\.yaml$|^client/yarn\.lock$|^client/package-lock\.json$'; then
+# If frontend changed → RUN build (exit 1)
+if echo "$CHANGED_FILES" | grep -Eq '^client/|^client/netlify\.toml$|^client/package\.json$|^client/(pnpm-lock\.yaml|yarn\.lock|package-lock\.json)$'; then
   echo "Client-related changes detected; building."
-  exit 0
+  exit 1
 fi
 
-echo "No client changes (likely server-only); skipping build."
-exit 1
+# Otherwise SKIP
+echo "No client changes detected (likely server-only). Skipping build."
+exit 0
