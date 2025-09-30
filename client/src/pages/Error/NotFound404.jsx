@@ -25,7 +25,7 @@ function Bubbles() {
   );
 }
 
-export const Error = () => {
+const NotFound404 = () => {
   // const { user } = useAuth();
   const navigate = useNavigate();
   const loc = useLocation();
@@ -100,7 +100,7 @@ export const Error = () => {
   );
 }
 
-
+export default NotFound404;
 
 {/* // import { Link } from "react-router-dom";
 import "./Error.css";

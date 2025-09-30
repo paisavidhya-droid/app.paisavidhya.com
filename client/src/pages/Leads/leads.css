@@ -1,0 +1,30 @@
+.view-note-btn {
+  background: none;
+  color: #007bff; 
+  border: none;
+  padding: 0;
+  font-size: 0.8em;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dropdown-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+  color: #333;
+  transition: color 0.2s ease;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+  color: #007bff;
+  outline: none;
+}
+
+.dropdown-icon {
+  color: #555;
+  font-size: 1rem;
+}

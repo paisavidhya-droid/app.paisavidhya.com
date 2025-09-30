@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")).render(
           <App />
           <Toaster position="top-right" reverseOrder={false} />
         </DeviceSizeProvider>
-      </BrowserRouter>{" "}
+      </BrowserRouter>
     </Provider>
   </StrictMode>
 );

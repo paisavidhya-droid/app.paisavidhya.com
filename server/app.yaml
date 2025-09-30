@@ -4,7 +4,32 @@ env: standard  # Use the standard environment
 
 instance_class: F2  # Adjust based on your resource needs
 
+
+# Keep 1 warm instance in prod; set to 0 or 1 in staging depending on your need
+automatic_scaling:
+  min_instances: 0 # For staging
+#   min_instances: 1 # For production
+  max_instances: 10
+
+
+
 handlers:
   # Handle API routes (e.g., /api)
   - url: /api/.*
     script: auto
+
+
+    # Put only non-secrets here; move to Secret Manager later
+env_variables:
+  NODE_ENV: "production"
+
+
+
+
+
+# # Avoid cold starts in staging/prod
+# automatic_scaling:
+#   min_instances: 1
+#   max_instances: 10
+#   target_cpu_utilization: 0.65
+#   target_throughput_utilization: 0.7

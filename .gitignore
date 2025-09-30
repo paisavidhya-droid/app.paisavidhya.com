@@ -48,3 +48,6 @@ Thumbs.db
 
 server/old
 client/src/old
+
+client/src/pages/Leads/old
+client/src/pages/Admin/olduser.jsx

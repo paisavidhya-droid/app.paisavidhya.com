@@ -26,6 +26,7 @@ import {
 import OtpPin from "../components/ui/OtpPin";
 import toast from "react-hot-toast";
 import FloatField from "../components/ui/FancyInput/FloatField";
+import StatusBadge from "../components/ui/StatusBadge";
 
 function Section({ id, title, children }) {
   return (
@@ -222,6 +223,17 @@ export default function UIComponents() {
             <Tooltip content="Family’s Financial Doctor">
               <Badge>Hover me</Badge>
             </Tooltip>
+          </div>
+        </Section>
+
+          <Section id="status-badge" title="Status Badge">
+          <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
+            <StatusBadge status="New" />
+            <StatusBadge status="Contacted" />
+            <StatusBadge status="Follow-Up" />
+            <StatusBadge status="Converted" />
+            <StatusBadge status="Not Interested" />
+            <StatusBadge status="Unknown" />
           </div>
         </Section>
 

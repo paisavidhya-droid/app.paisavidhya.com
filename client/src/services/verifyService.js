@@ -1,4 +1,4 @@
-// src/services/verifyService.js
+ // src/services/verifyService.js
 import axiosInstance from "../api/axios";
 
 export const sendPhoneOtp = async () => {

@@ -10,6 +10,7 @@
 }
 
 .pv-float .pv-float-input {
+  margin-top: 5px;
   width: 100%;
   background: var(--pv-input-bg);
   color: var(--pv-input-ink);

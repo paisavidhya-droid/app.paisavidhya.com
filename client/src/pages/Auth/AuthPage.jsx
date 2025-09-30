@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 /* --------------------------- Sign In --------------------------- */
-function SignInForm() {
+function SignInForm({ setTabIndex }) {
   const navigate = useNavigate();
   const { storeTokenInLS } = useAuth();
   const [identifier, setIdentifier] = useState("");
@@ -89,9 +89,17 @@ function SignInForm() {
         /> */}
 
         {/* Keep a static hint instead of a disabled checkbox */}
-        <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>
-          Tip: Sign in with email or phone.
-        </div>
+        <p>Don't have an account?   <button
+          type="button"
+          onClick={() => setTabIndex(1)}  
+          style={{
+            background: "none",
+            border: "none",
+            color: "var(--pv-primary)",
+            cursor: "pointer",
+            textDecoration: "underline",
+          }}
+        >Sign Up</button></p>
         <Badge>Secure</Badge>
       </div>
       <Button type="submit" disabled={loading}>
@@ -226,11 +234,11 @@ function SignUpForm() {
 
 /* --------------------------- Page Shell --------------------------- */
 export default function AuthPage() {
-  const [tabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState(0);
 
   const tabs = useMemo(
     () => [
-      { label: "Sign in", content: <SignInForm /> },
+      { label: "Sign in", content: <SignInForm setTabIndex={setTabIndex} /> },
       { label: "Sign up", content: <SignUpForm /> },
     ],
     []
@@ -257,7 +265,8 @@ export default function AuthPage() {
               Your Family’s Financial Doctor
             </div>
           </div>
-          <Tabs tabs={tabs} defaultIndex={tabIndex} />
+          <Tabs tabs={tabs} selectedIndex={tabIndex}
+            onChange={setTabIndex}    />
           <div
             style={{
               color: "var(--pv-dim)",

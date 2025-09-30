@@ -145,24 +145,31 @@ exports.adminCreate = async (req, res, next) => {
 };
 
 /** GET /api/users  (admin) – optional filters: ?role=STAFF&q=search */
-exports.adminList = async (req, res, next) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
-    const { role, q } = req.query || {};
+    const {
+      q = "", role = "", status = "", limit = 10, skip = 0
+    } = req.query || {};
+
     const filter = {};
     if (role) filter.role = role;
+    if (status) filter.status = status;
+
     if (q) {
       filter.$or = [
-        { name: { $regex: q, $options: 'i' } },
-        { email: { $regex: q, $options: 'i' } },
-        { phoneNumber: { $regex: q, $options: 'i' } },
+        { name: { $regex: q, $options: "i" } },
+        { email: { $regex: q, $options: "i" } },
+        { phoneNumber: { $regex: q, $options: "i" } },
       ];
     }
-    const items = await User.find(filter).select('-password').sort({ createdAt: -1 }).lean();
-    res.json({ items });
-  } catch (err) {
-    next(err);
-    // res.status(500).json({ message: 'List users failed', error: err.message });
-  }
+
+    const [items, total] = await Promise.all([
+      User.find(filter).select("-password").sort({ createdAt: -1 }).skip(+skip).limit(+limit).lean(),
+      User.countDocuments(filter),
+    ]);
+
+    res.json({ items, total, limit: +limit, skip: +skip });
+  } catch (err) { next(err); }
 };
 
 /** GET /api/users/:id  (admin or self) */
@@ -246,6 +253,78 @@ exports.updateById = async (req, res, next) => {
     // res.status(500).json({ message: 'Update failed', error: err.message });
   }
 };
+
+
+
+
+/**
+ * GET /api/admin/users/staff
+ * Purpose: Admin view → list ALL staff/admin (any status)
+ * Supports: q (search), limit, skip
+ */
+exports.listStaff = async (req, res, next) => {
+  try {
+    const { q = "", limit = 50, skip = 0 } = req.query;
+
+    // Only filter by role = STAFF or ADMIN
+    const filter = { role: { $in: ['ADMIN', 'STAFF'] } };
+
+    if (q) {
+      filter.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { email: { $regex: q, $options: 'i' } },
+        { phoneNumber: { $regex: q, $options: 'i' } },
+      ];
+    }
+
+    const [items, total] = await Promise.all([
+      User.find(filter, { name: 1, email: 1, role: 1, status: 1, createdAt: 1 })
+        .sort({ name: 1 })
+        .skip(+skip)
+        .limit(+limit)
+        .lean(),
+      User.countDocuments(filter),
+    ]);
+
+    res.json({ items: items.map(safeUser), total, limit: +limit, skip: +skip });
+  } catch (e) {
+    next(e);
+  }
+};
+
+
+
+/**
+ * GET /api/admin/users/assignable
+ * Purpose: Lead/Task assignment → list only ACTIVE staff/admin
+ * Supports: limit
+ */
+exports.listAssignableUsers = async (req, res, next) => {
+  try {
+    const limit = Number(req.query.limit || 200);
+
+    const items = await User.find(
+      { role: { $in: ['ADMIN', 'STAFF'] }, status: 'ACTIVE' },
+      { name: 1, email: 1, role: 1 } // minimal fields
+    )
+      .sort({ name: 1 })
+      .limit(limit)
+      .lean();
+
+      res.json({
+      items: items.map(u => ({
+        _id: String(u._id),
+        name: u.name || "",
+        email: u.email || "",
+        role: u.role || "",
+      })),
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+
 
 /** DELETE /api/users/:id  (admin) */
 exports.removeById = async (req, res, next) => {

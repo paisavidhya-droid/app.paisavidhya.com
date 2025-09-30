@@ -1,8 +1,6 @@
 // src/routes/AppRoutes.jsx
 import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Error } from "../pages/Error/Error";
-// import { ROLES } from "../auth/AuthContext";
 import ProtectedRoute from "../pages/Auth/ProtectedRoute";
 import RequireRole from "../pages/Auth/RequireRole";
 import RoleRedirect from "../pages/Auth/RoleRedirect";
@@ -11,6 +9,7 @@ import UIComponents from "../pages/UIComponents";
 import Logout from "../pages/Auth/Logout";
 import Verify from "../pages/Auth/Verify";
 import VerifyEmailLink from "../pages/Auth/VerifyEmailLink";
+import CallbackForm from "../components/Leads/CallbackForm";
 // import RequireRole from "../auth/RequireRole";
 
 // Lazy-load pages (keeps bundles small)
@@ -22,9 +21,15 @@ const CustomerDashboard = lazy(() =>
   import("../pages/Dashboards/CustomerDashboard")
 );
 const Profile = lazy(() => import("../pages/Profile/Profile"));
-// const Leads = lazy(()=>import("../pages/Leads"));
-const Forbidden = lazy(() => import("../pages/Forbidden/Forbidden"));
-// const NotFound = lazy(()=>import("../pages/NotFound"));
+const LeadsOps = lazy(() => import("../pages/Leads/LeadsOps"));
+const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
+const AdminAudit = lazy(() => import("../pages/Admin/AdminAudit"));
+const AdminUsers = lazy(() => import("../pages/Admin/Users"));
+
+// Error pages
+const Unauthorized401 = lazy(() => import("../pages/Error/Unauthorized401"));
+const Forbidden403 = lazy(() => import("../pages/Error/Forbidden403"));
+const NotFound404 = lazy(() => import("../pages/Error/NotFound404"));
 
 // Single source of roles (or import from a constants file)
 const ROLES = { ADMIN: "admin", STAFF: "staff", CUSTOMER: "customer" };
@@ -37,9 +42,9 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/403" element={<Forbidden />} />
         <Route path="/ui" element={<UIComponents />} />
         <Route path="/verify-email" element={<VerifyEmailLink />} />
+        <Route path="/request-callback" element={<CallbackForm />} />
 
         {/* Authenticated area */}
         {/* Protected (any logged-in) */}
@@ -73,7 +78,13 @@ export default function AppRoutes() {
           {/* Admin workspace*/}
           <Route path="/admin" element={<RequireRole roles={[ROLES.ADMIN]} />}>
             <Route index element={<AdminDashboard />} />
-            {/* <Route path="users" element={<AdminUsers />} /> */}
+            <Route path="audit" element={<AdminAudit />} />
+            <Route path="users" element={<AdminUsers />} />
+            {/* Future admin pages 
+            <Route path="billing" element={<div>Admin Billing (example)</div>} />
+            <Route path="integrations" element={<div>Admin Integrations (example)</div>} />*/}
+            <Route path="leads" element={<LeadsOps />} />
+            <Route path="leads/:id" element={<LeadDetails />} />
           </Route>
 
           {/* Common authenticated */}
@@ -92,7 +103,11 @@ export default function AppRoutes() {
 
         {/* Default redirects / 404 */}
         <Route path="/home" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<Error />} />
+        {/* Error routes */}
+        <Route path="/401" element={<Unauthorized401 />} />
+        <Route path="/403" element={<Forbidden403 />} />
+        <Route path="/404" element={<NotFound404 />} />
+        <Route path="*" element={<NotFound404 />} />
       </Route>
     </Routes>
   );

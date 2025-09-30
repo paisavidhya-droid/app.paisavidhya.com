@@ -13,3 +13,4 @@ This is a MERN (MongoDB, Express, React, Node.js) full-stack project.
 cd client
 npm install
 npm run dev
+
