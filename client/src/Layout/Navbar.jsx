@@ -62,7 +62,7 @@ export default function Navbar({ onOpenMobileSidebar }) {
         {/* theme toggle slot (optional) 
         {rightSlot}*/}
         <ThemeToggle />
-        <button onClick={()=>navigate("/logout", { replace: true })}>Logout</button>
+        
       </div>
     </nav>
   );

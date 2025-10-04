@@ -1,0 +1,151 @@
+/* Just coded But not being used */
+/* ====== Narrow screens (≤ 640px) ====== */
+@media (max-width: 640px) {
+
+    /* tighter vertical rhythm */
+    .section {
+        margin: 22px 0;
+    }
+
+    /* hero block: stack card under text */
+    .hero {
+        gap: 14px;
+    }
+
+    .hero-left {
+        order: 1;
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .hero-right {
+        order: 2;
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    /* subtext spacing */
+    .cta-row {
+        gap: 10px;
+        margin-top: 6px;
+    }
+
+    /* make buttons fill width in pairs/stack */
+    .cta-row .pv-btn,
+    .cta-buttons .pv-btn {
+        width: 100%;
+    }
+
+    /* badges/tooltip chip doesn’t break line height */
+    .pv-badge {
+        line-height: 1.2;
+    }
+
+    /* card padding a bit tighter */
+    .pv-card {
+        padding: 14px !important;
+    }
+
+    /* Tabs: larger hit area and snap scrolling */
+    .pv-tabs {
+        padding: 6px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pv-tab {
+        scroll-snap-align: start;
+        padding: 10px 14px;
+    }
+
+    /* Accordion: head text wraps nicely */
+    .pv-acc-head {
+        padding: 12px;
+    }
+
+    /* CTA strip stacks content and buttons */
+    .cta-strip {
+        align-items: stretch;
+    }
+
+    .cta-title {
+        font-weight: 800;
+        font-size: clamp(16px, 4.2vw, 18px);
+    }
+
+    /* Inputs – full width with comfy tap */
+    .pv-input,
+    .pv-select,
+    .pv-textarea {
+        padding: 14px 14px;
+    }
+
+    /* PIN/OTP shrinks to fit */
+    .pv-pin {
+        gap: 8px;
+    }
+
+    .pv-pin .pv-pin-cell {
+        width: 40px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .pv-pin.size-sm .pv-pin-cell {
+        width: 34px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .pv-pin.size-lg .pv-pin-cell {
+        width: 48px;
+        height: 56px;
+        font-size: 22px;
+    }
+
+    /* Modal fits small screens */
+    .pv-modal {
+        width: 94vw;
+        max-height: 88vh;
+        border-radius: 14px;
+    }
+
+    .pv-modal-body {
+        padding: 16px;
+    }
+
+    .pv-modal-header,
+    .pv-modal-footer {
+        padding: 14px 16px;
+    }
+
+    .modal-close {
+        top: 6px;
+        right: 6px;
+    }
+
+    /* Drawer uses full width on tiny screens */
+    .pv-drawer {
+        width: 100vw;
+    }
+}
+
+/* ====== Very small screens (≤ 360px) ====== */
+@media (max-width: 360px) {
+    .pv-pin .pv-pin-cell {
+        width: 34px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    .pv-card {
+        padding: 12px !important;
+    }
+}
+
+/* ====== Landscape phones (short height) ====== */
+@media (max-height: 480px) and (orientation: landscape) {
+    .pv-modal {
+        max-height: 86vh;
+    }
+}

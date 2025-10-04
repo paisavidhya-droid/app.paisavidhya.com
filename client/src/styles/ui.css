@@ -135,6 +135,15 @@ label.pv-label {
   color: white
 }
 
+/*Button with icon*/
+.pv-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
 /* chips/badges */
 .pv-badge {
   display: inline-flex;

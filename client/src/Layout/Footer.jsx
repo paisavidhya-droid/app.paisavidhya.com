@@ -4,8 +4,8 @@ export default function Footer() {
   return (
     <footer className="footer" role="contentinfo">
       <div className="footer__grid">
-        <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+         <div className="footer__brand">
+          <div className="footer__brandRow">
             <span className="navbar__logo" aria-hidden="true"></span>
             <strong>Paisavidhya</strong>
           </div>
@@ -16,31 +16,31 @@ export default function Footer() {
 
         <div>
           <div className="footer__title">Product</div>
-          <ul style={{ display: 'grid', gap: 6, padding: 0, listStyle: 'none' }}>
-            <li><a href="#">Features</a></li>
-            <li><a href="#">Integrations</a></li>
-            <li><a href="#">Changelog</a></li>
-            <li><a href="#">Roadmap</a></li>
+          <ul className="footer__list">
+            <li><a className="footer__link" href="#">Features</a></li>
+            <li><a className="footer__link" href="#">Integrations</a></li>
+            <li><a className="footer__link" href="#">Changelog</a></li>
+            <li><a className="footer__link" href="#">Roadmap</a></li>
           </ul>
         </div>
 
         <div>
           <div className="footer__title">Company</div>
-          <ul style={{ display: 'grid', gap: 6, padding: 0, listStyle: 'none' }}>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Press</a></li>
-            <li><a href="#">Contact</a></li>
+          <ul className="footer__list">
+            <li><a className="footer__link" href="#">About</a></li>
+            <li><a className="footer__link" href="#">Careers</a></li>
+            <li><a className="footer__link" href="#">Press</a></li>
+            <li><a className="footer__link" href="#">Contact</a></li>
           </ul>
         </div>
 
         <div>
           <div className="footer__title">Resources</div>
-          <ul style={{ display: 'grid', gap: 6, padding: 0, listStyle: 'none' }}>
-            <li><a href="#">Docs</a></li>
-            <li><a href="#">API</a></li>
-            <li><a href="#">Guides</a></li>
-            <li><a href="#">Support</a></li>
+          <ul className="footer__list">
+            <li><a className="footer__link" href="#">Docs</a></li>
+            <li><a className="footer__link" href="#">API</a></li>
+            <li><a className="footer__link" href="#">Guides</a></li>
+            <li><a className="footer__link" href="#">Support</a></li>
           </ul>
         </div>
       </div>
@@ -48,9 +48,9 @@ export default function Footer() {
       <div className="footer__bottom">
         <small style={{ color: 'var(--pv-dim)' }}>© {new Date().getFullYear()} Paisavidhya, Inc.</small>
         <div style={{ display: 'inline-flex', gap: 12, alignItems: 'center' }}>
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-          <a href="#">Status</a>
+          <a className="footer__link" href="#">Privacy</a>
+          <a className="footer__link" href="#">Terms</a>
+          <a className="footer__link" href="#">Status</a>
           <select
             aria-label="Region"
             style={{

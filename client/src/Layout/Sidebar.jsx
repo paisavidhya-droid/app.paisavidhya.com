@@ -1,82 +1,168 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+  FaSignOutAlt,
+  FaChartPie,
+  FaCog,
+  FaTachometerAlt,
+} from "react-icons/fa";
+import { useAuth } from "../hooks/useAuth";
+import { IconButton } from "../components";
+import { FaBars, FaXmark } from "react-icons/fa6";
 
 export default function Sidebar({
   collapsed,
-  // setCollapsed,
+  setCollapsed,
   mobileOpen,
-  setMobileOpen
+  setMobileOpen,
 }) {
   const panelRef = useRef(null);
+  const navigate = useNavigate();
+  const { isLoggedIn /*, initialized*/ } = useAuth();
 
-  // Close on ESC for mobile
+  // (optional) prevent flicker while auth bootstraps
+  // if you prefer to hide the rail until we know auth state:
+  // if (!initialized) return null;
+
+  // ROUTES: update these paths to match your router config
+  const menu = useMemo(
+    () => [
+      {
+        label: "Overview",
+        to: "/",
+        icon: <FaTachometerAlt aria-hidden="true" />,
+        tip: "Overview",
+      },
+      {
+        label: "Analytics",
+        to: "/analytics",
+        icon: <FaChartPie aria-hidden="true" />,
+        tip: "Analytics",
+      },
+      {
+        label: "Settings",
+        to: "/settings",
+        icon: <FaCog aria-hidden="true" />,
+        tip: "Settings",
+      },
+    ],
+    []
+  );
+
+  // Close mobile on ESC
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') setMobileOpen(false); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const onKey = (e) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [setMobileOpen]);
 
-  // focus trap on mobile open (simple)
+  // Simple focus trap when mobile menu is open
   useEffect(() => {
     if (!mobileOpen) return;
-    const first = panelRef.current?.querySelector('button, a, input, select');
+    const container = panelRef.current;
+    if (!container) return;
+
+    const focusables = container.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+
+    // Focus first item for accessibility
     first?.focus();
+
+    const handleTab = (e) => {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    };
+
+    container.addEventListener("keydown", handleTab);
+    return () => container.removeEventListener("keydown", handleTab);
   }, [mobileOpen]);
 
-  const menu = [
-    { label: 'Overview',   href: '#', current: true,  tip: 'Overview' },
-    { label: 'Analytics',  href: '#', current: false, tip: 'Analytics' },
-    { label: 'Billing',    href: '#', current: false, tip: 'Billing' },
-    { label: 'Settings',   href: '#', current: false, tip: 'Settings' },
-  ];
+  const handleRailToggle = () => {
+    setCollapsed((c) => !c);
+  };
 
-  const Section = () => (
-    <div className="sidebar__section" role="menu" aria-label="Main">
-      {menu.map(item => (
-        <a
-          key={item.label}
-          className="sidebar__item"
-          href={item.href}
-          role="menuitem"
-          aria-current={item.current ? 'page' : undefined}
-          data-tooltip={item.tip}
-        >
-          <svg className="sidebar__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="12" cy="12" r="8" fill="currentColor" opacity=".15" />
-            <path d="M7 12h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          <span className="sidebar__label">{item.label}</span>
-        </a>
-      ))}
-    </div>
+  const Section = (
+    <nav className="sidebar__section" aria-label="Main">
+      <ul className="sidebar__list">
+        {menu.map((item) => (
+          <li key={item.to}>
+            <NavLink
+              to={item.to}
+              end
+              className={({ isActive }) =>
+                [
+                  "sidebar__item",
+                  isActive ? "is-active" : "",
+                  collapsed ? "is-compact" : "",
+                ].join(" ")
+              }
+              aria-label={collapsed ? item.label : undefined}
+              data-tooltip={collapsed ? item.tip : undefined}
+            >
+              <span className="sidebar__icon">{item.icon}</span>
+              <span className="sidebar__label">{item.label}</span>
+            </NavLink>
+          </li>
+        ))}
+
+        {/* Logout as a sidebar item */}
+        {isLoggedIn && (
+          <li
+            className={`sidebar__item ${collapsed ? "is-compact" : ""}`}
+            onClick={() => navigate("/logout", { replace: true })}
+            aria-label={collapsed ? "Logout" : undefined}
+            data-tooltip={collapsed ? "Logout" : undefined}
+            variant="text"
+          >
+            <span className="sidebar__icon">
+              <FaSignOutAlt />
+            </span>
+            <span className="sidebar__label">Logout</span>
+          </li>
+        )}
+      </ul>
+    </nav>
   );
 
   return (
     <>
       {/* Desktop rail */}
       <aside
-        className={`sidebar ${collapsed ? 'sidebar--collapsed' : ''}`}
+        className={`sidebar ${collapsed ? "sidebar--collapsed" : ""}`}
         aria-label="Sidebar"
       >
         <div className="sidebar__header">
-          <strong className="sidebar__label">Navigation</strong>
-          <button
-            className="sidebar__toggle"
-            // onClick={() => setCollapsed(!collapsed)}
+          <IconButton
+            className="sidebar__toggle pv-icon-btn"
+            onClick={handleRailToggle}
             aria-pressed={collapsed}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand' : 'Collapse'}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand" : "Collapse"}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path fill="currentColor" d={collapsed ? "M9 6l6 6-6 6" : "M15 6l-6 6 6 6"}/>
-            </svg>
-          </button>
+            {collapsed ? <FaBars size={18} /> : <FaXmark size={18} />}
+          </IconButton>
+          <strong className="sidebar__brand" aria-hidden={collapsed}>
+            <span className="sidebar__label">Menu</span>
+          </strong>
         </div>
-        <Section />
+
+        {Section}
       </aside>
 
       {/* Mobile off-canvas */}
       <div
-        className={`offcanvas ${mobileOpen ? 'open' : ''}`}
+        className={`offcanvas ${mobileOpen ? "open" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-label="Mobile menu"
@@ -88,13 +174,17 @@ export default function Sidebar({
           ref={panelRef}
           onClick={(e) => e.stopPropagation()}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <strong>Menu</strong>
-            <button className="sidebar__toggle" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-              ✕
+          <div className="offcanvas__header">
+            <strong id="mobileMenuTitle">Menu</strong>
+            <button
+              className="sidebar__toggle pv-icon-btn"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+            >
+              <FaXmark size={18} />
             </button>
           </div>
-          <Section />
+          {Section}
         </div>
       </div>
     </>

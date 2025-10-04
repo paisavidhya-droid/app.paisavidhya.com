@@ -132,13 +132,12 @@ export default function AppLayout() {
           <Suspense fallback={<RouteLoader />}>
             <Outlet /> {/* all pages render here */}
           </Suspense>
-
-          <Footer />
         </main>
       </div>
+      <Footer />
 
-      {/* Mobile bottom bar (hidden on desktop via CSS) */}
-      <BottomNav />
+      {/* Mobile bottom bar (hidden on desktop via CSS) 
+      <BottomNav />*/}
     </>
   );
 }

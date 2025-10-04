@@ -164,7 +164,7 @@ export default function UIComponents() {
 
         <Section id="inputs" title="Input / Textarea / Select">
           <div className="pv-row" style={{ alignItems: "stretch" }}>
-            <Input label="Full Name" placeholder="e.g., Ekambaram G" />
+            <Input label="Full Name" placeholder="e.g., Full Name" />
             <Input label="Mobile" placeholder="+91…" />
             <Select label="Module">
               <option value="pfc">PFC</option>
