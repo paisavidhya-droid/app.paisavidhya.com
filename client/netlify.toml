@@ -34,7 +34,7 @@
   [headers.values]
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
     # Use Content-Security-Policy for iframe embedding instead of X-Frame-Options
-    Content-Security-Policy = "frame-ancestors 'self' https://paisavidhya-staging.netlify.app;"
+    Content-Security-Policy = "frame-ancestors 'self' https://paisavidhya.com;"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
