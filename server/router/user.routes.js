@@ -1,24 +1,34 @@
 // routes/users.routes.js
-const router = require('express').Router();
-const ctrl = require('../controllers/user.controller');
-const auth = require('../middlewares/authMiddleware');
-const { requireRole, ROLES } = require('../middlewares/roleMiddleware');
+import { Router } from "express";
+import {
+  listStaff,
+  listAssignableUsers,
+  adminCreate,
+  getAllUsers,
+  getById,
+  updateById,
+  removeById,
+} from "../controllers/user.controller.js";
+import auth from "../middlewares/authMiddleware.js";
+import { requireRole, ROLES } from "../middlewares/roleMiddleware.js";
 
-router.get('/staff', auth, requireRole(ROLES.ADMIN), ctrl.listStaff);
-router.get('/assignable', ctrl.listAssignableUsers);
+const router = Router();
+
+router.get('/staff', auth, requireRole(ROLES.ADMIN), listStaff);
+router.get('/assignable', listAssignableUsers);
 
 // Admin creates users (STAFF/ADMIN/CUSTOMER)
-router.post('/', auth, requireRole(ROLES.ADMIN), ctrl.adminCreate);
+router.post('/', auth, requireRole(ROLES.ADMIN), adminCreate);
 
 // Admin list (optional filters ?role=&q=)
-router.get('/', auth, requireRole(ROLES.ADMIN), ctrl.getAllUsers);
+router.get('/', auth, requireRole(ROLES.ADMIN), getAllUsers);
 
 // Admin or self
-router.get('/:id', auth, ctrl.getById);
-router.patch('/:id', auth, ctrl.updateById);
+router.get('/:id', auth, getById);
+router.patch('/:id', auth, updateById);
 
 // Admin only
-router.delete('/:id', auth, requireRole(ROLES.ADMIN), ctrl.removeById);
+router.delete('/:id', auth, requireRole(ROLES.ADMIN), removeById);
 
 
-module.exports = router;
+export default router;

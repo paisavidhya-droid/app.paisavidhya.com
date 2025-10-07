@@ -117,7 +117,7 @@ export default function CustomerDashboard() {
         <Col style={{ flex:"1 1 520px" }}>
           <Card title="Quick actions">
             <div className="pv-row" style={{ gap:8, flexWrap:"wrap" }}>
-              <Button as="a" href="/leads">Start PFC</Button>
+              <Button as="a" href="/pfc">Start PFC</Button>
               <Button variant="ghost" as="a" href="/profile">Complete profile</Button>
             </div>
           </Card>

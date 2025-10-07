@@ -1,9 +1,9 @@
 // controllers/verify.controller.js
-const User = require('../models/user.model');
-const { genOtp, hashOtp } = require('../utils/auth/otp');
-const { sendOtpByPreference } = require('../services/otpSender');
+import User from '../models/user.model.js';
+import { genOtp, hashOtp } from '../utils/auth/otp.js';
+import { sendOtpByPreference } from '../services/otpSender.js';
 
-exports.sendPhoneOtp = async (req, res) => {
+export const sendPhoneOtp = async (req, res) => {
     const userId = req.user?.id;               
     const user = await User.findById(userId);
 
@@ -24,7 +24,7 @@ exports.sendPhoneOtp = async (req, res) => {
     res.json({ ok: true });
 };
 
-exports.verifyPhoneOtp = async (req, res) => {
+export const verifyPhoneOtp = async (req, res) => {
     const { code } = req.body;
     const user = await User.findById(req.user.id);
     if (!user || !user.phoneOtpHash) return res.status(400).json({ message: "Invalid or expired OTP" });
@@ -58,10 +58,11 @@ exports.verifyPhoneOtp = async (req, res) => {
 };
 
 // controllers/verify.controller.js (cont.)
-const jwt = require("jsonwebtoken");
-const sendEmail = require("../utils/auth/sendEmail");
+import jwt from 'jsonwebtoken';
+import sendEmail  from '../utils/auth/sendEmail.js';
 
-exports.sendEmailVerifyLink = async (req, res) => {
+
+export const sendEmailVerifyLink = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user || !user.email) return res.status(400).json({ message: "Email not found" });
 
@@ -77,7 +78,7 @@ exports.sendEmailVerifyLink = async (req, res) => {
     res.json({ ok: true });
 };
 
-exports.verifyEmailLink = async (req, res) => {
+export const verifyEmailLink = async (req, res) => {
     try {
         const { token } = req.query;
         const payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -99,7 +100,7 @@ exports.verifyEmailLink = async (req, res) => {
 };
 
 
-exports.verifyEmailToken = async (req, res) => {
+export const verifyEmailToken = async (req, res) => {
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: "Missing token" });

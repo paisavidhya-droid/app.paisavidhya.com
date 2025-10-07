@@ -7,6 +7,8 @@ export default function Accordion({ items = [] }) {
     <div className="pv-col">
       {items.map((it, i) => {
         const expanded = open === i;
+        const titleNode =
+          typeof it.title === "function" ? it.title(expanded) : it.title;
         return (
           <div key={i} className="pv-acc-item">
             <button
@@ -14,7 +16,7 @@ export default function Accordion({ items = [] }) {
               onClick={() => setOpen(expanded ? null : i)}
               aria-expanded={expanded}
             >
-              <span>{it.title}</span>
+              <span>{titleNode}</span>
               <span>{expanded ? "−" : "+"}</span>
             </button>
             {expanded && <div className="pv-acc-body">{it.content}</div>}

@@ -1,8 +1,10 @@
 // server/router/audit.routes.js
-const router = require('express').Router();
-const AuditLog = require('../models/AuditLog');
-const auth = require('../middlewares/authMiddleware');
-const { requireRole, ROLES }  = require('../middlewares/roleMiddleware');
+import { Router } from "express";
+import AuditLog from "../models/AuditLog.js";
+import auth from "../middlewares/authMiddleware.js";
+import { requireRole, ROLES } from "../middlewares/roleMiddleware.js";
+
+const router = Router();
 
 router.get('/', auth, requireRole(ROLES.ADMIN), async (req, res, next) => {
   try {
@@ -109,4 +111,4 @@ router.get('/export.csv', auth, requireRole(ROLES.ADMIN), async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

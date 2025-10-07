@@ -12,7 +12,7 @@ const STAGE_BOUNDARY_STATUSES = new Set([
   'Contacted', 'Qualified', 'Meeting Scheduled', 'Won', 'Lost',
 ]);
 
-exports.shouldAuditGlobally = (action, payload = {}) => {
+export const shouldAuditGlobally = (action, payload = {}) => {
   if (DEFAULT_GLOBAL_ACTIONS.has(action)) return true;
   if (action === 'status_update') {
     const to = (payload?.to ?? '').toString();

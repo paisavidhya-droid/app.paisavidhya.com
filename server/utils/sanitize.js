@@ -1,5 +1,5 @@
 // utils/sanitize.js
-exports.sanitizeForAudit = (obj) => {
+export const sanitizeForAudit = (obj) => {
   if (!obj) return obj;
   const data = JSON.parse(JSON.stringify(obj));
   if (data.password) delete data.password;

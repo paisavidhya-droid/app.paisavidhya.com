@@ -1,7 +1,7 @@
-const AuditLog = require('../models/AuditLog');
-const { sanitizeForAudit } = require('./sanitize');
+import AuditLog from '../models/AuditLog.js';
+import { sanitizeForAudit } from './sanitize.js';
 
-exports.addAudit = ({ req, action, entity, entityId, before, after, meta }) => {
+export const addAudit = ({ req, action, entity, entityId, before, after, meta }) => {
   try {
     const log = new AuditLog({
       userId: req.user ? (req.user._id || req.user.sub) : null,

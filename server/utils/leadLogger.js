@@ -1,7 +1,7 @@
 // server/utils/leadLogger.js
 import LeadActivityLog from "../models/LeadActivityLog.js";
-const { sanitizeForAudit } = require("../utils/sanitize"); // your existing sanitizer
-const { shouldAuditGlobally } = require("./logPolicy");
+import { sanitizeForAudit } from "../utils/sanitize.js"; 
+import { shouldAuditGlobally } from "./logPolicy.js";
 
 const getUserId = (req, explicitUserId) =>
   explicitUserId ?? (req?.user ? (req.user._id || req.user.sub || null) : null);

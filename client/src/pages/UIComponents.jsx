@@ -22,11 +22,15 @@ import {
   Spinner,
   Skeleton,
   Pagination,
+  AmountInput,
 } from "../components";
 import OtpPin from "../components/ui/OtpPin";
 import toast from "react-hot-toast";
 import FloatField from "../components/ui/FancyInput/FloatField";
 import StatusBadge from "../components/ui/StatusBadge";
+import Placeholder from "../components/ui/Placeholder";
+import AlertWithIcons from "../components/ui/AlertWithIcons";
+import ModuleHeader from "../components/ui/ModuleHeader";
 
 function Section({ id, title, children }) {
   return (
@@ -63,6 +67,8 @@ export default function UIComponents() {
         { id: "spinner", label: "Spinner" },
         { id: "skeleton", label: "Skeleton" },
         { id: "pagination", label: "Pagination" },
+        { id: "module-header", label: "Module Header" },
+        { id: "placeholder", label: "Placeholder" },
       ].filter((it) => it.label.toLowerCase().includes(q.toLowerCase())),
     [q]
   );
@@ -190,6 +196,16 @@ export default function UIComponents() {
             <OtpPin disabled />
           </div>
         </Section>
+        <Section id="amount-input" title="Amount Input (₹)">
+          <div className="pv-row" style={{ alignItems: "center", gap: 12 }}>
+            <AmountInput
+              label="Monthly Salary"
+              value={25000}
+              onChange={() => {}}
+            />
+            <AmountInput label="SIP Amount" value={1500} onChange={() => {}} />
+          </div>
+        </Section>
 
         <Section id="checks" title="Checkbox / RadioGroup / Switch">
           <div className="pv-row">
@@ -225,8 +241,66 @@ export default function UIComponents() {
             </Tooltip>
           </div>
         </Section>
+        {/* Module Header */}
+        <Section
+          id="module-header"
+          title="Module Header (Breadcrumbs + Actions)"
+        >
+          {/* render non-sticky so it doesn't fight the page header */}
+          <ModuleHeader
+            title="Leads"
+            subtitle="Manage prospects and pipeline"
+            breadcrumbs={[
+              { label: "Home", to: "/" },
+              { label: "CRM", to: "/crm" },
+              { label: "Leads" },
+            ]}
+            actions={
+              <>
+                <Button onClick={() => toast.success("Created lead!")}>
+                  New Lead
+                </Button>
+                <Button variant="ghost">Export</Button>
+              </>
+            }
+            sticky={false}
+            compact
+          />
+          <div style={{ paddingTop: 8, color: "var(--pv-dim)" }}>
+            This is an embedded preview. In real pages, keep <code>sticky</code>{" "}
+            to maintain context.
+          </div>
+        </Section>
 
-          <Section id="status-badge" title="Status Badge">
+        {/* Alert with icons */}
+        <Section id="alert-icons" title="Alert (With Icons)">
+          <div className="pv-col">
+            <AlertWithIcons type="info" title="Heads up">
+              We’ll be upgrading MFU integration soon.
+            </AlertWithIcons>
+            <AlertWithIcons type="success" title="All good">
+              Your session is secure.
+            </AlertWithIcons>
+            <AlertWithIcons
+              type="warning"
+              title="Careful"
+              closable
+              onClose={() => toast("Closed!")}
+            >
+              Double-check KYC details.
+            </AlertWithIcons>
+            <AlertWithIcons type="danger" title="Action needed" compact>
+              PAN mismatch detected.
+            </AlertWithIcons>
+          </div>
+        </Section>
+
+        {/* Placeholder */}
+        <Section id="placeholder" title="Placeholder">
+          <Placeholder label="Reports Module" />
+        </Section>
+
+        <Section id="status-badge" title="Status Badge">
           <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
             <StatusBadge status="New" />
             <StatusBadge status="Contacted" />

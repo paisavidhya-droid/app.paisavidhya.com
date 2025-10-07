@@ -1,8 +1,8 @@
 // services/otpSender.js
-const { sendSmsOtp } = require('../utils/auth/exotel');
-const { toE164 } = require('../utils/auth/phone');
+import  sendSmsOtp  from '../utils/auth/exotel.js';
+import { toE164 } from '../utils/auth/phone.js';
 
-exports.sendOtpByPreference = async (user, otp) => {
+export const sendOtpByPreference = async (user, otp) => {
   const phone = toE164(user.phoneNumber, 'IN');
   if (!phone) return { ok: false, error: 'BAD_PHONE' };
 

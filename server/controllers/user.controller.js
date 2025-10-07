@@ -1,11 +1,11 @@
 // controllers/user.controller.js
-const User = require('../models/user.model');
-const bcrypt = require('bcryptjs');
-const { addAudit } = require('../utils/audit');
-const { shouldAuditLoginSuccess } = require('../utils/authAuditPolicy');
+import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
+import { addAudit } from '../utils/audit.js';
+import { shouldAuditLoginSuccess } from '../utils/authAuditPolicy.js';
 
 /** POST /api/auth/register  (public → creates CUSTOMER) */
-exports.register = async (req, res, next) => {
+const register = async (req, res, next) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
     if (!name || !email || !password || !phoneNumber) {
@@ -40,7 +40,7 @@ exports.register = async (req, res, next) => {
 };
 
 /** POST /api/auth/login  (public) */
-exports.login = async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const { email, phoneNumber, password } = req.body || {};
 
@@ -105,7 +105,7 @@ exports.login = async (req, res, next) => {
 };
 
 /** GET /api/auth/me  (auth) */
-exports.me = async (req, res, next) => {
+const me = async (req, res, next) => {
   try {
     const me = await User.findById(req.auth.sub).select("-password").lean();
     if (!me) return res.status(404).json({ message: "User not found" });
@@ -116,7 +116,7 @@ exports.me = async (req, res, next) => {
 };
 
 /** POST /api/users  (admin) – create STAFF or ADMIN or CUSTOMER */
-exports.adminCreate = async (req, res, next) => {
+const adminCreate = async (req, res, next) => {
   try {
     const { name, email, password, phoneNumber, role = 'STAFF' } = req.body || {};
     if (!name || !email || !password || !phoneNumber) {
@@ -145,7 +145,7 @@ exports.adminCreate = async (req, res, next) => {
 };
 
 /** GET /api/users  (admin) – optional filters: ?role=STAFF&q=search */
-exports.getAllUsers = async (req, res, next) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const {
       q = "", role = "", status = "", limit = 10, skip = 0
@@ -173,7 +173,7 @@ exports.getAllUsers = async (req, res, next) => {
 };
 
 /** GET /api/users/:id  (admin or self) */
-exports.getById = async (req, res, next) => {
+const getById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const u = await User.findById(id).select('-password').lean();
@@ -190,7 +190,7 @@ exports.getById = async (req, res, next) => {
 };
 
 /** PATCH /api/users/:id  (admin or self). Non-admin cannot change role/status */
-exports.updateById = async (req, res, next) => {
+const updateById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const patch = { ...req.body };
@@ -262,7 +262,7 @@ exports.updateById = async (req, res, next) => {
  * Purpose: Admin view → list ALL staff/admin (any status)
  * Supports: q (search), limit, skip
  */
-exports.listStaff = async (req, res, next) => {
+const listStaff = async (req, res, next) => {
   try {
     const { q = "", limit = 50, skip = 0 } = req.query;
 
@@ -299,7 +299,7 @@ exports.listStaff = async (req, res, next) => {
  * Purpose: Lead/Task assignment → list only ACTIVE staff/admin
  * Supports: limit
  */
-exports.listAssignableUsers = async (req, res, next) => {
+const listAssignableUsers = async (req, res, next) => {
   try {
     const limit = Number(req.query.limit || 200);
 
@@ -327,7 +327,7 @@ exports.listAssignableUsers = async (req, res, next) => {
 
 
 /** DELETE /api/users/:id  (admin) */
-exports.removeById = async (req, res, next) => {
+const removeById = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Forbidden' });
@@ -352,6 +352,18 @@ exports.removeById = async (req, res, next) => {
 };
 
 
+export {
+  register,
+  login,
+  me,
+  adminCreate,
+  getAllUsers,
+  getById,
+  updateById,
+  removeById,
+  listStaff,
+  listAssignableUsers,
+};
 
 
 //with login attempts count and last login details

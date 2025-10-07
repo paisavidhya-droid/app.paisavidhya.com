@@ -1,9 +1,9 @@
 // utils/auth/otp.js
-const crypto = require("crypto");
+import crypto from "crypto";
 
-exports.genOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+export const genOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
-exports.hashOtp = (code) =>
+export const hashOtp = (code) =>
   crypto.createHmac("sha256", process.env.OTP_PEPPER || "pepper")
         .update(code)
         .digest("hex");

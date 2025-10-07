@@ -1,6 +1,16 @@
-const router = require('express').Router();
-const { createLead, listLeads, updateOutreach, getLead, archiveLead, hardDeleteLead, restoreLead } = require('../controllers/lead.controller');
+// server\router\lead.routes.js
+import { Router } from "express";
+import {
+  createLead,
+  listLeads,
+  updateOutreach,
+  getLead,
+  archiveLead,
+  hardDeleteLead,
+  restoreLead,
+} from "../controllers/lead.controller.js";
 
+const router = Router();
  
 // Create + List + Detail
 router.post('/', createLead);
@@ -26,4 +36,4 @@ router.post('/:id/restore', restoreLead);
 
 
 
-module.exports = router;
+export default router;

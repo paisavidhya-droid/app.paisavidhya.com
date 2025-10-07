@@ -1,13 +1,16 @@
-const express = require("express");
-const app = express();
-require("dotenv").config();
-const cors = require("cors");
-const connectDb = require("./db/conn");
-const errorMiddleware = require("./middlewares/errorMiddleware");
-const authRoutes = require('./router/auth.routes');
-const userRoutes = require('./router/user.routes');
-const leadRoutes = require('./router/lead.routes');
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import  connectDb from "./db/conn.js";
+import errorMiddleware from './middlewares/errorMiddleware.js';
+import authRoutes from './router/auth.routes.js';
+import userRoutes from './router/user.routes.js';
+import leadRoutes from './router/lead.routes.js';
+import auditRoutes from "./router/audit.routes.js";
 
+dotenv.config();
+
+const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -34,7 +37,7 @@ app.use('/api/users', userRoutes);
 
 app.use('/api/leads', leadRoutes);
 
-app.use('/api/audit', require('./router/audit.routes'));
+app.use("/api/audit", auditRoutes);
 
 
 
@@ -48,6 +51,6 @@ app.use(errorMiddleware);
 // Start the server
 connectDb().then(() => {
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`----Server is running on port ${PORT}----`);
   });
 });

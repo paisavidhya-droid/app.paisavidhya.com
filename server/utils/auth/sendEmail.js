@@ -1,5 +1,5 @@
 // sendEmail.js
-const nodemailer = require("nodemailer");
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
     host: "smtp.hostinger.com",
@@ -27,4 +27,4 @@ const sendEmail = async (to, subject, text) => {
         console.error("Failed to send email:", err);
     }
 }
-module.exports = sendEmail;
+export default sendEmail;

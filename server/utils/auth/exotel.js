@@ -1,5 +1,5 @@
 // utils/auth/exotel.js
-const axios = require('axios');
+import axios from 'axios';
 
 const {
   EXOTEL_ACCOUNT_SID,
@@ -55,4 +55,4 @@ async function sendSmsOtp(toE164, otp) {
 }
 
 
-module.exports = { sendSmsOtp };
+export default sendSmsOtp ;

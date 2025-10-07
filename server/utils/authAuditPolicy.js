@@ -1,5 +1,5 @@
 // utils/authAuditPolicy.js
-exports.shouldAuditLoginSuccess = ({ role, isCustomer, newIp, newUa }) => {
+export const shouldAuditLoginSuccess = ({ role, isCustomer, newIp, newUa }) => {
   if (!role) return true;
   if (role === 'ADMIN' || role === 'STAFF') return true;    // always
   if (isCustomer) {

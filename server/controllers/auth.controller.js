@@ -1,10 +1,10 @@
 // authController.js
-const User = require('../models/user.model');
-const sendEmail = require('../utils/auth/sendEmail');
+import User from '../models/user.model.js';
+import sendEmail from '../utils/auth/sendEmail.js';
 
 
 // Generate and send OTP
-exports.sendOtp = async (req, res) => {
+const sendOtp = async (req, res) => {
     const { email } = req.body;
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
@@ -46,7 +46,7 @@ The Support Team
     }
 };
 // Verify OTP and 
-exports.verifyOtp = async (req, res) => {
+const verifyOtp = async (req, res) => {
     const { email, otp } = req.body;
 
     const user = await User.findOne({ email });
@@ -59,7 +59,7 @@ exports.verifyOtp = async (req, res) => {
 };
 
 // Reset password
-exports.resetPassword = async (req, res) => {
+const resetPassword = async (req, res) => {
     const { email, newPassword } = req.body;
 
     const user = await User.findOne({ email });
@@ -74,4 +74,11 @@ exports.resetPassword = async (req, res) => {
     await user.save();
 
     res.status(200).json({ message: 'Password reset successful' });
+};
+
+
+export default {
+  sendOtp,
+  verifyOtp,
+  resetPassword,
 };

@@ -9,11 +9,10 @@ const OutreachSchema = new mongoose.Schema(
       type: String,
       enum: OUTREACH_STATUS,
       default: 'New',
-      index: true,
     },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
     note: { type: String, trim: true, maxlength: 2000 },
-    followUpAt: { type: Date, index: true },
+    followUpAt: { type: Date },
     lastActivityAt: { type: Date, default: Date.now },
   },
   { _id: false }

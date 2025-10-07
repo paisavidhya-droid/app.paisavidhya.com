@@ -1,4 +1,4 @@
-const activityLogModel = require("../models/activityLogModel");
+
 // this is not being used anywhere in paisavidhya
 // controllers/activityLog.controller.js
 exports.getActivityLogs = async (req, res, next) => {

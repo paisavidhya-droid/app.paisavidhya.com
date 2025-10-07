@@ -13,7 +13,7 @@ import {
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { login, register } from "../../services/authService";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 /* --------------------------- Sign In --------------------------- */
@@ -89,17 +89,10 @@ function SignInForm({ setTabIndex }) {
         /> */}
 
         {/* Keep a static hint instead of a disabled checkbox */}
-        <p>Don't have an account?   <button
-          type="button"
-          onClick={() => setTabIndex(1)}  
-          style={{
-            background: "none",
-            border: "none",
-            color: "var(--pv-primary)",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >Sign Up</button></p>
+        <p>
+          Don't have an account?{" "}
+          <Link onClick={() => setTabIndex(1)}>Sign Up</Link>
+        </p>
         <Badge>Secure</Badge>
       </div>
       <Button type="submit" disabled={loading}>
@@ -265,8 +258,7 @@ export default function AuthPage() {
               Your Family’s Financial Doctor
             </div>
           </div>
-          <Tabs tabs={tabs} selectedIndex={tabIndex}
-            onChange={setTabIndex}    />
+          <Tabs tabs={tabs} selectedIndex={tabIndex} onChange={setTabIndex} />
           <div
             style={{
               color: "var(--pv-dim)",

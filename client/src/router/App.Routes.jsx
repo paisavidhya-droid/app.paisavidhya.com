@@ -10,6 +10,9 @@ import Logout from "../pages/Auth/Logout";
 import Verify from "../pages/Auth/Verify";
 import VerifyEmailLink from "../pages/Auth/VerifyEmailLink";
 import CallbackForm from "../components/Leads/CallbackForm";
+import Placeholder from "../components/ui/Placeholder";
+import FFC from "../modules/FFC";
+import FFCReport from "../modules/FFCReport";
 // import RequireRole from "../auth/RequireRole";
 
 // Lazy-load pages (keeps bundles small)
@@ -31,6 +34,10 @@ const Unauthorized401 = lazy(() => import("../pages/Error/Unauthorized401"));
 const Forbidden403 = lazy(() => import("../pages/Error/Forbidden403"));
 const NotFound404 = lazy(() => import("../pages/Error/NotFound404"));
 
+
+const PFC = lazy(() => import("../modules/PFC"));
+const PFCReport = lazy(() => import("../modules/PFCReport"));
+
 // Single source of roles (or import from a constants file)
 const ROLES = { ADMIN: "admin", STAFF: "staff", CUSTOMER: "customer" };
 
@@ -45,6 +52,13 @@ export default function AppRoutes() {
         <Route path="/ui" element={<UIComponents />} />
         <Route path="/verify-email" element={<VerifyEmailLink />} />
         <Route path="/request-callback" element={<CallbackForm />} />
+        <Route path="/pfc" element={<PFC />} />
+        <Route path="/pfc/report" element={<PFCReport />} />
+        <Route path="/ffcc" element={<FFC />} />
+        <Route path="/ffc/report" element={<FFCReport />} />
+
+        <Route path="/ffc" element={<Placeholder label="FFC coming soon" />} />
+        <Route path="/bfc" element={<Placeholder label="BFC coming soon" />} />
 
         {/* Authenticated area */}
         {/* Protected (any logged-in) */}

@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const activityLogModel = require("./activityLogModel");
+import mongoose from 'mongoose';
+import activityLogModel from "./activityLogModel.js";
 
 const collegeSchema = new mongoose.Schema(
   {

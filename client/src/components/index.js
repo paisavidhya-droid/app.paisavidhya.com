@@ -22,3 +22,8 @@ export { default as Progress } from "./ui/Progress.jsx";
 export { default as Spinner } from "./ui/Spinner.jsx";
 export { default as Skeleton } from "./ui/Skeleton.jsx";
 export { default as Pagination } from "./ui/Pagination.jsx";
+export { default as OtpPin } from "./ui/OtpPin.jsx";
+
+// this below both are same but just the differet names
+export { default as AmountInput } from "./ui/AmountInput.jsx";
+export { default as CurrencyInput } from "./ui/AmountInput";

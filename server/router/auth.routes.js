@@ -1,14 +1,19 @@
-const express = require("express");
-const router = express.Router();
-const ctrl = require('../controllers/user.controller');
-const auth = require('../middlewares/authMiddleware');
-const authController = require("../controllers/auth.controller");
-const verifyCtrl = require("../controllers/verify.controller");
+// server\router\auth.routes.js
 
+import { Router } from "express";
+import {
+ register,
+  login,
+  me,
+} from "../controllers/user.controller.js";
+import auth from "../middlewares/authMiddleware.js";
+import authController from "../controllers/auth.controller.js";
+import {sendPhoneOtp,verifyPhoneOtp,sendEmailVerifyLink,verifyEmailLink,verifyEmailToken} from "../controllers/verify.controller.js";
+const router = Router();
 
-router.post('/register', ctrl.register); // public signup → CUSTOMER
-router.post('/login', ctrl.login);       // public
-router.get('/me', auth, ctrl.me);        // current user
+router.post('/register', register); // public signup → CUSTOMER
+router.post('/login', login);       // public
+router.get('/me', auth, me);        // current user
 
 
 // password reset
@@ -19,11 +24,11 @@ router.post("/reset-password", authController.resetPassword);
 
 
 // NEW: verification
-router.post("/send-phone-otp", auth, verifyCtrl.sendPhoneOtp);
-router.post("/verify-phone-otp", auth, verifyCtrl.verifyPhoneOtp);
+router.post("/send-phone-otp", auth, sendPhoneOtp);
+router.post("/verify-phone-otp", auth, verifyPhoneOtp);
 
-router.post("/send-email-link", auth, verifyCtrl.sendEmailVerifyLink);
-router.get("/verify-email", verifyCtrl.verifyEmailLink); 
-router.post("/verify-email", verifyCtrl.verifyEmailToken); 
+router.post("/send-email-link", auth, sendEmailVerifyLink);
+router.get("/verify-email", verifyEmailLink); 
+router.post("/verify-email", verifyEmailToken); 
 
-module.exports = router;
+export default router;
