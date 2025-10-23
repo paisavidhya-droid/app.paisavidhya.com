@@ -1,5 +1,10 @@
 // main.jsx
 
+import "./styles/App.css";
+import "./styles/ui.css";
+import "./styles/theme.css";
+import "./Layout/Layout.css";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";

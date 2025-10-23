@@ -8,13 +8,29 @@ const {
   EXOTEL_SMS_SENDER_ID,
   DLT_ENTITY_ID,
   DLT_TEMPLATE_ID,
-  OTP_DEV_BYPASS = '0',
+  OTP_DEV_BYPASS,
 } = process.env;
 
 const http = axios.create({
   auth: { username: EXOTEL_API_KEY, password: EXOTEL_API_TOKEN },
   timeout: 10000,
 });
+
+
+// run once at boot to verify Exotel creds
+// async function exotelSelfTest() {
+//   try {
+//     const url = `https://api.exotel.com/v1/Accounts/${process.env.EXOTEL_ACCOUNT_SID}/Users.json`;
+//     const res = await http.get(url); // uses same axios instance with Basic auth
+//     console.log('[Exotel][SelfTest] OK', res.status);
+//   } catch (e) {
+//     console.error('[Exotel][SelfTest] FAIL', e?.response?.status, e?.response?.data);
+//   }
+// }
+// exotelSelfTest();
+
+
+
 
 /** Send OTP over SMS (adjust payload to your Exotel SMS API variant) */
 async function sendSmsOtp(toE164, otp) {
@@ -24,13 +40,13 @@ async function sendSmsOtp(toE164, otp) {
     const payload = {
       From: EXOTEL_SMS_SENDER_ID,        // DLT header/sender
       To: toE164,
-      Body: `Dear Customer,Thank you for choosing Paisavidhya. Your registration is almost complete.To ensure compliance with telecom regulations, we require you to verify your registration using the following One-Time Password (OTP): ${otp}.Please enter this OTP on our registration page to complete the process. Kindly note that this OTP is valid for a single use and should not be shared with anyone for security reasons.If you did not initiate this registration, please ignore this message.Thank you for your cooperation.Best regards,Paisavidhya team.`,
+      Body: `Dear Customer, thank you for choosing Paisavidhya. Your OTP for Paisavidhya account verification is ${otp}. It is valid for 5 minutes. Do not share it with anyone.`,
 
       DltEntityId: DLT_ENTITY_ID,
       DltTemplateId: DLT_TEMPLATE_ID,
 
 
-      // Body: `Your Paisavidhya OTP is ${otp}. It expires in 5 minutes. Do not share it.`,
+      // Body: `Dear Customer,Thank you for choosing Paisavidhya. Your Paisavidhya OTP is ${otp}. It expires in 5 minutes. Do not share it.`,
       // template to be used 
       // Your Paisavidhya OTP is %d. It expires in %d minutes. Do not share it.
 

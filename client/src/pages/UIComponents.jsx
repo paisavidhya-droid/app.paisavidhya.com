@@ -250,7 +250,7 @@ export default function UIComponents() {
           <ModuleHeader
             title="Leads"
             subtitle="Manage prospects and pipeline"
-            breadcrumbs={[
+            brdcrumbs={[
               { label: "Home", to: "/" },
               { label: "CRM", to: "/crm" },
               { label: "Leads" },

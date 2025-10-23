@@ -1,5 +1,3 @@
-// client\src\modules\PFC.jsx
-
 import { useState, useMemo } from "react";
 import "./piechart.css";
 import {
@@ -9,13 +7,33 @@ import {
   Button,
   Accordion,
   Alert,
+  Badge,
+  Modal,
   AmountInput,
 } from "../components";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as ChartTooltip,
+  ResponsiveContainer,
+} from "recharts";
 import "../styles/ui.css";
 import ModuleHeader from "../components/ui/ModuleHeader";
 import { useAuth } from "../hooks/useAuth";
+import InsightsList from "../components/InsightsList";
 import { useNavigate } from "react-router-dom";
+import RatioCoach from "./RatioCoach";
 
+/* ---------- small helper ---------- */
+const COLORS = [
+  "#0071E3",
+  "#1FC27E",
+  "#FFC300",
+  "#FF8C00",
+  "#FF4C4C",
+  "#905EFF",
+];
 const fmt = (n) => (isNaN(n) ? 0 : Number(n));
 
 /* ---------- reusable input row ---------- */
@@ -136,6 +154,161 @@ export default function PFC() {
     () => Object.values(income).reduce((a, b) => a + fmt(b), 0),
     [income]
   );
+  const totalExpenses = useMemo(
+    () =>
+      [
+        housing,
+        food,
+        transport,
+        lifestyle,
+        health,
+        obligations,
+        leisure,
+        growth,
+        giving,
+      ].reduce(
+        (acc, cat) => acc + Object.values(cat).reduce((a, b) => a + fmt(b), 0),
+        0
+      ),
+    [
+      housing,
+      food,
+      transport,
+      lifestyle,
+      health,
+      obligations,
+      leisure,
+      growth,
+      giving,
+    ]
+  );
+
+  const surplus = totalIncome - totalExpenses;
+  const savingsRate =
+    ((fmt(obligations.sip) + fmt(obligations.rd) + fmt(obligations.nps)) /
+      totalIncome) *
+      100 || 0;
+  const emiLoad = (fmt(obligations.loanEmi) / totalIncome) * 100 || 0;
+
+  const savingsOnly =
+    fmt(obligations.sip) + fmt(obligations.rd) + fmt(obligations.nps);
+
+  const coachTotals = {
+    Housing: Object.values(housing).reduce((a, b) => a + fmt(b), 0),
+    Food: Object.values(food).reduce((a, b) => a + fmt(b), 0),
+    Transport: Object.values(transport).reduce((a, b) => a + fmt(b), 0),
+    Lifestyle: Object.values(lifestyle).reduce((a, b) => a + fmt(b), 0),
+    Health: Object.values(health).reduce((a, b) => a + fmt(b), 0),
+    Obligations: Object.values(obligations).reduce((a, b) => a + fmt(b), 0),
+    Leisure: Object.values(leisure).reduce((a, b) => a + fmt(b), 0),
+    Growth: Object.values(growth).reduce((a, b) => a + fmt(b), 0),
+    Giving: Object.values(giving).reduce((a, b) => a + fmt(b), 0),
+    _SavingsInvestments: savingsOnly, // coach uses ONLY true investments here
+  };
+
+  const pieData = useMemo(() => {
+    if (!totalExpenses) return [];
+    return [
+      {
+        name: "Housing",
+        value: Object.values(housing).reduce((a, b) => a + fmt(b), 0)
+      },
+      { name: "Food", value: Object.values(food).reduce((a, b) => a + fmt(b), 0) },
+      {
+        name: "Transport",
+        value: Object.values(transport).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Lifestyle",
+        value: Object.values(lifestyle).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Health",
+        value: Object.values(health).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Obligations",
+        value: Object.values(obligations).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Leisure",
+        value: Object.values(leisure).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Growth",
+        value: Object.values(growth).reduce((a, b) => a + fmt(b), 0),
+      },
+      {
+        name: "Giving",
+        value: Object.values(giving).reduce((a, b) => a + fmt(b), 0),
+      },
+    ].filter((d) => d.value > 0);
+  }, [
+    housing,
+    food,
+    transport,
+    lifestyle,
+    health,
+    obligations,
+    leisure,
+    growth,
+    giving,
+    totalExpenses,
+  ]);
+  /* -------- insights -------- */
+  const insights = useMemo(() => {
+    // if no income, don't show any insights
+    if (totalIncome <= 0) return [];
+    const list = [];
+
+    if (savingsRate < 15) {
+      list.push({
+        type: "warning",
+        title: "Low Savings Rate",
+        detail: "Your savings rate is below 15%. Try to raise it gradually.",
+      });
+    }
+
+    if (emiLoad > 30) {
+      list.push({
+        type: "danger",
+        title: "High EMI Load",
+        detail:
+          "EMIs exceed 30% of income. Consider restructuring or prepaying debt.",
+      });
+    }
+
+    if (surplus < 0) {
+      list.push({
+        type: "danger",
+        title: "Monthly Deficit",
+        detail: "You're spending more than you earn. Reduce variable expenses.",
+      });
+    }
+
+    // Nice-to-have (example): Lifestyle > 30% of expenses
+    // optional: only check lifestyle if expenses exist
+    const totalExp = totalExpenses || 0;
+    if (totalExp > 0) {
+      const lifestyleTotal = Object.values(lifestyle).reduce(
+        (a, b) => a + (b || 0),
+        0
+      );
+      if (lifestyleTotal / totalExp > 0.3) {
+        list.push({
+          type: "info",
+          title: "Lifestyle Spending",
+          detail:
+            "Lifestyle is over 30% of expenses. Review subscriptions & outings.",
+        });
+      }
+    }
+
+    return list;
+  }, [totalIncome, savingsRate, emiLoad, surplus, lifestyle, totalExpenses]);
+
+  const renderPieLabel = ({ name, value }) =>
+    `${name} — ₹${Number(value).toLocaleString()}`;
 
   const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
   const getTotal = (obj) =>
@@ -152,35 +325,38 @@ export default function PFC() {
     );
 
   const goToReport = () => {
-    const payload = {
-      info,
-      income,
-      expenses: {
-        housing,
-        food,
-        transport,
-        lifestyle,
-        health,
-        obligations,
-        leisure,
-        growth,
-        giving,
+    navigate("/pfc/report", {
+      state: {
+        info,
+        income,
+        expenses: {
+          housing,
+          food,
+          transport,
+          lifestyle,
+          health,
+          obligations,
+          leisure,
+          growth,
+          giving,
+        },
       },
-    };
-    try {
-      localStorage.setItem("pv_pfc_payload", JSON.stringify(payload));
-    } catch {}
-    navigate("/pfc/report", { state: payload });
+    });
   };
 
   return (
     <>
       <ModuleHeader
-  title="Personal Financial Checkup (PFC)"
-  subtitle="Your money health report"
-  actions={<Button onClick={goToReport}>Generate Report</Button>}
-/>
-
+        title="Personal Financial Checkup (PFC)"
+        subtitle="Your money health report"
+        actions={
+          <>
+            <Button variant="ghost">Share</Button>
+            <Button>Download PDF</Button>
+            <Button onClick={goToReport}>Preview Report</Button>
+          </>
+        }
+      />
       <div
         className="pv-col pv-container"
         style={{ gap: 24, padding: "16px 8px" }}
@@ -210,6 +386,19 @@ export default function PFC() {
               <option>Female</option>
               <option>Other</option>
             </Select>
+            {/* <Select
+              label="Tenure/Cycle"
+              value={info.tenure}
+              onChange={(e) => setInfo({ ...info, gender: e.target.value })}
+              disabled
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
+            >
+              <option value="">select</option>
+              <option>Monthly</option>
+              <option>Quarterly</option>
+              <option>Half yearly</option>
+              <option>Yearly</option>
+            </Select> */}
             <Input
               label="City & State"
               value={info.city}
@@ -404,10 +593,79 @@ export default function PFC() {
           ]}
         />
 
-        {/* ---------- Generate Report CTA ---------- */}
-        <Card>
-          <div className="pv-row" style={{ justifyContent: "flex-end" }}>
-            <Button onClick={goToReport}>Generate Report</Button>
+        {/* ---------- Results ---------- */}
+        <Card title="Financial Health Summary">
+          <div
+            className="pv-row"
+            style={{
+              alignItems: "flex-start",
+              flexWrap: "wrap",
+              gap: 20,
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ flex: "1 1 320px", height: 260 }}>
+              {pieData.length ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={100}
+                      label={renderPieLabel}
+                    >
+                      {pieData.map((_, i) => (
+                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <p style={{ color: "var(--pv-dim)" }}>
+                  Enter data to see expense distribution.
+                </p>
+              )}
+            </div>
+
+            <div className="pv-col" style={{ gap: 6, minWidth: 220 }}>
+              <Badge>Income ₹{totalIncome.toLocaleString()}</Badge>
+              <Badge variant="ghost">
+                Expenses ₹{totalExpenses.toLocaleString()}
+              </Badge>
+              <Badge color={surplus >= 0 ? "green" : "red"}>
+                Surplus ₹{surplus.toLocaleString()}
+              </Badge>
+              <Badge>
+                Savings Rate{" "}
+                {totalIncome > 0 ? `${savingsRate.toFixed(1)}%` : "-"}
+              </Badge>
+              <Badge>
+                EMI Load {totalIncome > 0 ? `${emiLoad.toFixed(1)}%` : "-"}
+              </Badge>
+            </div>
+          </div>
+
+          {insights.length > 0 && (
+            <div className="pv-col" style={{ marginTop: 14 }}>
+              <InsightsList items={insights} />
+            </div>
+          )}
+
+          <div
+            className="pv-row"
+            style={{ marginTop: 14, justifyContent: "flex-end" }}
+          >
+            <Button onClick={goToReport}>Preview Report</Button>
+          </div>
+          <div className="pv-col" style={{ marginTop: 16 }}>
+            <RatioCoach
+              info={info}
+              totals={coachTotals}
+              totalIncome={totalIncome}
+            />
           </div>
         </Card>
       </div>

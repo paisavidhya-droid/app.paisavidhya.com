@@ -13,6 +13,8 @@ import CallbackForm from "../components/Leads/CallbackForm";
 import Placeholder from "../components/ui/Placeholder";
 import FFC from "../modules/FFC";
 import FFCReport from "../modules/FFCReport";
+import SipCalculator from "../pages/calculators/SipCalculator";
+import ToolsHub from "../pages/ToolsHub";
 // import RequireRole from "../auth/RequireRole";
 
 // Lazy-load pages (keeps bundles small)
@@ -54,11 +56,17 @@ export default function AppRoutes() {
         <Route path="/request-callback" element={<CallbackForm />} />
         <Route path="/pfc" element={<PFC />} />
         <Route path="/pfc/report" element={<PFCReport />} />
-        <Route path="/ffcc" element={<FFC />} />
+        <Route path="/ffc" element={<FFC />} />
         <Route path="/ffc/report" element={<FFCReport />} />
 
-        <Route path="/ffc" element={<Placeholder label="FFC coming soon" />} />
+        {/* <Route path="/ffc" element={<Placeholder label="FFC coming soon" />} /> */}
         <Route path="/bfc" element={<Placeholder label="BFC coming soon" />} />
+
+
+
+ <Route path="/tools/sip-calculator" element={<SipCalculator/>} />
+
+ <Route path="/tools" element={<ToolsHub />} />
 
         {/* Authenticated area */}
         {/* Protected (any logged-in) */}

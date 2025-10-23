@@ -151,7 +151,7 @@ export default function CustomerDashboard() {
           <Card title="Shortcuts">
             <div className="pv-col" style={{ gap:8 }}>
               <Button as="a" href="/profile" variant="ghost">Edit profile</Button>
-              <Button as="a" href="/leads" variant="ghost">View leads</Button>
+              <Button as="a" href="/calculators/sip" variant="ghost">SIP Calculator</Button>
             </div>
           </Card>
         </Col>

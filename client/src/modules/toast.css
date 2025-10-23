@@ -1,0 +1,78 @@
+/* Toast container card */
+.pv-toast {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 10px;
+  width: min(460px, calc(100vw - 24px));
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--pv-toast-border, #e6eaf0);
+  background: var(--pv-toast-bg, #f9fbff);
+  color: var(--pv-toast-text, #0f172a);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition: transform .2s ease, opacity .2s ease, filter .2s ease;
+}
+
+/* Soft entrance/exit */
+.pv-toast-enter { opacity: 1; transform: translateY(0); }
+.pv-toast-leave { opacity: 0; transform: translateY(6px); }
+
+/* Icon */
+.pv-toast-icon {
+  font-size: 18px;
+  line-height: 18px;
+  margin-top: 2px;
+}
+
+/* Content block */
+.pv-toast-content { display: grid; gap: 4px; }
+.pv-toast-title { font-weight: 700; font-size: 14px; letter-spacing: .2px; }
+.pv-toast-sub { font-size: 13px; color: #475569; }
+
+/* Close button */
+.pv-toast-close {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 16px;
+  line-height: 16px;
+  padding: 2px 4px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.pv-toast-close:hover { background: rgba(100,116,139,0.08); }
+
+/* Progress bar (synced to ~6s) */
+.pv-toast-progress {
+  height: 3px;
+  width: 100%;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #93c5fd, #60a5fa, #3b82f6);
+  animation: pv-toast-progress 6s linear forwards;
+  opacity: .9;
+}
+@keyframes pv-toast-progress {
+  from { transform: scaleX(1); transform-origin: left; }
+  to   { transform: scaleX(0); transform-origin: left; }
+}
+
+/* Light theme defaults (overrideable by your CSS vars) */
+:root {
+  --pv-toast-bg: #f6f9ff;    /* faint blue tint */
+  --pv-toast-border: #dfe7f5;
+  --pv-toast-text: #0f172a;
+}
+
+/* Dark mode (auto, if you use it) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pv-toast-bg: #0b1220;
+    --pv-toast-border: #1f2a44;
+    --pv-toast-text: #e5e7eb;
+  }
+  .pv-toast-sub { color: #cbd5e1; }
+  .pv-toast { box-shadow: 0 8px 28px rgba(0,0,0,0.35); }
+}

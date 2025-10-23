@@ -1,6 +1,5 @@
 // import React, { useState } from "react";
 import ThemeToggle from "../components/ThemeToggleBtn/ThemeToggle";
-import {  useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { FaBars } from "react-icons/fa6";
 
@@ -9,8 +8,7 @@ import { FaBars } from "react-icons/fa6";
 
   
 export default function Navbar({ onOpenMobileSidebar }) {
-  const navigate = useNavigate();
-
+ 
 
   return (
     <nav className="navbar" role="navigation" aria-label="Primary">

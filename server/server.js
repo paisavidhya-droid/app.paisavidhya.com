@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import 'dotenv/config';
 import cors from "cors";
 import  connectDb from "./db/conn.js";
 import errorMiddleware from './middlewares/errorMiddleware.js';
@@ -8,7 +8,6 @@ import userRoutes from './router/user.routes.js';
 import leadRoutes from './router/lead.routes.js';
 import auditRoutes from "./router/audit.routes.js";
 
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
