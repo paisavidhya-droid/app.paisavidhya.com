@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Netlify ignore: exit 0 = SKIP build, non-zero = RUN build
 
+# Always build on the production branch
+if [ "$BRANCH" = "prod" ]; then
+  echo "Production branch detected; forcing build."
+  exit 1
+fi
+
 # If Netlify has no cached base commit, FORCE a build
 if [ -z "$CACHED_COMMIT_REF" ]; then
   echo "No cached commit ref; forcing build."
