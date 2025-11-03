@@ -1,5 +1,5 @@
 // client\src\components\ui\FloatField.jsx
-import './FloatField.css';
+import "./FloatField.css";
 import { useId, useMemo, useState } from "react";
 
 /**
@@ -47,7 +47,8 @@ export default function FloatField({
   const [show, setShow] = useState(false);
 
   const isPassword = type === "password";
-  const actualType = isPassword && showToggle ? (show ? "text" : "password") : type;
+  const actualType =
+    isPassword && showToggle ? (show ? "text" : "password") : type;
 
   const cls = useMemo(() => {
     const classes = ["pv-float", `size-${size}`, variant];
@@ -62,24 +63,42 @@ export default function FloatField({
       {leftIcon && <span className="pv-float-icon left">{leftIcon}</span>}
 
       <div className="pv-float-field">
-        <input
-          id={inputId}
-          name={name}
-          type={actualType}
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          required={required}
-          autoComplete={autoComplete}
-          inputMode={inputMode}
-          maxLength={maxLength}
-          className="pv-float-input"
-          placeholder=" "             // ← important for :placeholder-shown
-          aria-invalid={!!error}
-          {...rest}
-        />
+        {type === "textarea" ? (
+          <textarea
+            id={inputId}
+            name={name}
+            value={value}
+            onChange={onChange}
+            disabled={disabled}
+            required={required}
+            autoComplete={autoComplete}
+            maxLength={maxLength}
+            className="pv-float-input"
+            placeholder=" "
+            aria-invalid={!!error}
+            {...rest}
+          />
+        ) : (
+          <input
+            id={inputId}
+            name={name}
+            type={actualType}
+            value={value}
+            onChange={onChange}
+            disabled={disabled}
+            required={required}
+            autoComplete={autoComplete}
+            inputMode={inputMode}
+            maxLength={maxLength}
+            className="pv-float-input"
+            placeholder=" " // ← important for :placeholder-shown
+            aria-invalid={!!error}
+            {...rest}
+          />
+        )}
         <label htmlFor={inputId} className="pv-float-label">
-          {label}{required ? " *" : ""}
+          {label}
+          {required ? " *" : ""}
         </label>
 
         {/* Right adornment */}
@@ -100,10 +119,14 @@ export default function FloatField({
 
       {/* Helper lines */}
       {!error && hint && (
-        <small className="pv-float-hint" aria-live="polite">{hint}</small>
+        <small className="pv-float-hint" aria-live="polite">
+          {hint}
+        </small>
       )}
       {error && (
-        <small className="pv-float-error" role="alert">{error}</small>
+        <small className="pv-float-error" role="alert">
+          {error}
+        </small>
       )}
     </div>
   );

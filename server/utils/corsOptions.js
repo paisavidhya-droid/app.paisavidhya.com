@@ -1,32 +1,35 @@
 // utils/corsOptions.js
 import cors from "cors";
 
-const defaultAllowed = [
-  "http://localhost:5173",          // vite dev
-  "http://localhost:3000",          // next / react default
-  "https://app.paisavidhya.com",    // prod
-  "https://paisavidhya-staging.netlify.app", // staging
-];
+const parseList = (v) =>
+  (v || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-// merge .env list with defaults
-const extra = (process.env.FRONTEND_ORIGINS || "")
-  .split(",")
-  .map((x) => x.trim())
-  .filter(Boolean);
-
-const ALLOWED = [...new Set([...defaultAllowed, ...extra])];
+// You can keep simple strings or regex-like patterns
+const ALLOWED = parseList(process.env.FRONTEND_ORIGINS);
+// e.g. FRONTEND_ORIGINS="https://app.paisavidhya.com,https://staging.app.paisavidhya.com,http://localhost:5173"
 
 export const corsOptions = {
   origin(origin, cb) {
-    // no Origin (Postman, curl, internal calls)
+    // Allow non-browser tools (no origin) like curl/Postman/health checks
     if (!origin) return cb(null, true);
 
-    // allow if matches any allowed host, or subdomain of paisavidhya.com
-    const ok =
-      ALLOWED.includes(origin) ||
-      /^https:\/\/.*\.paisavidhya\.com$/.test(origin);
+    const allowed = ALLOWED.some((o) => {
+      if (o.startsWith("/") && o.endsWith("/")) {
+        // regex support: "/^https:\/\/.*\.paisavidhya\.com$/"
+        const re = new RegExp(o.slice(1, -1));
+        return re.test(origin);
+      }
+      return o === origin;
+    });
 
-    cb(ok ? null : new Error(`CORS not allowed: ${origin}`), ok);
+    return allowed ? cb(null, true) : cb(new Error(`CORS blocked: ${origin}`));
   },
-  credentials: true,
+  credentials: true,                   // allow cookies / auth headers
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  exposedHeaders: ["Set-Cookie"],
+  optionsSuccessStatus: 204,           // some old browsers choke on 200 for OPTIONS
 };

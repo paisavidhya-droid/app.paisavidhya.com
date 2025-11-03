@@ -18,6 +18,7 @@ export default function CallbackForm() {
     name: "",
     phone: "",
     email: "",
+    message: "",
     preferredTimeType: "ASAP",
     preferredTimeAt: "",
     consent: true,
@@ -45,6 +46,7 @@ export default function CallbackForm() {
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim() || undefined,
+        message: form.message.trim() || undefined,
         preferredTimeType: form.preferredTimeType,
         preferredTimeAt:
           form.preferredTimeType === "SCHEDULED"
@@ -59,16 +61,20 @@ export default function CallbackForm() {
           ? "We already have your request. We’ll call you shortly."
           : "Thanks! We’ll call you soon."
       );
-       setSuccess({
+      setSuccess({
         deduped: !!data?.deduped,
-        scheduledAt: data?.preferredTimeAt ? new Date(data.preferredTimeAt) : null,
+        scheduledAt: data?.preferredTimeAt
+          ? new Date(data.preferredTimeAt)
+          : null,
       });
       setForm({
         name: "",
         phone: "",
         email: "",
+        message: "",
         preferredTimeType: "ASAP",
         preferredTimeAt: "",
+        consent: true,
       });
     } catch (err) {
       const code = err?.response?.data?.error || err.message;
@@ -208,6 +214,14 @@ export default function CallbackForm() {
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
+          <FloatField
+            label="Message (optional)"
+            type="textarea"
+            value={form.message}
+            onChange={(e) => setForm({ ...form, message: e.target.value })}
+            maxLength={500}
+          />
+
           <div className="pv-row" style={{ gap: 8 }}>
             <Select
               label="Callback preference"

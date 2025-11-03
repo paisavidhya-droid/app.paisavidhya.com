@@ -60,22 +60,47 @@ export const verifyPhoneOtp = async (req, res) => {
 // controllers/verify.controller.js (cont.)
 import jwt from 'jsonwebtoken';
 import sendEmail  from '../utils/auth/sendEmail.js';
+import { withBase } from '../utils/url.js';
+import { buildVerifyEmailHTML, buildVerifyEmailText } from '../utils/auth/templates/verifyEmailTemplate.js';
 
 
-export const sendEmailVerifyLink = async (req, res) => {
+export const sendEmailVerifyLink = async (req, res, next) => {
+  try {
     const user = await User.findById(req.user.id);
     if (!user || !user.email) return res.status(400).json({ message: "Email not found" });
 
+    const expiresMinutes = 10;
     const token = jwt.sign(
-        { sub: user.id, purpose: "verify_email", v: user.emailVerifyVersion || 0 },
-        process.env.JWT_SECRET_KEY,
-        { expiresIn: "10m" }
+      { sub: user.id, purpose: "verify_email", v: user.emailVerifyVersion || 0 },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: `${expiresMinutes}m` }
     );
 
-    const url = `${process.env.APP_URL}/verify-email?token=${token}`;
-    await sendEmail(user.email, "Verify your email", `Click to verify: ${url}`);
+    const verifyUrl = withBase(process.env.APP_URL, `/verify-email?token=${token}`);
 
-    res.json({ ok: true });
+    const subject = `Verify your email • ${process.env.MAIL_SUBJECT_PREFIX || 'Paisavidhya'}`;
+    const text = buildVerifyEmailText({
+      appName: process.env.APP_NAME || 'Paisavidhya',
+      verifyUrl,
+      expiresMinutes
+    });
+    const html = buildVerifyEmailHTML({
+      appName: process.env.APP_NAME || 'Paisavidhya',
+      verifyUrl,
+      supportEmail: process.env.SUPPORT_EMAIL || 'contact@paisavidhya.com',
+      logoUrl: process.env.MAIL_LOGO_URL || withBase(process.env.APP_URL, '/logo.png'),
+      userName: user.name,
+      expiresMinutes,
+    });
+
+    await sendEmail(user.email, subject, text, html);
+    return res.json({ ok: true });
+  } catch (e) {
+    console.log(e);
+    
+    next(e);
+    // return res.status(502).json({ message: "Failed to send verification email" });
+  }
 };
 
 export const verifyEmailLink = async (req, res) => {
@@ -124,3 +149,23 @@ export const verifyEmailToken = async (req, res) => {
   }
 };
 
+
+
+
+/*the below code is for mail sending with just link and plain text*/
+
+// export const sendEmailVerifyLink = async (req, res) => {
+//     const user = await User.findById(req.user.id);
+//     if (!user || !user.email) return res.status(400).json({ message: "Email not found" });
+
+//     const token = jwt.sign(
+//         { sub: user.id, purpose: "verify_email", v: user.emailVerifyVersion || 0 },
+//         process.env.JWT_SECRET_KEY,
+//         { expiresIn: "10m" }
+//     );
+
+//     const url = `${process.env.APP_URL}/verify-email?token=${token}`;
+//     await sendEmail(user.email, "Verify your email", `Click to verify: ${url}`);
+
+//     res.json({ ok: true });
+// };

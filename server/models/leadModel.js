@@ -54,6 +54,13 @@ const LeadSchema = new mongoose.Schema(
       },
       index: true,
     },
+    message: {
+      type: String,
+      trim: true,
+      maxlength: 500, // same as frontend maxLength
+      default: "",
+    },
+
 
     // Meta
     source: {
@@ -108,7 +115,7 @@ const LeadSchema = new mongoose.Schema(
     },
 
     archivedAt: { type: Date, index: true },
-archivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    archivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

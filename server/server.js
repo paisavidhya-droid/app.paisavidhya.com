@@ -1,28 +1,35 @@
 import express from "express";
 import 'dotenv/config';
 import cors from "cors";
-import  connectDb from "./db/conn.js";
+import connectDb from "./db/conn.js";
 import errorMiddleware from './middlewares/errorMiddleware.js';
 import authRoutes from './router/auth.routes.js';
 import userRoutes from './router/user.routes.js';
 import leadRoutes from './router/lead.routes.js';
 import auditRoutes from "./router/audit.routes.js";
-import { corsOptions } from "./utils/corsOptions.js";
 
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// // Middleware
-// const corsOptions = {
-//   origin: true, // reflects the request origin
-//   // origin: process.env.FRONTEND_URL || "http://localhost:3000",
-//   credentials: true, // 🔥 required for cookies, auth headers
-// };
-// app.use(cors(corsOptions));
+// Middleware
 
+// app.use(cors(corsOptions));
+// app.options("*", cors(corsOptions));
+
+
+// ✅ if behind Netlify/GAE/CDN and you use cookies/sessions
+app.set("trust proxy", 1);
+
+const corsOptions = {
+  origin: true, // reflects the request origin
+  // origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true, // 🔥 required for cookies, auth headers
+  optionsSuccessStatus: 204,
+};
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions))
+
+
 
 // app.use(cors({ origin: [/\.netlify\.app$/, "https://app.paisavidhya.com", "https://staging.app.paisavidhya.com"], credentials: true }));
 

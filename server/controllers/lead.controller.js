@@ -59,6 +59,7 @@ export async function createLead(req, res) {
       name: req.body.name,
       phone: req.body.phone,
       email: req.body.email,
+      message: req.body.message || "",
       source,
       tags: req.body.tags || [],
       interests: req.body.interests || [],

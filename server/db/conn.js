@@ -14,3 +14,8 @@ const connectDb = async () => {
 
 
 export default connectDb;
+
+// ✔ Preflight checks.
+// ✔ Verifying framework. Found Vite.
+// ✔ Validating Tailwind CSS config. Found v4.
+// ✖ Validating import alias.

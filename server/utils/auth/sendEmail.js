@@ -1,7 +1,7 @@
 // sendEmail.js
 import nodemailer from 'nodemailer';
 
-const { EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_PORT } = process.env;
+const { EMAIL_HOST, EMAIL_USER, EMAIL_PASS, EMAIL_PORT,  MAIL_FROM_NAME,   } = process.env;
 
 if (!EMAIL_HOST || !EMAIL_USER || !EMAIL_PASS) {
     throw new Error('Missing EMAIL_HOST/EMAIL_USER/EMAIL_PASS in env');
@@ -25,20 +25,34 @@ const transporter = nodemailer.createTransport({
 });
 
 
+export default async function sendEmail(to, subject, text, html) {
+  const fromName = MAIL_FROM_NAME;
+  const fromAddr =  EMAIL_USER;
 
-const sendEmail = async (to, subject, text, next) => {
-    try {
-        const info = await transporter.sendMail({
-            from: `"Paisavidhya" <${EMAIL_USER}>`,
-            to,
-            subject,
-            text,
-        });
+  const info = await transporter.sendMail({
+    from: `"${fromName}" <${fromAddr}>`,
+    to,
+    subject,
+    text,     // plain-text fallback
+    html,     // HTML body
+  });
 
-        // console.log("Email sent:", info.messageId);
-    } catch (err) {
-        // console.error("Failed to send email:", err);
-        next(err);
-    }
+  return info; // caller can log messageId if desired
 }
-export default sendEmail;
+
+// const sendEmail = async (to, subject, text, next) => {
+//     try {
+//         const info = await transporter.sendMail({
+//             from: `"Paisavidhya" <${EMAIL_USER}>`,
+//             to,
+//             subject,
+//             text,
+//         });
+
+//         // console.log("Email sent:", info.messageId);
+//     } catch (err) {
+//         // console.error("Failed to send email:", err);
+//         next(err);
+//     }
+// }
+// export default sendEmail;

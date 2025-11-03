@@ -8,7 +8,7 @@ import {
   sendEmailVerifyLink,
 } from "../../services/verifyService";
 import { useAuth } from "../../hooks/useAuth";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function ResendTimer({ seconds = 30, onResend }) {
@@ -50,8 +50,6 @@ export default function Verify() {
       navigate("/start", { replace: true });
   }, [user, navigate]);
 
-
-
   const needPhone = !user?.phoneVerified;
   const needEmail = !user?.emailVerified;
 
@@ -70,15 +68,23 @@ export default function Verify() {
     })();
   }, [needPhone]);
 
+  // const handleResendPhone = async () => {
+  //   try {
+  //     setSendErr("");
+  //     await sendPhoneOtp();
+  //     toast.success("OTP re-sent");
+  //   } catch (e) {
+  //     setSendErr(e.message);
+  //     toast.error(e.message);
+  //   }
+  // };
   const handleResendPhone = async () => {
-    try {
-      setSendErr("");
-      await sendPhoneOtp();
-      toast.success("OTP re-sent");
-    } catch (e) {
-      setSendErr(e.message);
-      toast.error(e.message);
-    }
+    await toast.promise(sendPhoneOtp(), {
+      loading: "Sending OTP...",
+      success: "OTP sent successfully 📩",
+      error: (err) =>
+        err?.response?.data?.message || err?.message || "Failed to send OTP",
+    });
   };
 
   const handleVerifyPhone = async (code) => {
@@ -87,10 +93,10 @@ export default function Verify() {
       setSubmitting(true);
       await verifyPhoneOtp(code);
       toast.success("Phone verified");
-      await authenticateUser();
+      const updated = await authenticateUser();
 
       // ✅ Auto-send email link after phone verification
-      if (!user?.emailVerified) {
+      if (!updated?.emailVerified) {
         try {
           await sendEmailVerifyLink();
           toast.success("Verification link sent to your email");
@@ -105,13 +111,22 @@ export default function Verify() {
     }
   };
 
+  // const handleResendEmail = async () => {
+  //   try {
+  //     await sendEmailVerifyLink();
+  //     toast.success("Verification link resent");
+  //   } catch (e) {
+  //     toast.error(e?.response?.data?.message || "Failed to send link");
+  //   }
+  // };
+
   const handleResendEmail = async () => {
-    try {
-      await sendEmailVerifyLink();
-      toast.success("Verification link resent");
-    } catch (e) {
-      toast.error(e?.response?.data?.message || "Failed to send link");
-    }
+    await toast.promise(sendEmailVerifyLink(), {
+      loading: "Sending verification email...",
+      success: "Verification email sent successfully ✅",
+      error: (err) =>
+        err?.response?.data?.message || err?.message || "Failed to send email",
+    });
   };
 
   return (
@@ -134,7 +149,16 @@ export default function Verify() {
           {needPhone ? (
             <>
               <div style={{ color: "var(--pv-dim)" }}>
-                We sent a 6-digit code to <b>{user?.phoneNumber}</b>.
+                We sent a 6-digit code to{" "}
+                <b
+                  style={{
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, Menlo, monospace",
+                  }}
+                >
+                  {user?.phoneNumber}
+                </b>
+                .
               </div>
               {sendErr && (
                 <Alert type="warning" title="Couldn’t send OTP">
