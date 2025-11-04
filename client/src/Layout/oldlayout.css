@@ -148,18 +148,13 @@
   box-shadow: var(--pv-shadow);
   width: var(--sidebar-width);
   transition: width 200ms ease;
-  /* display: none; */
+  display: none;
   /* hidden on mobile by default */
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
-.sidebar__brand {
+.sidebar__brand{
   letter-spacing: .5px;
-
-  span {
+  span{
     padding-left: 25px;
   }
 }
@@ -173,54 +168,22 @@
 
 
 @media (min-width: 1200px) {
-
-  /* .sidebar {
-    display: block;
-  } */
   .sidebar {
-    display: flex;
+    display: block;
   }
-}
-
-.sidebar__scroll {
-  min-height: 0;
-  /* critical for flex children to shrink */
-  overflow-y: auto;
-  /* enables vertical scroll */
-  padding: 8px 0;
-  /* keep your section padding look */
-  flex: 1;
-  /* take the available space */
-}
-
-/* Optional: keep footer pinned visually */
-.sidebar__footer {
-  padding: 8px 12px;
-  border-top: 1px solid var(--pv-border);
-  background: var(--pv-surface);
 }
 
 .sidebar--collapsed {
   width: var(--sidebar-width-collapsed);
 }
 
-/* shadow above footer only when expanded */
-.sidebar:not(.sidebar--collapsed) .sidebar__footer {
-  box-shadow: 0 -10px 16px -12px rgba(0, 0, 0, .22);
-}
-
-/* shadow under header only when expanded */
-.sidebar:not(.sidebar--collapsed) .sidebar__header {
-  box-shadow: 0 10px 16px -14px rgba(0, 0, 0, .18);
-}
-
 .sidebar__header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-start; 
   padding: 12px;
   border-bottom: 1px solid var(--pv-border);
-  position: relative;
+   position: relative; 
 }
 
 .sidebar__toggle {
@@ -305,23 +268,9 @@
   border-right: 1px solid var(--pv-border);
   box-shadow: var(--pv-shadow);
   padding: 12px;
-
-
-  display: flex;
-  /* NEW: column layout */
-  flex-direction: column;
-  overflow: hidden;
-  /* prevent double scrollbars */
 }
 
-.offcanvas__scroll {
-  min-height: 0;
-  overflow-y: auto;
-  /* vertical scroll on mobile menu */
-  padding-bottom: 12px;
-  /* comfortable end padding */
-  flex: 1;
-}
+
 
 .offcanvas__header {
   display: flex;
@@ -332,30 +281,6 @@
   margin-bottom: 8px;
   border-bottom: 1px solid var(--pv-border);
 }
-
-
-.sidebar__scroll,
-.offcanvas__scroll {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Hide scrollbars but keep scrollability */
-.sidebar__scroll,
-.offcanvas__scroll {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE 10+ */
-}
-
-.sidebar__scroll::-webkit-scrollbar,
-.offcanvas__scroll::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari, Edge */
-}
-
-
 
 /* ===== Footer ===== */
 .footer {
@@ -455,22 +380,10 @@
 .app-shell {
   display: grid;
   grid-template-columns: 1fr;
-
-
-
-  min-height: calc(100dvh - var(--nav-height));
-}
-
-.sidebar {
-  display: none;
 }
 
 /* desktop only */
 @media (min-width: 1200px) {
-  .sidebar {
-    display: flex;
-  }
-
   .app-shell {
     grid-template-columns: var(--sidebar-width) 1fr;
   }

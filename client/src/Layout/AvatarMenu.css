@@ -1,0 +1,13 @@
+/* caret / tail for the avatar popover */
+.avatar-menu__panel {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  width: 320px;
+  background: var(--pv-surface);
+  border: 1px solid var(--pv-border);
+  box-shadow: var(--pv-shadow);
+  border-radius: 12px;
+  padding: 8px;
+  z-index: 100;
+}

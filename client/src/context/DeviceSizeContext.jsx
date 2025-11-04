@@ -1,6 +1,7 @@
 // client\src\context\DeviceSizeContext.jsx
 
-import React, { createContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
+import  { createContext, useState, useEffect } from 'react';
 
 const DeviceSizeContext = createContext();
 
@@ -24,4 +25,6 @@ const DeviceSizeProvider = ({ children }) => {
   );
 };
 
-export { DeviceSizeProvider, DeviceSizeContext };
+const useDeviceSize = () => useContext(DeviceSizeContext);
+
+export { DeviceSizeProvider, useDeviceSize };

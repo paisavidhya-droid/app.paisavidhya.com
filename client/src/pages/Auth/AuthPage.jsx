@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "../../styles/ui.css";
 import {
   Card,
@@ -17,7 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 /* --------------------------- Sign In --------------------------- */
-function SignInForm({ setTabIndex }) {
+function SignInForm({ setTabIndex, setPrefill }) {
   const navigate = useNavigate();
   const { storeTokenInLS } = useAuth();
   const [identifier, setIdentifier] = useState("");
@@ -26,31 +26,90 @@ function SignInForm({ setTabIndex }) {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setErr("");
+  //   if (!identifier || !password) {
+  //     setErr("Email/phone and password are required");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     // 1) login via axios service
+  //     const id = identifier.trim();
+  //     const payload = id.includes("@")
+  //       ? { email: id.toLowerCase(), password }
+  //       : { phoneNumber: id.replace(/\s+/g, ""), password };
+
+  //     const { token /*user*/ } = await login(payload);
+
+  //     // 2) persist token in Redux (your slice writes to localStorage "token")
+  //     storeTokenInLS(token); // AuthBootstrap will hydrate via /me
+
+  //     toast.success("Welcome back!");
+  //     navigate("/start", { replace: true });
+  //   } catch (e) {
+  //     setErr(e.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErr("");
+
     if (!identifier || !password) {
       setErr("Email/phone and password are required");
       return;
     }
 
+    const id = identifier.trim();
+    const payload = id.includes("@")
+      ? { email: id.toLowerCase(), password }
+      : { phoneNumber: id.replace(/\s+/g, ""), password };
+
     try {
       setLoading(true);
-      // 1) login via axios service
-      const id = identifier.trim();
-      const payload = id.includes("@")
-        ? { email: id.toLowerCase(), password }
-        : { phoneNumber: id.replace(/\s+/g, ""), password };
 
-      const { token /*user*/ } = await login(payload);
+      const { token } = await login(payload);
 
-      // 2) persist token in Redux (your slice writes to localStorage "token")
-      storeTokenInLS(token); // AuthBootstrap will hydrate via /me
-
+      storeTokenInLS(token);
       toast.success("Welcome back!");
       navigate("/start", { replace: true });
     } catch (e) {
-      setErr(e.message);
+      // Normalize error coming from axios or a wrapped error
+      const status = e?.response?.status;
+      const msg = e?.response?.data?.message || e.message || "Sign in failed";
+
+      // ✅ Trigger sign-up path if either status or message indicates unknown user
+      const looksLikeNoUser =
+        status === 401 || status === 404 || /user\s*not\s*found/i.test(msg);
+
+      if (looksLikeNoUser) {
+        toast(
+          () => (
+            <div>
+              <strong>No account found</strong>
+              <div style={{ fontSize: 13 }}>Create an account to continue.</div>
+            </div>
+          ),
+          { icon: "🆕" }
+        );
+
+        if (payload.email)
+          setPrefill({ email: payload.email, phoneNumber: "" });
+        if (payload.phoneNumber)
+          setPrefill({ email: "", phoneNumber: payload.phoneNumber });
+
+        setTabIndex(1); // → switch to Sign up
+        return; // don't show inline error
+      }
+
+      // Other errors → inline + toast
+      setErr(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -109,7 +168,7 @@ function SignInForm({ setTabIndex }) {
 }
 
 /* --------------------------- Sign Up --------------------------- */
-function SignUpForm() {
+function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
   const navigate = useNavigate();
   const { storeTokenInLS } = useAuth();
   const [name, setName] = useState("");
@@ -120,6 +179,12 @@ function SignUpForm() {
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+
+  // Apply prefill when it changes (e.g., after failed login)
+  useEffect(() => {
+    if (prefill?.email) setEmail(prefill.email);
+    if (prefill?.phoneNumber) setPhone(prefill.phoneNumber);
+  }, [prefill]);
 
   const match = password.length > 0 && password === confirmPassword;
 
@@ -228,13 +293,19 @@ function SignUpForm() {
 /* --------------------------- Page Shell --------------------------- */
 export default function AuthPage() {
   const [tabIndex, setTabIndex] = useState(0);
+  const [prefill, setPrefill] = useState({ email: "", phoneNumber: "" });
 
   const tabs = useMemo(
     () => [
-      { label: "Sign in", content: <SignInForm setTabIndex={setTabIndex} /> },
-      { label: "Sign up", content: <SignUpForm /> },
+      {
+        label: "Sign in",
+        content: (
+          <SignInForm setTabIndex={setTabIndex} setPrefill={setPrefill} />
+        ),
+      },
+      { label: "Sign up", content: <SignUpForm prefill={prefill} /> },
     ],
-    []
+    [prefill] // 👈 update when prefill changes
   );
 
   return (
