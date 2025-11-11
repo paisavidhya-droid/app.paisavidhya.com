@@ -22,14 +22,29 @@ export const LEAD_SOURCES = [
   'Other',
 ];
 
-// Interests / products / modules
+
+
 export const LEAD_INTERESTS = [
-  'PFC', 'FFC', 'BFC', 'SFC',
-  'MutualFunds', 'ELSS', 'PSU', 'BalancedAdvantage', 'Contra', 'Index',
-  'Insurance-Life', 'Insurance-Health', 'Insurance-Motor',
-  'NPS',
-  'TaxPlanning', 'Retirement', 'EmergencyFund',
+  'MutualFunds',
+  'Insurance',
+  'FinancialPlanning',
+
 ];
 
 
-export const PREFERRED_TIME_TYPE = ["ASAP","SCHEDULED"];
+
+
+
+
+// Interests / products / modules
+// export const LEAD_INTERESTS = [
+//   'PFC', 'FFC', 'BFC', 'SFC',
+//   'MutualFunds', 'ELSS', 'PSU', 'BalancedAdvantage', 'Contra', 'Index',
+//   'Insurance-Life', 'Insurance-Health', 'Insurance-Motor',
+//   'NPS',
+//   'TaxPlanning', 'Retirement', 'EmergencyFund',
+// ];
+
+// export const PREFERRED_TIME_TYPE = ["ASAP", "SCHEDULED"];
+
+export const PREFERRED_TIME_TYPE = ["Later", "SCHEDULED"];

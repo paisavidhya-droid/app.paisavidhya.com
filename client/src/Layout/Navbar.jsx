@@ -31,31 +31,37 @@ export default function Navbar({ onOpenMobileSidebar }) {
       </div>
 
       {/* center: primary nav (desktop)*/}
-      <div className="navbar__nav" role="menubar" aria-label="Sections">
-        {[
-          { id: "Home", label: "Home", to: "/" },
-          { id: "tools", label: "Tools", to: "/tools" },
-          {
-            id: "WealthPath",
-            label: "WealthPath",
-            to: "https://paisavidhya.com/wealthpath",
-          },
-          { id: "about", label: "About", to: "https://paisavidhya.com/about" },
-          { id: "blog", label: "Blog", to: "https://paisavidhya.com/blog" },
-        ].map((item) => (
-          <NavLink
-            key={item.id}
-            className={({ isActive }) =>
-              `navbar__link ${isActive ? "is-active" : ""}`
-            }
-            to={item.to}
-            role="menuitem"
-            aria-current={({ isActive }) => (isActive ? "page" : undefined)}
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </div>
+      {isLoggedIn && (
+        <div className="navbar__nav" role="menubar" aria-label="Sections">
+          {[
+            { id: "Home", label: "Home", to: "/" },
+            { id: "tools", label: "Tools", to: "/tools" },
+            {
+              id: "WealthPath",
+              label: "WealthPath",
+              to: "https://paisavidhya.com/wealthpath",
+            },
+            {
+              id: "about",
+              label: "About",
+              to: "https://paisavidhya.com/about",
+            },
+            { id: "blog", label: "Blog", to: "https://paisavidhya.com/blog" },
+          ].map((item) => (
+            <NavLink
+              key={item.id}
+              className={({ isActive }) =>
+                `navbar__link ${isActive ? "is-active" : ""}`
+              }
+              to={item.to}
+              role="menuitem"
+              aria-current={({ isActive }) => (isActive ? "page" : undefined)}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      )}
 
       {/* right: search + actions */}
       <div className="navbar__actions">

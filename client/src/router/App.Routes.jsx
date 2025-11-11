@@ -15,6 +15,7 @@ import FFC from "../modules/FFC";
 import FFCReport from "../modules/FFCReport";
 import SipCalculator from "../pages/calculators/SipCalculator";
 import ToolsHub from "../pages/ToolsHub";
+// import ToolstestHub from "../pages/test";
 // import RequireRole from "../auth/RequireRole";
 
 // Lazy-load pages (keeps bundles small)
@@ -35,7 +36,6 @@ const AdminUsers = lazy(() => import("../pages/Admin/Users"));
 const Unauthorized401 = lazy(() => import("../pages/Error/Unauthorized401"));
 const Forbidden403 = lazy(() => import("../pages/Error/Forbidden403"));
 const NotFound404 = lazy(() => import("../pages/Error/NotFound404"));
-
 
 const PFC = lazy(() => import("../modules/PFC"));
 const PFCReport = lazy(() => import("../modules/PFCReport"));
@@ -62,11 +62,9 @@ export default function AppRoutes() {
         {/* <Route path="/ffc" element={<Placeholder label="FFC coming soon" />} /> */}
         <Route path="/bfc" element={<Placeholder label="BFC coming soon" />} />
 
-
-
- <Route path="/tools/sip-calculator" element={<SipCalculator/>} />
-
- <Route path="/tools" element={<ToolsHub />} />
+        <Route path="/tools" element={<ToolsHub />} />
+        <Route path="/tools/sip-calculator" element={<SipCalculator />} />
+        {/* <Route path="/test" element={<ToolstestHub/>} /> */}
 
         {/* Authenticated area */}
         {/* Protected (any logged-in) */}

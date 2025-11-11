@@ -9,7 +9,19 @@ import {
   Tooltip,
   Button,
 } from "../../components";
-import { FaArrowRight } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaBookOpen,
+  FaLightbulb,
+  FaShieldAlt,
+  FaUsers,
+} from "react-icons/fa";
+import {
+  LuBookOpen,
+  LuLightbulb,
+  LuUsers,
+  LuShieldCheck,
+} from "react-icons/lu";
 
 function Section({ title, children, style }) {
   return (
@@ -47,10 +59,10 @@ export default function Home() {
           <Button
             as={Link}
             to="/ffc"
-            className="pv-btn ghost"
+            className="pv-btn"
             style={{ justifyContent: "center" }}
           >
-            FFC (Coming Soon)
+            FFC 
           </Button>
         </>
       ),
@@ -90,7 +102,12 @@ export default function Home() {
     {
       title: "How do I start?",
       content:
-        "Create an account and book a checkup. A staff advisor will guide you.",
+       (
+    <>
+      <Link to="/auth?mode=signup">Create an account</Link> and book a checkup. A staff
+      advisor will guide you.
+    </>
+  ),
     },
   ];
 
@@ -122,7 +139,7 @@ export default function Home() {
               guidance.
             </div>
             <div className="pv-row" style={{ gap: 8, marginTop: 8 }}>
-              <Link to="/auth" className="pv-btn">
+              <Link to="/auth?mode=signup" className="pv-btn">
                 Get started
               </Link>
               <Link to="/auth" className="pv-btn ghost">
@@ -147,18 +164,73 @@ export default function Home() {
       <Section title="Why Paisavidhya?">
         <div className="pv-row" style={{ gap: 16, flexWrap: "wrap" }}>
           {[
-            { h: "Clarity", p: "Know exactly where you stand, today." },
-            { h: "Actionable", p: "Simple steps you can take this week." },
-            { h: "Human", p: "Talk to an advisor when you need." },
-            { h: "Secure", p: "Bank-grade security & consent-first." },
-          ].map((b, i) => (
+            {
+              h: "Financial Awareness",
+              p: "Learn how money really works — from budgeting to markets — in simple Indian examples.",
+              Icon: LuBookOpen,
+            },
+            {
+              h: "Empowerment Through Knowledge",
+              p: "Build the confidence to make your own financial decisions without relying on others.",
+              Icon: LuLightbulb,
+            },
+            {
+              h: "Accessible for Everyone",
+              p: "Whether you’re a student or first-time investor, our tools and workshops make learning easy.",
+              Icon: LuUsers,
+            },
+            {
+              h: "Trusted & Transparent",
+              p: "Education-first initiative backed by registered professionals — no hidden agendas, only clarity.",
+              Icon: LuShieldCheck,
+            },
+          ].map(({ h, p, Icon }) => (
             <div
-              key={i}
+              key={h} // stable key
               className="pv-card"
-              style={{ padding: 16, flex: "1 1 220px" }}
+              style={{
+                // card container
+                padding: 18,
+                flex: "1 1 240px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                textAlign: "center",
+                gap: 12,
+                minHeight: 180,
+                transition: "transform 160ms ease, box-shadow 160ms ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "translateY(-2px)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "translateY(0)")
+              }
             >
-              <div style={{ fontWeight: 700, marginBottom: 8 }}>{b.h}</div>
-              <div style={{ color: "var(--pv-dim)" }}>{b.p}</div>
+              {/* Icon badge */}
+              <div
+                aria-hidden="true"
+                style={{
+                  display: "grid",
+                  placeItems: "center",
+                  width: 64,
+                  height: 64,
+                  borderRadius: 16,
+                  background: "var(--pv-surface)",
+                  border: "1px solid var(--pv-border)",
+                }}
+              >
+                <Icon
+                  size={32} // good balance; scales well
+                  style={{ color: "var(--pv-accent)" }}
+                />
+              </div>
+
+              {/* Title */}
+              <div style={{ fontWeight: 700, fontSize: 16 }}>{h}</div>
+
+              {/* Description */}
+              <div style={{ color: "var(--pv-dim)", lineHeight: 1.5 }}>{p}</div>
             </div>
           ))}
         </div>
@@ -182,7 +254,7 @@ export default function Home() {
             </div>
           </div>
           <div className="pv-row" style={{ gap: 8 }}>
-            <Link to="/auth" className="pv-btn">
+            <Link to="/auth?mode=signup" className="pv-btn">
               Create account
             </Link>
             <Link to="/auth" className="pv-btn ghost">

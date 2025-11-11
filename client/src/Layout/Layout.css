@@ -625,3 +625,22 @@
 
 /* ====== Very small screens (≤ 360px) ====== */
 @media (max-width: 360px) {}
+
+
+/* Breakpoint can be whatever matches your design system */
+@media (max-width: 900px) {
+  .tools-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: initial !important;
+  }
+}
+
+/* Default: mobile-only hidden on desktop */
+.mobile-only {
+  display: none;
+}

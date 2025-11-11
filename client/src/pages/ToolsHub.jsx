@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import "../styles/ui.css";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 import {
   Card,
@@ -19,6 +21,9 @@ import {
 
 import toast from "react-hot-toast";
 import ModuleHeader from "../components/ui/ModuleHeader";
+import { FaTimes } from "react-icons/fa";
+import { useDeviceSize } from "../context/DeviceSizeContext";
+import { useEffect } from "react";
 
 // ---- data you can extend anytime ----
 const CATEGORIES = [
@@ -125,23 +130,110 @@ function ToolCard({ tool }) {
               Open
             </Button>
           </Tooltip>
-          <Button
+          {/* <Button
             variant="ghost"
             onClick={() => toast.success(`Pinned ${tool.title}`)}
           >
             Pin
-          </Button>
+          </Button> */}
         </div>
       </div>
     </Card>
   );
 }
 
+/** Re-usable sidebar content so we can render it in a Drawer on mobile */
+function SidebarContent({
+  q,
+  setQ,
+  cat,
+  setCat,
+  setNewCheckupOpen,
+  setDrawerOpen,
+}) {
+  return (
+    <div style={{ padding: 16 }}>
+      <div style={{ fontWeight: 800, marginBottom: 8 }}>Tools</div>
+
+      <Input
+        placeholder="Search tools…"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+      />
+
+      <div
+        className="pv-row"
+        style={{ marginTop: 10, gap: 8, flexWrap: "wrap" }}
+      >
+        <Chip active={cat === "all"} onClick={() => setCat("all")}>
+          All
+        </Chip>
+        {CATEGORIES.map((c) => (
+          <Chip
+            key={c.key}
+            active={cat === c.key}
+            onClick={() => setCat(c.key)}
+          >
+            {c.label}
+          </Chip>
+        ))}
+      </div>
+
+      <div className="pv-col" style={{ marginTop: 14, gap: 8 }}>
+        <Button onClick={() => setNewCheckupOpen(true)}>New Checkup</Button>
+        <Button variant="ghost" onClick={() => setDrawerOpen(true)}>
+          Quick Actions
+        </Button>
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <Alert type="info" title="Pro tip">
+          Use search to jump to SIP/Insurance in seconds.
+        </Alert>
+      </div>
+    </div>
+  );
+}
+
 export default function ToolsHub() {
+  const { isMobile } = useDeviceSize();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false); // left drawer (Filters on mobile)
   const [newCheckupOpen, setNewCheckupOpen] = useState(false);
+
+  const MySwal = withReactContent(Swal);
+
+  useEffect(() => {
+    const SEEN_KEY = "pv_tools_welcome_seen";
+    if (sessionStorage.getItem(SEEN_KEY)) return; // show once per session
+    sessionStorage.setItem(SEEN_KEY, "1");
+
+    MySwal.fire({
+      title: "Welcome to Paisavidhya 👋",
+      text: "Explore all financial checkups, calculators, and advisory tools — everything you need in one place.",
+      confirmButtonText: "Continue",
+      background:
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--pv-surface"
+        ) || "#111827",
+      color:
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--pv-text"
+        ) || "#e5e7eb",
+      confirmButtonColor:
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--pv-primary"
+        ) || "#00c2a8",
+      customClass: {
+        popup: "pv-card", // use your card style (border-radius, shadow)
+        confirmButton: "pv-btn primary",
+      },
+      timer: 4500, // auto close in 4.5s
+      timerProgressBar: true,
+    });
+  }, []);
 
   const filtered = useMemo(() => {
     const byCat = (t) => (cat === "all" ? true : t.category === cat);
@@ -151,20 +243,11 @@ export default function ToolsHub() {
     return TOOLS.filter((t) => byCat(t) && byQuery(t));
   }, [q, cat]);
 
-  const tabsData = [
-    {
-      label: "All",
-      content: null,
-    },
-    {
-      label: "Checkups",
-      content: null,
-    },
-    {
-      label: "Calculators",
-      content: null,
-    },
+  const TAB_ITEMS = [
+    { label: "All Tools", value: "all" },
+    ...CATEGORIES.map((c) => ({ label: c.label, value: c.key })),
   ];
+  const selectedTabIndex = TAB_ITEMS.findIndex((t) => t.value === cat);
 
   const accItems = [
     {
@@ -180,12 +263,14 @@ export default function ToolsHub() {
   ];
 
   return (
-    <div className="pv-container" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 18 }}>
+    <div
+      className="pv-container tools-grid"
+      style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 18 }}
+    >
       {/* Sidebar */}
       <aside
-        className="pv-card"
+        className="pv-card desktop-only"
         style={{
-          padding: 16,
           position: "sticky",
           top: 76,
           alignSelf: "start",
@@ -193,37 +278,14 @@ export default function ToolsHub() {
           overflow: "auto",
         }}
       >
-        <div style={{ fontWeight: 800, marginBottom: 8 }}>Tools</div>
-
-        <Input
-          placeholder="Search tools…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
+        <SidebarContent
+          q={q}
+          setQ={setQ}
+          cat={cat}
+          setCat={setCat}
+          setNewCheckupOpen={setNewCheckupOpen}
+          setDrawerOpen={setDrawerOpen}
         />
-
-        <div className="pv-row" style={{ marginTop: 10, gap: 8, flexWrap: "wrap" }}>
-          <Chip active={cat === "all"} onClick={() => setCat("all")}>
-            All
-          </Chip>
-          {CATEGORIES.map((c) => (
-            <Chip key={c.key} active={cat === c.key} onClick={() => setCat(c.key)}>
-              {c.label}
-            </Chip>
-          ))}
-        </div>
-
-        <div className="pv-col" style={{ marginTop: 14, gap: 8 }}>
-          <Button onClick={() => setNewCheckupOpen(true)}>New Checkup</Button>
-          <Button variant="ghost" onClick={() => setDrawerOpen(true)}>
-            Quick Actions
-          </Button>
-        </div>
-
-        <div style={{ marginTop: 16 }}>
-          <Alert type="info" title="Pro tip">
-            Use search to jump to SIP/Insurance in seconds.
-          </Alert>
-        </div>
       </aside>
 
       {/* Main */}
@@ -238,8 +300,13 @@ export default function ToolsHub() {
           ]}
           actions={
             <>
-              <Button onClick={() => setNewCheckupOpen(true)}>Start Checkup</Button>
-              <Button variant="ghost" onClick={() => (window.location.href = "/reports")}>
+              <Button onClick={() => setNewCheckupOpen(true)}>
+                Start Checkup
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => (window.location.href = "/reports")}
+              >
                 Reports
               </Button>
             </>
@@ -248,7 +315,7 @@ export default function ToolsHub() {
           compact
         />
 
-        {/* Featured row */}
+        {/* Featured row
         <section className="pv-row" style={{ gap: 18, flexWrap: "wrap" }}>
           {["pfc", "ffc", "sip"].map((id) => {
             const tool = TOOLS.find((t) => t.id === id);
@@ -256,45 +323,123 @@ export default function ToolsHub() {
               <ToolCard tool={tool} />
             </div>;
           })}
+        </section> */}
+
+        {/* Compact mobile bar under header (search quick access) */}
+        <section className="mobile-only">
+          <Card>
+            <div className="pv-row" style={{ gap: 8, alignItems: "center" }}>
+              <Input
+                placeholder="Search tools…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+              <Button onClick={() => setFiltersOpen(true)} variant="ghost">
+                Filters
+              </Button>
+              <Button onClick={() => setDrawerOpen(true)} variant="ghost">
+                Quick
+              </Button>
+            </div>
+          </Card>
         </section>
 
         {/* Results */}
         <section className="pv-col" style={{ gap: 12 }}>
-          <div className="pv-row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 700 }}>All tools</div>
-            <div className="pv-row" style={{ gap: 8 }}>
-              <Select
-                label=""
-                value={cat}
-                onChange={(e) => setCat(e.target.value)}
-                style={{ minWidth: 160 }}
+          {isMobile && (
+            <>
+              {/* For mobile only*/}
+              <div
+                className="pv-row"
+                style={{
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
               >
-                <option value="all">All Categories</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>{c.label}</option>
-                ))}
-              </Select>
-            </div>
-          </div>
+                <div style={{ fontWeight: 700 }}>
+                  {" "}
+                  {CATEGORIES.find((c) => c.key === cat)?.label || "All Tools"}
+                </div>
+                <div className="pv-row" style={{ gap: 8 }}>
+                  <Select
+                    label=""
+                    value={cat}
+                    onChange={(e) => setCat(e.target.value)}
+                    style={{ minWidth: 160 }}
+                  >
+                    <option value="all">All Categories</option>
+                    {CATEGORIES.map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
 
-          <div className="pv-row" style={{ gap: 18, flexWrap: "wrap" }}>
-            {filtered.length ? (
-              filtered.map((t) => (
-                <div key={t.id} style={{ minWidth: 320, flex: "1 1 320px" }}>
-                  <ToolCard tool={t} />
-                </div>
-              ))
-            ) : (
-              <Card title="No results">
-                <div className="pv-col" style={{ gap: 8 }}>
-                  <div style={{ color: "var(--pv-dim)" }}>
-                    Try another keyword or switch category.
-                  </div>
-                  <Placeholder label="Nothing found" />
-                </div>
-              </Card>
-            )}
-          </div>
+              <div className="pv-row" style={{ gap: 18, flexWrap: "wrap" }}>
+                {filtered.length ? (
+                  filtered.map((t) => (
+                    <div key={t.id}>
+                      <ToolCard tool={t} />
+                    </div>
+                  ))
+                ) : (
+                  <Card title="No results">
+                    <div className="pv-col" style={{ gap: 8 }}>
+                      <div style={{ color: "var(--pv-dim)" }}>
+                        Try another keyword or switch category.
+                      </div>
+                      <Placeholder label="Nothing found" />
+                    </div>
+                  </Card>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* For Desktop only*/}
+          {!isMobile && (
+            <div className="pv-col" style={{ gap: 8 }}>
+              <Tabs
+                tabs={TAB_ITEMS.map((t) => ({
+                  label: t.label,
+                  content: (
+                    <div
+                      className="pv-row"
+                      style={{ gap: 18, flexWrap: "wrap" }}
+                    >
+                      {filtered.length ? (
+                        filtered.map((t) => (
+                          <div
+                            key={t.id}
+                            style={{
+                              minWidth: 320,
+                              flex: "1 1 320px",
+                              gap: 18,
+                            }}
+                          >
+                            <ToolCard tool={t} />
+                          </div>
+                        ))
+                      ) : (
+                        <Card title="No results">
+                          <div className="pv-col" style={{ gap: 8 }}>
+                            <div style={{ color: "var(--pv-dim)" }}>
+                              Try another keyword or switch category.
+                            </div>
+                            <Placeholder label="Nothing found" />
+                          </div>
+                        </Card>
+                      )}
+                    </div>
+                  ),
+                }))}
+                selectedIndex={selectedTabIndex}
+                onChange={(i) => setCat(TAB_ITEMS[i].value)}
+              />
+            </div>
+          )}
         </section>
 
         {/* Help / FAQ */}
@@ -326,6 +471,26 @@ export default function ToolsHub() {
         </div>
       </Drawer>
 
+      {/* Filters/Sidebar Drawer (left) */}
+      <Drawer isOpen={filtersOpen} onClose={() => setFiltersOpen(false)}>
+        <SidebarContent
+          q={q}
+          setQ={setQ}
+          cat={cat}
+          setCat={setCat}
+          setNewCheckupOpen={setNewCheckupOpen}
+          setDrawerOpen={setDrawerOpen}
+        />
+        <Button
+          variant="ghost"
+          onClick={() => setFiltersOpen(false)}
+          style={{ margin: 8 }}
+        >
+          Close
+          <FaTimes />
+        </Button>
+      </Drawer>
+
       {/* New Checkup Modal */}
       <Modal
         isOpen={newCheckupOpen}
@@ -335,14 +500,6 @@ export default function ToolsHub() {
           <>
             <Button variant="ghost" onClick={() => setNewCheckupOpen(false)}>
               Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                toast.success("Launching PFC…");
-                window.location.href = "/pfc";
-              }}
-            >
-              Continue
             </Button>
           </>
         }
@@ -356,13 +513,18 @@ export default function ToolsHub() {
               const t = TOOLS.find((x) => x.id === id);
               return (
                 <Card key={id} title={t.title}>
-                  <div className="pv-row" style={{ gap: 8, alignItems: "center" }}>
+                  <div
+                    className="pv-row"
+                    style={{ gap: 8, alignItems: "center" }}
+                  >
                     <Badge>{t.badge}</Badge>
                     <Button onClick={() => (window.location.href = t.route)}>
                       Start
                     </Button>
                   </div>
-                  <div style={{ marginTop: 8, color: "var(--pv-dim)" }}>{t.blurb}</div>
+                  <div style={{ marginTop: 8, color: "var(--pv-dim)" }}>
+                    {t.blurb}
+                  </div>
                 </Card>
               );
             })}

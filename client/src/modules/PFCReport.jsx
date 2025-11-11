@@ -371,106 +371,43 @@ export default function PFCReport() {
   const handlePrint = () => window.print();
   const renderPieLabel = ({ name, value }) => `${name} — ₹${inr.format(value)}`;
 
-  const exportPDF = async () => {
-    try {
-      toast.loading("Preparing PDF...", { id: "pdf" });
-      const node = reportRef.current;
-      if (!node) {
-        toast.error("Nothing to export");
-        return;
-      }
-
-      // Make sure charts and fonts are rendered before capture
-      await new Promise((r) => setTimeout(r, 100));
-
-      // Capture
-      const canvas = await html2canvas(node, {
-        scale: Math.min(2, window.devicePixelRatio || 1.5),
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        logging: false,
-        windowWidth: document.documentElement.scrollWidth,
-      });
-
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-      // A4 portrait in jsPDF: 210 x 297 mm
-      const pdf = new jsPDF({
-        unit: "mm",
-        format: "a4",
-        orientation: "portrait",
-      });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const margin = 10; // mm
-      const usableWidth = pageWidth - margin * 2;
-
-      // Compute image dimensions to fit width while keeping aspect
-      const imgWidthPx = canvas.width;
-      const imgHeightPx = canvas.height;
-      const ratio =
-        usableWidth /
-        (((imgWidthPx / (window.devicePixelRatio || 2)) * 25.4) / 96);
-      // Simpler: scale by width in mm using dpi≈96
-      const imgWmm = usableWidth;
-      const imgHmm = (imgHeightPx / imgWidthPx) * imgWmm;
-      let y = margin;
-      if (imgHmm <= pageHeight - margin * 2) {
-        // Single page
-        pdf.addImage(imgData, "JPEG", margin, y, imgWmm, imgHmm, "", "FAST");
-      } else {
-        // Multi-page slicing
-        let remainingHmm = imgHmm;
-        const pageContentHmm = pageHeight - margin * 2;
-        let srcYpx = 0;
-        const pxPerMm = imgHeightPx / imgHmm;
-        while (remainingHmm > 0) {
-          const sliceHmm = Math.min(pageContentHmm, remainingHmm);
-          const sliceHeightPx = Math.round(sliceHmm * pxPerMm);
-
-          // Create a slice canvas
-          const sliceCanvas = document.createElement("canvas");
-          sliceCanvas.width = imgWidthPx;
-          sliceCanvas.height = sliceHeightPx;
-          const ctx = sliceCanvas.getContext("2d");
-          ctx.drawImage(
-            canvas,
-            0,
-            srcYpx,
-            imgWidthPx,
-            sliceHeightPx,
-            0,
-            0,
-            imgWidthPx,
-            sliceHeightPx
-          );
-          const sliceData = sliceCanvas.toDataURL("image/jpeg", 0.95);
-
-          if (srcYpx > 0) pdf.addPage();
-          pdf.addImage(
-            sliceData,
-            "JPEG",
-            margin,
-            margin,
-            imgWmm,
-            sliceHmm,
-            "",
-            "FAST"
-          );
-
-          srcYpx += sliceHeightPx;
-          remainingHmm -= sliceHmm;
-        }
-      }
-
-      pdf.save(`${info?.name ? info.name + "-" : ""}PFC-Report.pdf`);
-      toast.success("PDF downloaded", { id: "pdf" });
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to generate PDF", { id: "pdf" });
+  function neutralizeOklabColors(rootEl = document.documentElement) {
+  const styles = getComputedStyle(rootEl);
+  for (let i = 0; i < styles.length; i++) {
+    const prop = styles[i];
+    const val = styles.getPropertyValue(prop);
+    if (val.includes("oklab")) {
+      rootEl.style.setProperty(prop, "rgb(100,100,100)");
     }
-  };
+  }
+}
+
+
+  const exportPDF = async () => {
+  const input = reportRef.current;
+  if (!input) return;
+  try {
+    neutralizeOklabColors(); // <-- call before capture
+
+    const canvas = await html2canvas(input, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff",
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
+    pdf.save(`${info?.name || "PFC_Report"}.pdf`);
+  } catch (err) {
+    console.error("PDF export failed:", err);
+    toast.error("Could not generate PDF");
+  }
+};
 
   const msisdnDisplay = String(info?.mobile || "")
     .replace(/\D/g, "")

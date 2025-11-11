@@ -228,6 +228,10 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
 
+  // =========================
+  // LOGGED-IN: your full app
+  // =========================
+
   // 1) define your sections, and mark the few you want when collapsed
   const sections = useMemo(
     () => [
@@ -360,6 +364,40 @@ export default function Sidebar({
     []
   );
 
+  // =========================
+  // LOGGED-OUT: public links
+  // - desktop: show 5 icons only
+  // - mobile: full list (same links)
+  // =========================
+  const publicList = useMemo(
+    () => [
+      { label: "Home", to: "/", icon: <FaTachometerAlt aria-hidden="true" /> },
+      { label: "Tools", to: "/tools", icon: <FaListUl aria-hidden="true" /> },
+      {
+        label: "WealthPath",
+        to: "https://paisavidhya.com/wealthpath",
+        icon: <FaRocket aria-hidden="true" />,
+      },
+      {
+        label: "About",
+        to: "https://paisavidhya.com/about",
+        icon: <FaBookOpen aria-hidden="true" />,
+      },
+      {
+        label: "Blog",
+        to: "https://paisavidhya.com/blog",
+        icon: <FaFileAlt aria-hidden="true" />,
+      },
+    ],
+    []
+  );
+
+  // build the 5-icon rail for guests
+  const guestCollapsedOnly = useMemo(
+    () => [{ title: "", items: publicList.slice(0, 5) }],
+    [publicList]
+  );
+
   // 2) build the "collapsed shortcuts" (flat 4–5 icons) once
   const collapsedShortcuts = useMemo(() => {
     const allItems = sections.flatMap((s) => s.items);
@@ -450,51 +488,135 @@ export default function Sidebar({
     </button>
   ) : null;
 
-  // 3) choose what to render based on collapsed
-  const renderedForRail = collapsed
-    ? // collapsed: just the 4–5 pinned icons in one “Quick” group
-      [{ title: "", items: collapsedShortcuts }]
-    : // expanded: full sections
-      sections;
+  // // 3) choose what to render based on collapsed
+  // const renderedForRail = collapsed
+  //   ? // collapsed: just the 4–5 pinned icons in one “Quick” group
+  //     [{ title: "", items: collapsedShortcuts }]
+  //   : // expanded: full sections
+  //     sections;
 
-  const DesktopRail = (
-    <aside
-      className={["sidebar", collapsed ? "sidebar--collapsed" : ""].join(" ")}
-      aria-label="Sidebar"
-    >
-      <div className="sidebar__header">
-        <IconButton
-          className="sidebar__toggle pv-icon-btn"
-          onClick={handleRailToggle}
-          aria-pressed={collapsed}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand" : "Collapse"}
+  if (isLoggedIn) {
+    // current behavior for logged-in
+    const renderedForRail = collapsed
+      ? [{ title: "", items: collapsedShortcuts }]
+      : sections;
+
+    const DesktopRail = (
+      <aside
+        className={["sidebar", collapsed ? "sidebar--collapsed" : ""].join(" ")}
+        aria-label="Sidebar"
+      >
+        <div className="sidebar__header">
+          <IconButton
+            className="sidebar__toggle pv-icon-btn"
+            onClick={handleRailToggle}
+            aria-pressed={collapsed}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={collapsed ? "Expand" : "Collapse"}
+          >
+            {collapsed ? <FaBars size={18} /> : <FaXmark size={18} />}
+          </IconButton>
+          <strong className="sidebar__brand" aria-hidden={collapsed}>
+            <span className="sidebar__label">Menu</span>
+          </strong>
+        </div>
+
+        <div className="sidebar__scroll">
+          {renderedForRail.map((s) => (
+            <MenuSection
+              key={s.title || "quick"}
+              title={s.title}
+              items={s.items}
+            />
+          ))}
+        </div>
+
+        <div className="sidebar__footer">{LogoutItem}</div>
+      </aside>
+    );
+
+    // Mobile: usually you want full nav when the drawer is open,
+    // but if you want the same "pinned-only" behavior on small screens,
+    // swap `sections` with the same `renderedForRail` below.
+    const MobileOffcanvas = (
+      <div
+        className={["offcanvas", mobileOpen ? "open" : ""].join(" ")}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile menu"
+        onClick={() => setMobileOpen(false)}
+        style={{ zIndex: 60 }}
+      >
+        <div
+          className="offcanvas__panel"
+          ref={panelRef}
+          onClick={(e) => e.stopPropagation()}
         >
-          {collapsed ? <FaBars size={18} /> : <FaXmark size={18} />}
-        </IconButton>
-        <strong className="sidebar__brand" aria-hidden={collapsed}>
-          <span className="sidebar__label">Menu</span>
-        </strong>
+          <div className="offcanvas__header">
+            <strong id="mobileMenuTitle">Menu</strong>
+            <button
+              className="sidebar__toggle pv-icon-btn"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close menu"
+            >
+              <FaXmark size={18} />
+            </button>
+          </div>
+          <div className="offcanvas__scroll">
+            {sections.map((s) => (
+              <MenuSection key={s.title} title={s.title} items={s.items} />
+            ))}
+            {LogoutItem}
+          </div>
+        </div>
       </div>
+    );
 
-      <div className="sidebar__scroll">
-        {renderedForRail.map((s) => (
-          <MenuSection
-            key={s.title || "quick"}
-            title={s.title}
-            items={s.items}
-          />
-        ))}
-      </div>
+    return (
+      <>
+        {DesktopRail}
+        {MobileOffcanvas}
+      </>
+    );
+  }
 
-      <div className="sidebar__footer">{LogoutItem}</div>
-    </aside>
-  );
+  // -------------------------
+  // LOGGED-OUT rendering
+  // -------------------------
+  // Desktop: show a collapsed rail with exactly 5 icons (public)
+  // Note: we keep it always "collapsed" and hide the toggle to avoid confusion.
+ // Guest: Desktop rail (collapsed) with burger that opens offcanvas
+const GuestDesktopRail = (
+  <aside
+    className={["sidebar", "sidebar--collapsed"].join(" ")}
+    aria-label="Sidebar"
+  >
+    <div className="sidebar__header">
+      <IconButton
+        className="sidebar__toggle pv-icon-btn"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open menu"
+        title="Open menu"
+      >
+        <FaBars size={18} />
+      </IconButton>
 
-  // Mobile: usually you want full nav when the drawer is open,
-  // but if you want the same "pinned-only" behavior on small screens,
-  // swap `sections` with the same `renderedForRail` below.
-  const MobileOffcanvas = (
+      <strong className="sidebar__brand" aria-hidden={true}>
+        <span className="sidebar__label">Menu</span>
+      </strong>
+    </div>
+
+    <div className="sidebar__scroll">
+      {guestCollapsedOnly.map((s) => (
+        <MenuSection key="guest-quick" title={s.title} items={s.items} />
+      ))}
+    </div>
+  </aside>
+);
+
+
+  // Mobile: off-canvas shows the public list as full menu
+  const GuestMobileOffcanvas = (
     <div
       className={["offcanvas", mobileOpen ? "open" : ""].join(" ")}
       role="dialog"
@@ -519,10 +641,36 @@ export default function Sidebar({
           </button>
         </div>
         <div className="offcanvas__scroll">
-          {sections.map((s) => (
-            <MenuSection key={s.title} title={s.title} items={s.items} />
-          ))}
-          {LogoutItem}
+          <div className="sidebar__section">
+            <div className="sidebar__title">Explore</div>
+            <ul className="sidebar__list">
+              {publicList.map((item) => {
+                const isExternal = /^https?:\/\//.test(item.to);
+                return (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      end
+                      className="sidebar__item"
+                      target={isExternal ? "_blank" : undefined}
+                      rel={isExternal ? "noopener noreferrer" : undefined}
+                    >
+                      <span className="sidebar__icon">{item.icon}</span>
+                      <span className="sidebar__label">{item.label}</span>
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <NavLink
+            to="/auth"
+            className="pv-btn primary"
+            style={{ marginTop: 12 }}
+          >
+            Sign in
+          </NavLink>
         </div>
       </div>
     </div>
@@ -530,8 +678,9 @@ export default function Sidebar({
 
   return (
     <>
-      {DesktopRail}
-      {MobileOffcanvas}
+      {GuestDesktopRail}
+      {GuestMobileOffcanvas}
     </>
   );
 }
+ 

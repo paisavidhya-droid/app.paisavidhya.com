@@ -13,12 +13,14 @@ import {
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { login, register } from "../../services/authService";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
+import { useDeviceSize } from "../../context/DeviceSizeContext";
 
 /* --------------------------- Sign In --------------------------- */
 function SignInForm({ setTabIndex, setPrefill }) {
   const navigate = useNavigate();
+  const { isMobile } = useDeviceSize();
   const { storeTokenInLS } = useAuth();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -152,7 +154,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
           Don't have an account?{" "}
           <Link onClick={() => setTabIndex(1)}>Sign Up</Link>
         </p>
-        <Badge>Secure</Badge>
+        {!isMobile && <Badge>Secure</Badge>}
       </div>
       <Button type="submit" disabled={loading}>
         {loading ? (
@@ -292,8 +294,15 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
 
 /* --------------------------- Page Shell --------------------------- */
 export default function AuthPage() {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [search] = useSearchParams();
+  const navigate = useNavigate();
+
+  const mode = (search.get("mode") || "").toLowerCase();
+  const [tabIndex, setTabIndex] = useState(mode === "signup" ? 1 : 0);
   const [prefill, setPrefill] = useState({ email: "", phoneNumber: "" });
+  useEffect(() => {
+    if (mode) navigate("/auth", { replace: true });
+  }, [mode, navigate]);
 
   const tabs = useMemo(
     () => [
@@ -337,7 +346,42 @@ export default function AuthPage() {
               textAlign: "center",
             }}
           >
-            By continuing, you agree to our terms & privacy.
+            By continuing, you agree to our{" "}
+            <a
+              href="https://paisavidhya.com/terms-and-conditions"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "underline", color: "inherit" }}
+            >
+              Terms & Conditions
+            </a>
+            {/* <div
+              style={{
+                color: "var(--pv-dim)",
+                fontSize: 12,
+                textAlign: "center",
+              }}
+            >
+              By continuing, you agree to our{" "}
+              <a
+                href="https://paisavidhya.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "underline", color: "inherit" }}
+              >
+                Terms and Conditions
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://paisavidhya.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "underline", color: "inherit" }}
+              >
+                Privacy Policy
+              </a>
+              .
+            </div> */}
           </div>
         </div>
       </Card>

@@ -527,11 +527,6 @@ export default function SipCalculator() {
     </div>
   );
 
-  const tabs = [
-    { label: "Overview", content: Overview },
-    { label: "Amortization", content: Amortization },
-  ];
-
   return (
     <div className="pv-col" style={{ gap: 16 }}>
       <ModuleHeader
@@ -734,8 +729,12 @@ export default function SipCalculator() {
             </details>
 
             <Alert type="warning" title="Note">
-              This tool is for education. Markets are volatile; actual results
-              may differ.
+              This tool is designed for educational purposes only and does not
+              guarantee accuracy in real-time market conditions. Actual
+              performance or results may differ from simulated outcomes. Users
+              should exercise independent judgment before making financial
+              decisions.
+              {/* This tool is for educational purposes only. Real-time market conditions may vary, and actual results could differ. */}
             </Alert>
           </div>
         </Card>
