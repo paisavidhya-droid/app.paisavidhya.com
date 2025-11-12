@@ -16,6 +16,7 @@ import { login, register } from "../../services/authService";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { useDeviceSize } from "../../context/DeviceSizeContext";
+import MathCaptcha from "../../components/MathCaptcha";
 
 /* --------------------------- Sign In --------------------------- */
 function SignInForm({ setTabIndex, setPrefill }) {
@@ -27,6 +28,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
   // const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [captchaOK, setCaptchaOK] = useState(false);
 
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
@@ -64,6 +66,10 @@ function SignInForm({ setTabIndex, setPrefill }) {
 
     if (!identifier || !password) {
       setErr("Email/phone and password are required");
+      return;
+    }
+    if (!captchaOK) {
+      setErr("Please solve the human check.");
       return;
     }
 
@@ -114,6 +120,8 @@ function SignInForm({ setTabIndex, setPrefill }) {
       toast.error(msg);
     } finally {
       setLoading(false);
+      // after any submit attempt, require solving a fresh captcha again
+      setCaptchaOK(false);
     }
   };
 
@@ -138,6 +146,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
       />
+      <MathCaptcha onChange={setCaptchaOK} />
       <div
         className="pv-row"
         style={{ justifyContent: "space-between", alignItems: "center" }}
@@ -156,7 +165,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
         </p>
         {!isMobile && <Badge>Secure</Badge>}
       </div>
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading || !captchaOK}>
         {loading ? (
           <span className="pv-row" style={{ gap: 8, alignItems: "center" }}>
             <ClipLoader size={18} color="white" /> Signing in…
@@ -181,6 +190,7 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [captchaOK, setCaptchaOK] = useState(false);
 
   // Apply prefill when it changes (e.g., after failed login)
   useEffect(() => {
@@ -197,6 +207,12 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
       setErr("All fields are required");
       return;
     }
+
+    if (!captchaOK) {
+      setErr("Please solve the human check.");
+      return;
+    }
+
     if (!agree) {
       setErr("Please agree to the terms");
       return;
@@ -232,6 +248,7 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
       setErr(e.message);
     } finally {
       setLoading(false);
+      setCaptchaOK(false);
     }
   };
 
@@ -274,12 +291,13 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
       />
+      <MathCaptcha onChange={setCaptchaOK} />
       <Checkbox
         label="I agree to the terms & privacy"
         checked={agree}
         onChange={setAgree}
       />
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading || !captchaOK}>
         {loading ? (
           <span className="pv-row" style={{ gap: 8, alignItems: "center" }}>
             <ClipLoader size={18} color="white" /> Creating…

@@ -1,6 +1,6 @@
 // this is the simple badge
-export default function Badge({ children }){
-  return <span className="pv-badge">{children}</span>;
+export default function Badge({ children, style }){
+  return <span className="pv-badge" style={{  ...style }}>{children}</span>;
 }
 
 // // this is the badge with colors
