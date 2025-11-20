@@ -1,4 +1,5 @@
 // client\src\components\ui\FloatField.jsx
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./FloatField.css";
 import { useId, useMemo, useState } from "react";
 
@@ -110,7 +111,7 @@ export default function FloatField({
             aria-label={show ? "Hide password" : "Show password"}
             tabIndex={-1}
           >
-            {show ? "🙈" : "👁️"}
+            {show ? <FaEyeSlash size={16}  /> : <FaEye size={16}  />}
           </button>
         ) : (
           rightIcon && <span className="pv-float-icon right">{rightIcon}</span>

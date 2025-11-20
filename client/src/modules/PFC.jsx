@@ -15,6 +15,7 @@ import "../styles/ui.css";
 import ModuleHeader from "../components/ui/ModuleHeader";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const fmt = (n) => (isNaN(n) ? 0 : Number(n));
 
@@ -55,6 +56,7 @@ function CategoryGroup({ title, fields, data, setData }) {
 export default function PFC() {
   const navigate = useNavigate();
   const { user } = useAuth();
+
   /* -------- basic info -------- */
   const [info, setInfo] = useState({
     name: user?.name || "",
@@ -131,6 +133,40 @@ export default function PFC() {
     familySupport: 0,
   });
 
+  
+
+
+  useEffect(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem("pv_pfc_payload") || "null");
+      if (!cached) return;
+
+      const { info: cInfo, income: cIncome, expenses: cExp } = cached;
+
+      if (cInfo) setInfo((prev) => ({ ...prev, ...cInfo }));
+      if (cIncome) setIncome(cIncome);
+
+      if (cExp) {
+        setHousing(cExp.housing || {});
+        setFood(cExp.food || {});
+        setTransport(cExp.transport || {});
+        setLifestyle(cExp.lifestyle || {});
+        setHealth(cExp.health || {});
+        setObligations(cExp.obligations || {});
+        setLeisure(cExp.leisure || {});
+        setGrowth(cExp.growth || {});
+        setGiving(cExp.giving || {});
+      }
+    } catch (e) {
+      console.error("Failed to hydrate PFC from localStorage", e);
+    }
+  }, []);
+
+
+
+
+
+
   /* -------- results -------- */
   const totalIncome = useMemo(
     () => Object.values(income).reduce((a, b) => a + fmt(b), 0),
@@ -151,7 +187,16 @@ export default function PFC() {
       </div>
     );
 
+    
+
   const goToReport = () => {
+        // block empty report
+    // if (!hasAnyAmount()) {
+    //   alert(
+    //     ""
+    //   );
+    //   return;
+    // }
     const payload = {
       info,
       income,

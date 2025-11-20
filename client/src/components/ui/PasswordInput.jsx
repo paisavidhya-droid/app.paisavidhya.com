@@ -30,6 +30,7 @@ export default function PasswordInput({ label="Password", hint, error, ...props 
           }}
         >
           {show ? <FaEyeSlash size={16}  /> : <FaEye size={16}  />}
+          {/* {show ? "🙈" : "👁️"} */}
         </button>
       </div>
 

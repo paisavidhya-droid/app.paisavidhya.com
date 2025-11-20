@@ -17,6 +17,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { useDeviceSize } from "../../context/DeviceSizeContext";
 import MathCaptcha from "../../components/MathCaptcha";
+import FloatField from "../../components/ui/FancyInput/FloatField";
 
 /* --------------------------- Sign In --------------------------- */
 function SignInForm({ setTabIndex, setPrefill }) {
@@ -132,7 +133,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
           {err}
         </Alert>
       )}
-      <Input
+      {/* <Input
         label="Email or phone"
         type="text"
         placeholder="you@example.com or 9999999999"
@@ -145,6 +146,21 @@ function SignInForm({ setTabIndex, setPrefill }) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         autoComplete="current-password"
+      /> */}
+      <FloatField
+        label="Email or phone"
+        type="text"
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value)}
+        autoComplete="username"
+      />
+
+      <FloatField
+        label="Password"
+        type="password"
+        showToggle
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
       <MathCaptcha onChange={setCaptchaOK} />
       <div

@@ -15,7 +15,9 @@ import { requireRole, ROLES } from "../middlewares/roleMiddleware.js";
 const router = Router();
 
 router.get('/staff', auth, requireRole(ROLES.ADMIN), listStaff);
-router.get('/assignable', listAssignableUsers);
+router.get('/assignable', auth, requireRole(ROLES.ADMIN), listAssignableUsers);
+
+// router.get('/assignable', listAssignableUsers);
 
 // Admin creates users (STAFF/ADMIN/CUSTOMER)
 router.post('/', auth, requireRole(ROLES.ADMIN), adminCreate);

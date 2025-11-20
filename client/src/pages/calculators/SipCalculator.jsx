@@ -621,7 +621,7 @@ export default function SipCalculator() {
               value={rate}
               onChange={setRate}
               min={-10}
-              max={25}
+              max={50}
               step={0.1}
               suffix="%"
             />

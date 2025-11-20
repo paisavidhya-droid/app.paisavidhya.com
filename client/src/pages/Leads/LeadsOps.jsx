@@ -117,7 +117,8 @@ export default function LeadsOps() {
 
   const fmtNextActionNode = (lead) => {
     const t = fmtNextAction(lead);
-    return t === "ASAP" ? <Badge>ASAP</Badge> : t;
+    return t === "Later" ? <Badge>Later</Badge> : t;
+    // return t === "ASAP" ? <Badge>ASAP</Badge> : t;
   };
 
   return (

@@ -5,12 +5,15 @@ import { FaBars } from "react-icons/fa6";
 import { NavLink } from "react-router-dom";
 import { AvatarMenu } from "./AvatarMenu";
 import { useAuth } from "../hooks/useAuth";
+import { useDeviceSize } from "../context/DeviceSizeContext";
 
 // export default function Navbar({ onOpenMobileSidebar, rightSlot }) {
 //   const [active, setActive] = useState("dashboard");
 
 export default function Navbar({ onOpenMobileSidebar }) {
   const { user, isLoggedIn } = useAuth();
+  const { isMobile } = useDeviceSize();
+
   return (
     <nav className="navbar" role="navigation" aria-label="Primary">
       {/* left: brand & mobile menu */}
@@ -31,7 +34,7 @@ export default function Navbar({ onOpenMobileSidebar }) {
       </div>
 
       {/* center: primary nav (desktop)*/}
-      {isLoggedIn && (
+      {!isLoggedIn && (
         <div className="navbar__nav" role="menubar" aria-label="Sections">
           {[
             { id: "Home", label: "Home", to: "/" },
@@ -116,7 +119,7 @@ export default function Navbar({ onOpenMobileSidebar }) {
             >
               Sign in
             </NavLink>
-            <ThemeToggle />
+            {!isMobile && <ThemeToggle />}
           </>
         )}
         {/* theme toggle slot (optional) 

@@ -3,6 +3,7 @@ import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import { addAudit } from '../utils/audit.js';
 import { shouldAuditLoginSuccess } from '../utils/authAuditPolicy.js';
+import Profile from '../models/profile.model.js';
 
 /** POST /api/auth/register  (public → creates CUSTOMER) */
 const register = async (req, res, next) => {
@@ -11,7 +12,7 @@ const register = async (req, res, next) => {
     if (!name || !email || !password || !phoneNumber) {
       return res.status(400).json({ message: 'name, email, password, phoneNumber are required' });
     }
-     // check duplicates for BOTH email & phone
+    // check duplicates for BOTH email & phone
     const [emailExists, phoneExists] = await Promise.all([
       User.exists({ email }),
       User.exists({ phoneNumber }),
@@ -20,6 +21,13 @@ const register = async (req, res, next) => {
     if (phoneExists) return res.status(409).json({ message: 'Phone already registered' });
 
     const user = await User.create({ name, email, password, phoneNumber, role: 'CUSTOMER' });
+
+    await Profile.create({
+      userId: user._id,
+      name: { full: name }, // since User.name is a simple string
+      primaryPhone: { number: phoneNumber },
+    });
+
     const token = user.generateAuthToken();
     const safe = await User.findById(user._id).select('-password').lean();
 
@@ -126,6 +134,13 @@ const adminCreate = async (req, res, next) => {
     if (exists) return res.status(409).json({ message: 'Email already exists' });
 
     const user = await User.create({ name, email, password, phoneNumber, role });
+
+    await Profile.create({
+      userId: user._id,
+      name: { full: name },
+      primaryPhone: { number: phoneNumber },
+    });
+
     const safe = await User.findById(user._id).select('-password').lean();
 
     // AUDIT
@@ -311,7 +326,7 @@ const listAssignableUsers = async (req, res, next) => {
       .limit(limit)
       .lean();
 
-      res.json({
+    res.json({
       items: items.map(u => ({
         _id: String(u._id),
         name: u.name || "",

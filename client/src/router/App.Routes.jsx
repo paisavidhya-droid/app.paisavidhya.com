@@ -15,6 +15,7 @@ import FFC from "../modules/FFC";
 import FFCReport from "../modules/FFCReport";
 import SipCalculator from "../pages/calculators/SipCalculator";
 import ToolsHub from "../pages/ToolsHub";
+import InsuranceApplications from "../modules/Insurance/InsuranceApplications";
 // import ToolstestHub from "../pages/test";
 // import RequireRole from "../auth/RequireRole";
 
@@ -64,6 +65,9 @@ export default function AppRoutes() {
 
         <Route path="/tools" element={<ToolsHub />} />
         <Route path="/tools/sip-calculator" element={<SipCalculator />} />
+
+        <Route path="/insurance/apply" element={<InsuranceApplications />} />
+
         {/* <Route path="/test" element={<ToolstestHub/>} /> */}
 
         {/* Authenticated area */}

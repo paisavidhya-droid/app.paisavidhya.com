@@ -9,7 +9,6 @@ export default function MathCaptcha({
   max = 9,
   className = "",
   style,
-  size = "sm", // not used by default Input, but kept if you map sizes
 }) {
   const [a, setA] = useState(0);
   const [b, setB] = useState(0);
@@ -95,7 +94,24 @@ export default function MathCaptcha({
               background: "var(--pv-surface)",
             }}
           >
-            {a} {op} {b} = ?
+            {a} {op} {b} = ?{" "}
+            <Button
+              type="button"
+              onClick={refresh}
+              variant="secondary"
+              disabled={refreshing}
+              style={{padding: 8}}
+            >
+              {refreshing ? (
+                <span className="pv-row">
+                  <ClipLoader size={14} />
+                </span>
+              ) : (
+                <span className="pv-row">
+                  <FiRefreshCw size={16} />
+                </span>
+              )}
+            </Button>
           </div>
           <Input
             aria-label="Enter the result of the math question"
@@ -106,23 +122,6 @@ export default function MathCaptcha({
             style={{ width: 96 }}
             maxLength={3}
           />
-          <Button
-            type="button"
-            onClick={refresh}
-            variant="secondary"
-            disabled={refreshing}
-          >
-            {refreshing ? (
-              <span className="pv-row" style={{ gap: 6, alignItems: "center" }}>
-                <ClipLoader size={14} /> New
-              </span>
-            ) : (
-              <span className="pv-row" style={{ gap: 6, alignItems: "center" }}>
-                <FiRefreshCw size={16} />
-                New
-              </span>
-            )}
-          </Button>
         </div>
         {valid && (
           <Badge
