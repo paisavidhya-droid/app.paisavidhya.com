@@ -16,10 +16,7 @@ services:
     depends_on:
       
 
-  
 
-volumes:
-  mongo-data:
 
 
 
