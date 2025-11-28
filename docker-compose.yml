@@ -1,3 +1,4 @@
+
 version: "3.8"
 
 services:
@@ -11,29 +12,7 @@ services:
       - .env
     environment:
       - NODE_ENV=production
-      # Add your DB connection, JWT secrets, etc.
-      - MONGO_URI=${MONGO_URI}
-    depends_on:
-      - mongo
-
-  bse-service:
-    build: ./bse-service
-    container_name: pv-bse-service
-    restart: always
-    ports:
-      - "4000:4000"
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=production
-      - BSE_MEMBER_ID=${BSE_MEMBER_ID}
-      - BSE_USER_ID=${BSE_USER_ID}
-      - BSE_PASSWORD=${BSE_PASSWORD}
-      - BSE_ENCRYPTION_KEY_PATH=/keys/pv_private.pem
-      - BSE_PUBLIC_KEY_PATH=/keys/bse_public.pem
-      # etc.
-    volumes:
-      - /home/ubuntu/bse-keys:/keys:ro
+      - MONGO_URI=${MONGODB_URI}  
     depends_on:
       - mongo
 
@@ -48,3 +27,57 @@ services:
 
 volumes:
   mongo-data:
+
+
+
+
+# version: "3.8"
+
+# services:
+#   server:
+#     build: ./server
+#     container_name: pv-server
+#     restart: always
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - .env
+#     environment:
+#       - NODE_ENV=production
+#       # Add your DB connection, JWT secrets, etc.
+#       - MONGO_URI=${MONGO_URI}
+#     depends_on:
+#       - mongo
+
+#   bse-service:
+#     build: ./bse-service
+#     container_name: pv-bse-service
+#     restart: always
+#     ports:
+#       - "4000:4000"
+#     env_file:
+#       - .env
+#     environment:
+#       - NODE_ENV=production
+#       - BSE_MEMBER_ID=${BSE_MEMBER_ID}
+#       - BSE_USER_ID=${BSE_USER_ID}
+#       - BSE_PASSWORD=${BSE_PASSWORD}
+#       - BSE_ENCRYPTION_KEY_PATH=/keys/pv_private.pem
+#       - BSE_PUBLIC_KEY_PATH=/keys/bse_public.pem
+#       # etc.
+#     volumes:
+#       - /home/ubuntu/bse-keys:/keys:ro
+#     depends_on:
+#       - mongo
+
+#   mongo:
+#     image: mongo:7
+#     container_name: pv-mongo
+#     restart: always
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db
+
+# volumes:
+#   mongo-data:
