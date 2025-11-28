@@ -13,8 +13,7 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI=${MONGODB_URI}  
-    depends_on:
-      - []
+  
       
 
 
