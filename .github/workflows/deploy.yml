@@ -17,6 +17,13 @@ jobs:
           echo "HOST: ${{ secrets.EC2_HOST }}"
           echo "USER: ${{ secrets.EC2_USER }}"
 
+      - name: Test secrets
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then echo "EC2_HOST missing"; fi
+          if [ -z "${{ secrets.EC2_USER }}" ]; then echo "EC2_USER missing"; fi
+          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then echo "EC2_SSH_KEY missing"; fi
+
+
 
       - name: SSH & Deploy
         uses: appleboy/ssh-action@v1.2.0
