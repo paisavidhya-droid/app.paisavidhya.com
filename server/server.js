@@ -38,7 +38,7 @@ app.use(cors(corsOptions));
 // app.use(morgan('dev'));
 app.use(express.json());
 
-app.get("/api/health", (req, res) => res.status(200).send("ok"));
+app.get("/api/health", (req, res) => res.status(200).send("All Good!!!"));
 
 
 // Routes
