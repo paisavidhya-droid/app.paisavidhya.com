@@ -11,7 +11,7 @@ services:
       - ./server/.env
     environment:
       - NODE_ENV=production
-      - MONGO_URI=${MONGODB_URI}
+
 
   bse-service:
     build: ./bse-service
@@ -23,11 +23,7 @@ services:
       - ./bse-service/.env
     environment:
       - NODE_ENV=production
-      - BSE_MEMBER_ID=${BSE_MEMBER_ID}
-      - BSE_USER_ID=${BSE_USER_ID}
-      - BSE_PASSWORD=${BSE_PASSWORD}
-      - BSE_ENCRYPTION_KEY_PATH=/keys/pv_private.pem
-      - BSE_PUBLIC_KEY_PATH=/keys/bse_public.pem
+
 
      
   
