@@ -1,4 +1,3 @@
-
 version: "3.8"
 
 services:
@@ -12,23 +11,24 @@ services:
       - ./server/.env
     environment:
       - NODE_ENV=production
-      - MONGO_URI=${MONGODB_URI}  
+      - MONGO_URI=${MONGODB_URI}
 
-    bse-service:
-      build: ./bse-service
-      container_name: pv-bse-service
-      restart: always
-      ports:
-        - "3000:3000"
-      env_file:
-        - ./bse-service/.env
-      environment:
-        - NODE_ENV=production
-        - BSE_MEMBER_ID=${BSE_MEMBER_ID}
-        - BSE_USER_ID=${BSE_USER_ID}
-        - BSE_PASSWORD=${BSE_PASSWORD}
-        - BSE_ENCRYPTION_KEY_PATH=/keys/pv_private.pem
-        - BSE_PUBLIC_KEY_PATH=/keys/bse_public.pem
+  bse-service:
+    build: ./bse-service
+    container_name: pv-bse-service
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./bse-service/.env
+    environment:
+      - NODE_ENV=production
+      - BSE_MEMBER_ID=${BSE_MEMBER_ID}
+      - BSE_USER_ID=${BSE_USER_ID}
+      - BSE_PASSWORD=${BSE_PASSWORD}
+      - BSE_ENCRYPTION_KEY_PATH=/keys/pv_private.pem
+      - BSE_PUBLIC_KEY_PATH=/keys/bse_public.pem
+
      
   
       
