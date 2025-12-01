@@ -11,6 +11,8 @@ services:
       - ./server/.env
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./bse-service/keys:/usr/src/app/keys:ro
 
 
   bse-service:
