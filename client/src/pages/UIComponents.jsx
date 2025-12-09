@@ -69,6 +69,10 @@ export default function UIComponents() {
         { id: "pagination", label: "Pagination" },
         { id: "module-header", label: "Module Header" },
         { id: "placeholder", label: "Placeholder" },
+        { id: "pin", label: "OTP / PIN Input" },
+        { id: "amount-input", label: "Amount Input (₹)" },
+        { id: "alert-icons", label: "Alert With Icons" },
+        { id: "status-badge", label: "Status Badge" },
       ].filter((it) => it.label.toLowerCase().includes(q.toLowerCase())),
     [q]
   );

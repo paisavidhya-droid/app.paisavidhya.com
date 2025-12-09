@@ -1,26 +1,25 @@
-// routes/profile.routes.js
+// router/profile.routes.js
 import { Router } from 'express';
 import auth from '../middlewares/authMiddleware.js';
 import { requireRole, ROLES } from '../middlewares/roleMiddleware.js';
 import {
   getMyProfile,
   upsertMyProfile,
-  listProfiles,
-  getProfileByUserId,
-  updateProfileByUserId,
-  deleteProfileByUserId,
+  adminListProfiles,
+  adminGetProfileByUserId,
+  adminUpdateProfileByUserId,
 } from '../controllers/profile.controller.js';
 
 const router = Router();
 
-// Self routes
+// Logged-in user endpoints
 router.get('/me', auth, getMyProfile);
+router.put('/me', auth, upsertMyProfile);
 router.patch('/me', auth, upsertMyProfile);
 
-// Admin routes
-router.get('/', auth, requireRole(ROLES.ADMIN), listProfiles);
-router.get('/:userId', auth, getProfileByUserId);        // internal guard handles admin/self
-router.patch('/:userId', auth, updateProfileByUserId);   // internal guard handles admin/self
-router.delete('/:userId', auth, requireRole(ROLES.ADMIN), deleteProfileByUserId);
+// Admin endpoints
+router.get('/', auth, requireRole(ROLES.ADMIN), adminListProfiles);
+router.get('/:userId', auth, requireRole(ROLES.ADMIN), adminGetProfileByUserId);
+router.patch('/:userId', auth, requireRole(ROLES.ADMIN), adminUpdateProfileByUserId);
 
 export default router;

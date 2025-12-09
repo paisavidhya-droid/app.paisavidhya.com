@@ -68,3 +68,16 @@ export const deleteUserById = async (id) => {
   const res = await axiosInstance.delete(`${BASE}/${id}`);
   return res.data; // { message, id }
 };
+
+
+export const takePledge = async () => {
+  const res = await axiosInstance.post(`${BASE}/pledge`);
+  return res.data;             
+};
+
+export const downloadCertificate = async () => {
+  const res = await axiosInstance.get(`${BASE}/certificate`, {
+    responseType: "arraybuffer",   
+  });
+  return res.data; 
+};

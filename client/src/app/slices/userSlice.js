@@ -1,4 +1,4 @@
-// src/store/usersSlice.js
+// src/store/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as userService from "../../services/userService";
 import toast from "react-hot-toast";

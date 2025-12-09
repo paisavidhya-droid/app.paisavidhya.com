@@ -16,6 +16,7 @@ import ModuleHeader from "../components/ui/ModuleHeader";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { getMyProfile } from "../services/profileService";
 
 const fmt = (n) => (isNaN(n) ? 0 : Number(n));
 
@@ -163,6 +164,56 @@ export default function PFC() {
   }, []);
 
 
+  // ✅ Load profile and map to basic info (read-only)
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const profile = await getMyProfile();
+        if (!profile) return;
+
+        const fullName =
+          profile.name?.full ||
+          [profile.name?.first, profile.name?.last].filter(Boolean).join(" ");
+
+        const dob = profile.dob ? profile.dob.substring(0, 10) : "";
+
+        let genderLabel = "";
+        switch (profile.gender) {
+          case "MALE":
+            genderLabel = "Male";
+            break;
+          case "FEMALE":
+            genderLabel = "Female";
+            break;
+          case "OTHER":
+            genderLabel = "Other";
+            break;
+          default:
+            genderLabel = "";
+        }
+
+        const cityState = [profile.address?.city, profile.address?.state]
+          .filter(Boolean)
+          .join(", ");
+
+        const mobile =
+          profile.primaryPhone?.number || user?.phoneNumber || "";
+
+        setInfo((prev) => ({
+          ...prev,
+          name: fullName || prev.name,
+          dob: dob || prev.dob,
+          gender: genderLabel || prev.gender,
+          city: cityState || prev.city,
+          mobile: mobile || prev.mobile,
+        }));
+      } catch (e) {
+        console.error("Failed to load profile for PFC", e);
+      }
+    };
+
+    loadProfile();
+  }, [user]);
 
 
 
@@ -230,44 +281,52 @@ export default function PFC() {
         className="pv-col pv-container"
         style={{ gap: 24, padding: "16px 8px" }}
       >
-        {/* ---------- Basic Info ---------- */}
+          {/* ---------- Basic Info (from Profile, read-only) ---------- */}
         <Card title="Personal Details">
           <div className="pv-row" style={{ flexWrap: "wrap", gap: 12 }}>
             <Input
               label="Full Name"
               placeholder="Your name"
               value={info.name}
-              onChange={(e) => setInfo({ ...info, name: e.target.value })}
+              disabled // ⬅️ read-only
             />
             <Input
               type="date"
               label="Date of Birth"
               value={info.dob}
-              onChange={(e) => setInfo({ ...info, dob: e.target.value })}
+              disabled // ⬅️ read-only
             />
             <Select
               label="Gender"
               value={info.gender}
-              onChange={(e) => setInfo({ ...info, gender: e.target.value })}
+              disabled // ⬅️ read-only
             >
-              <option value="">Select</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
+              <option value="">{info.gender || "Select"}</option>
             </Select>
             <Input
               label="City & State"
               value={info.city}
-              onChange={(e) => setInfo({ ...info, city: e.target.value })}
+              disabled // ⬅️ read-only
             />
             <Input
               label="WhatsApp Number"
               placeholder="10-digit number"
               value={info.mobile}
-              onChange={(e) => setInfo({ ...info, mobile: e.target.value })}
+              disabled // ⬅️ read-only
             />
           </div>
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 12,
+              color: "var(--pv-dim)",
+            }}
+          >
+            To update these details, go to{" "}
+            <strong>My Profile</strong> page.
+          </div>
         </Card>
+
 
         <Alert type="info" title="Tip">
           Enter all amounts as <strong>monthly</strong> values for best

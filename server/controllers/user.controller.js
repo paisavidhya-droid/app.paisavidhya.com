@@ -22,11 +22,33 @@ const register = async (req, res, next) => {
 
     const user = await User.create({ name, email, password, phoneNumber, role: 'CUSTOMER' });
 
-    await Profile.create({
-      userId: user._id,
-      name: { full: name }, // since User.name is a simple string
-      primaryPhone: { number: phoneNumber },
-    });
+    // 🔹 Create linked Profile (basic info)
+    try {
+      const [first, ...rest] = String(name).trim().split(' ');
+      const last = rest.join(' ') || '';
+      await Profile.create({
+        userId: user._id,
+        name: {
+          first: first || '',
+          last: last || '',
+          full: name,
+        },
+        primaryPhone: {
+          number: phoneNumber,
+          verified: false,
+        },
+        // other fields (dob, gender, kyc, address, bank, nominee) stay empty for now
+      });
+    } catch (e) {
+      // if profile creation fails, don't block signup – just log via audit
+      await addAudit({
+        req,
+        action: 'PROFILE_CREATE_FAIL_ON_REGISTER',
+        entity: 'User',
+        entityId: user._id,
+        after: { error: e.message },
+      });
+    }
 
     const token = user.generateAuthToken();
     const safe = await User.findById(user._id).select('-password').lean();
@@ -115,9 +137,12 @@ const login = async (req, res, next) => {
 /** GET /api/auth/me  (auth) */
 const me = async (req, res, next) => {
   try {
-    const me = await User.findById(req.auth.sub).select("-password").lean();
-    if (!me) return res.status(404).json({ message: "User not found" });
-    return res.json({ user: me });
+    const userId = req.auth?.sub || req.user?.sub;
+    const user = await User.findById(userId).select("-password").lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const profile = await Profile.findOne({ userId }).lean();
+
+    return res.json({ user, profile });
   } catch (err) {
     next(err);
   }
@@ -349,6 +374,9 @@ const removeById = async (req, res, next) => {
 
     const removed = await User.findByIdAndDelete(id).select('-password').lean();
     if (!removed) return res.status(404).json({ message: 'User not found' });
+
+     // 🔹 Remove linked profile (if any)
+    await Profile.findOneAndDelete({ userId: id });
 
     // AUDIT
     await addAudit({

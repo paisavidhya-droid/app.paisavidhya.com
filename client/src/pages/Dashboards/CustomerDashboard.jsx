@@ -1,6 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Button, Badge, Alert, Progress, Skeleton, Tooltip } from "../../components";
+import {
+  Card,
+  Button,
+  Badge,
+  Alert,
+  Progress,
+  Skeleton,
+  Tooltip,
+  Modal,
+} from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import * as userService from "../../services/userService";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { authenticateUser } from "../../app/slices/authSlice";
 
 // Local tiny UI helpers (no shared imports)
 function Stat({ label, value, hint }) {
@@ -8,18 +23,25 @@ function Stat({ label, value, hint }) {
     <div className="pv-card" style={{ padding: 14, flex: "1 1 200px" }}>
       <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>{label}</div>
       <div style={{ fontSize: 22, fontWeight: 800 }}>{value}</div>
-      {hint && <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>{hint}</div>}
+      {hint && (
+        <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>{hint}</div>
+      )}
     </div>
   );
 }
 const Row = ({ children }) => (
-  <div className="pv-row" style={{ gap: 16, flexWrap: "wrap" }}>{children}</div>
+  <div className="pv-row" style={{ gap: 16, flexWrap: "wrap" }}>
+    {children}
+  </div>
 );
 const Col = ({ children, style }) => (
-  <div className="pv-col" style={{ gap: 16, ...(style || {}) }}>{children}</div>
+  <div className="pv-col" style={{ gap: 16, ...(style || {}) }}>
+    {children}
+  </div>
 );
 
 export default function CustomerDashboard() {
+  const dispatch = useDispatch();
   const { user } = useAuth();
 
   // --- Dummy data only ---
@@ -42,8 +64,14 @@ export default function CustomerDashboard() {
         pipelineLabel: "Leads → Appointments → Checkups",
 
         customerTips: [
-          { type: "info",    message: "Verify your mobile & email to secure your account." },
-          { type: "success", message: "Emergency fund at 4 months — aim for 6 months." },
+          {
+            type: "info",
+            message: "Verify your mobile & email to secure your account.",
+          },
+          {
+            type: "success",
+            message: "Emergency fund at 4 months — aim for 6 months.",
+          },
           { type: "warning", message: "KYC pending for MF linking." },
         ],
       };
@@ -71,39 +99,137 @@ export default function CustomerDashboard() {
     return Math.min(100, Math.round((done / total) * 100));
   }, [summary]);
 
+  const [showPledgeModal, setShowPledgeModal] = useState(false);
+  const [pledgeLoading, setPledgeLoading] = useState(false);
+
+    const viewCertificate = async () => {
+    try {
+      const data = await userService.downloadCertificate();
+
+      const blob = new Blob([data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+
+      window.open(url, "_blank");
+    } catch (err) {
+      console.error("Certificate open error:", err);
+      toast.error("Unable to generate certificate. Please try again.");
+    }
+  };
+
+  const submitPledge = async () => {
+    try {
+      setPledgeLoading(true);
+
+      const res = await userService.takePledge();
+
+      if (res.success) {
+        setShowPledgeModal(false);
+
+          // refresh logged-in user to update UI
+  await dispatch(authenticateUser());
+
+        // Optional small toast
+        toast.success("Your Financial Safety Pledge has been saved.");
+
+        // Beautiful success popup
+        const result = await Swal.fire({
+          title: "Pledge Completed 🎉",
+          html: `
+            <p style="margin-bottom:8px;">
+              Thank you, <b>${user?.name || "Investor"}</b>, for taking the
+              <b>Financial Discipline & Safety Pledge</b>.
+            </p>
+            <p style="font-size:14px; color:#6b7280;">
+              This is your first step towards a safe, disciplined and
+              long-term wealth journey with <b>Paisavidhya</b>.
+            </p>
+          `,
+          icon: "success",
+          confirmButtonText: "View My Certificate",
+          showCancelButton: true,
+          cancelButtonText: "Close",
+          buttonsStyling: true,
+        });
+
+        // If they click "View My Certificate"
+        if (result.isConfirmed) {
+          await viewCertificate();
+        } 
+        // else {
+        //   // If you want to hard-refresh to get updated user.pledge in UI:
+        //   window.location.reload();
+        // }
+      }
+    } catch (err) {
+      console.log(err);
+      Swal.fire(
+        "Error",
+        "Error saving your pledge. Please try again.",
+        "error"
+      );
+    } finally {
+      setPledgeLoading(false);
+    }
+  };
+
   return (
-    <div className="pv-container" style={{ maxWidth: 1200, margin:"0 auto", padding:"24px 16px" }}>
+    <div
+      className="pv-container"
+      style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px" }}
+    >
       <Card>
-        <div className="pv-row" style={{ justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap" }}>
-          <div className="pv-col" style={{ gap:4 }}>
-            <div style={{ fontSize:14, color:"var(--pv-dim)" }}>Welcome</div>
-            <h1 style={{ margin:0, fontSize:26 }}>
+        <div
+          className="pv-row"
+          style={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <div className="pv-col" style={{ gap: 4 }}>
+            <div style={{ fontSize: 14, color: "var(--pv-dim)" }}>Welcome</div>
+            <h1 style={{ margin: 0, fontSize: 26 }}>
               {user?.name || "User"} <Badge>Customer</Badge>
             </h1>
           </div>
-          <div className="pv-row" style={{ gap:8 }}>
-            <Button as="a" href="/leads" className="pv-btn">Book Checkup</Button>
-            <Button as="a" href="/profile" variant="ghost">Complete profile</Button>
+          <div className="pv-row" style={{ gap: 8 }}>
+            <Button as={Link} to="/leads" className="pv-btn">
+              Book Checkup
+            </Button>
+            <Button as={Link} to="/profile" variant="ghost">
+              Complete profile
+            </Button>
           </div>
         </div>
       </Card>
 
-      {error && <Alert type="error" style={{ marginTop: 12 }}>{error}</Alert>}
+      {error && (
+        <Alert type="error" style={{ marginTop: 12 }}>
+          {error}
+        </Alert>
+      )}
 
       {/* Stats */}
       <Row>
         {loading ? (
           <>
-            <Skeleton height={90} style={{ flex:"1 1 200px" }} />
-            <Skeleton height={90} style={{ flex:"1 1 200px" }} />
-            <Skeleton height={90} style={{ flex:"1 1 200px" }} />
-            <Skeleton height={90} style={{ flex:"1 1 200px" }} />
+            <Skeleton height={90} style={{ flex: "1 1 200px" }} />
+            <Skeleton height={90} style={{ flex: "1 1 200px" }} />
+            <Skeleton height={90} style={{ flex: "1 1 200px" }} />
+            <Skeleton height={90} style={{ flex: "1 1 200px" }} />
           </>
         ) : (
           <>
             <Stat label="Leads today" value={summary?.leadsToday ?? 0} />
-            <Stat label="Upcoming appointments" value={summary?.upcomingAppointments ?? 0} />
-            <Stat label="Checkups in progress" value={summary?.checkupsInProgress ?? 0} />
+            <Stat
+              label="Upcoming appointments"
+              value={summary?.upcomingAppointments ?? 0}
+            />
+            <Stat
+              label="Checkups in progress"
+              value={summary?.checkupsInProgress ?? 0}
+            />
             <Stat
               label="Profile completion"
               value={`${summary?.profileCompletion ?? 0}%`}
@@ -114,34 +240,64 @@ export default function CustomerDashboard() {
       </Row>
 
       <Row>
-        <Col style={{ flex:"1 1 520px" }}>
+        <Col style={{ flex: "1 1 520px" }}>
           <Card title="Quick actions">
-            <div className="pv-row" style={{ gap:8, flexWrap:"wrap" }}>
-              <Button as="a" href="/pfc">Start PFC</Button>
-              <Button variant="ghost" as="a" href="/profile">Complete profile</Button>
+            <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
+              <Button as={Link} to="/pfc">
+                Start PFC
+              </Button>
+              <Button variant="ghost" as={Link} to="/profile">
+                Complete profile
+              </Button>
+              {!user?.pledge?.taken && (
+                <Button
+                  onClick={() => setShowPledgeModal(true)}
+                >
+                  Take Financial Safety Pledge
+                </Button>
+              )}
+
+              {user?.pledge?.taken && (
+                <Button as={Link} onClick={viewCertificate} variant="ghost">
+                  View Certificate
+                </Button>
+              )}
             </div>
           </Card>
 
-          {Array.isArray(summary?.customerTips) && summary.customerTips.length>0 && (
-            <Card title="Next steps">
-              <div className="pv-col" style={{ gap:8 }}>
-                {summary.customerTips.map((t,i)=>(
-                  <Alert key={i} type={t.type || "info"}>{t.message}</Alert>
-                ))}
-              </div>
-            </Card>
-          )}
+          {Array.isArray(summary?.customerTips) &&
+            summary.customerTips.length > 0 && (
+              <Card title="Next steps">
+                <div className="pv-col" style={{ gap: 8 }}>
+                  {summary.customerTips.map((t, i) => (
+                    <Alert key={i} type={t.type || "info"}>
+                      {t.message}
+                    </Alert>
+                  ))}
+                </div>
+              </Card>
+            )}
         </Col>
 
-        <Col style={{ flex:"1 1 360px" }}>
+        <Col style={{ flex: "1 1 360px" }}>
           <Card title="Overview">
-            <div className="pv-col" style={{ gap:10 }}>
-              <div className="pv-row" style={{ justifyContent:"space-between" }}>
+            <div className="pv-col" style={{ gap: 10 }}>
+              <div
+                className="pv-row"
+                style={{ justifyContent: "space-between" }}
+              >
                 <span>PFC pipeline</span>
                 <Badge>{summary?.pipelineStatus ?? "—"}</Badge>
               </div>
               <Progress value={loading ? 0 : pipelineProgress} />
-              <div className="pv-row" style={{ justifyContent:"space-between", color:"var(--pv-dim)", fontSize:12 }}>
+              <div
+                className="pv-row"
+                style={{
+                  justifyContent: "space-between",
+                  color: "var(--pv-dim)",
+                  fontSize: 12,
+                }}
+              >
                 <span>Stage</span>
                 <span>{summary?.pipelineLabel ?? "—"}</span>
               </div>
@@ -149,23 +305,82 @@ export default function CustomerDashboard() {
           </Card>
 
           <Card title="Shortcuts">
-            <div className="pv-col" style={{ gap:8 }}>
-              <Button as="a" href="/profile" variant="ghost">Edit profile</Button>
-              <Button as="a" href="/calculators/sip" variant="ghost">SIP Calculator</Button>
+            <div className="pv-col" style={{ gap: 8 }}>
+              <Button as="a" href="/profile" variant="ghost">
+                Edit profile
+              </Button>
+              <Button as="a" href="/calculators/sip" variant="ghost">
+                SIP Calculator
+              </Button>
             </div>
           </Card>
         </Col>
       </Row>
 
       <Card>
-        <div className="pv-row" style={{ justifyContent:"space-between", alignItems:"center", gap:10, flexWrap:"wrap" }}>
-          <div className="pv-col" style={{ gap:4 }}>
-            <div style={{ fontWeight:800 }}>Your data is protected</div>
-            <div style={{ color:"var(--pv-dim)" }}>End-to-end TLS. Consent-first access. Logged actions.</div>
+        <div
+          className="pv-row"
+          style={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <div className="pv-col" style={{ gap: 4 }}>
+            <div style={{ fontWeight: 800 }}>Your data is protected</div>
+            <div style={{ color: "var(--pv-dim)" }}>
+              End-to-end TLS. Consent-first access. Logged actions.
+            </div>
           </div>
-          <Tooltip content="View privacy & terms"><Badge>Privacy-first</Badge></Tooltip>
+          <Tooltip content="View privacy & terms">
+            <Badge>Privacy-first</Badge>
+          </Tooltip>
         </div>
       </Card>
+      {/* Pledge Modal */}
+      <Modal
+        isOpen={showPledgeModal}
+        onClose={() => setShowPledgeModal(false)}
+        title="Financial Discipline & Safety Pledge"
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => setShowPledgeModal(false)}
+              disabled={pledgeLoading}
+            >
+              Cancel
+            </Button>
+            <Button onClick={submitPledge} disabled={pledgeLoading}>
+              {pledgeLoading ? "Saving..." : "I Agree, Complete My Pledge"}
+            </Button>
+          </>
+        }
+      >
+        <div
+          className="pledge-text"
+          style={{ maxHeight: 300, overflowY: "auto" }}
+        >
+          <p style={{ fontSize: 14, color: "var(--pv-dim)" }}>
+            By accepting this pledge, you are committing to practice safe,
+            disciplined money habits with Paisavidhya’s guidance.
+          </p>
+          <ul>
+            <li>I will stay away from financial traps and misleading schemes.</li>
+            <li>I will avoid instant loan apps & high-interest credit traps.</li>
+            <li>I will borrow only when necessary & from legal sources.</li>
+            <li>
+              I will protect myself from online financial frauds & phishing.
+            </li>
+            <li>
+              I will not allow greed or fear to influence financial decisions.
+            </li>
+            <li>I will follow smart money habits & maintain discipline.</li>
+            <li>I will encourage others to stay financially safe.</li>
+          </ul>
+        </div>
+      </Modal>
     </div>
   );
 }

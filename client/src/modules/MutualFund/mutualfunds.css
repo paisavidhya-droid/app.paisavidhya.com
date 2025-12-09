@@ -1,0 +1,443 @@
+/* MUTUAL FUNDS PAGE – all namespaced with mf- to avoid conflicts */
+
+/* Page shell (sits inside .pv-container) */
+.mf-page {
+  padding-block: 24px 40px;
+}
+
+/* Header */
+.mf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.mf-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--pv-text);
+}
+
+.mf-subtitle {
+  font-size: 13px;
+  color: var(--pv-dim);
+  max-width: 520px;
+}
+
+.mf-header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Card that holds Tabs */
+.mf-tabs-card {
+  margin-top: 8px;
+}
+
+/* Generic tab layout */
+.mf-tab-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+/* Grids */
+.mf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.mf-grid-2-bottom {
+  margin-top: 4px;
+}
+
+/* key-value rows */
+.mf-kv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: var(--pv-dim);
+  margin-bottom: 6px;
+}
+
+.mf-kv strong,
+.mf-kv span + strong {
+  color: var(--pv-text);
+  font-weight: 600;
+}
+
+.mf-text-success {
+  color: var(--pv-success);
+  font-weight: 500;
+}
+
+.mf-text-danger {
+  color: var(--pv-danger);
+  font-weight: 500;
+}
+
+/* Progress */
+.mf-progress-wrap {
+  margin-top: 10px;
+}
+
+.mf-progress-label {
+  font-size: 11px;
+  color: var(--pv-dim);
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* Quick actions */
+.mf-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mf-quick-btn {
+  width: 100%;
+}
+
+/* Holdings summary (Overview) */
+.mf-holdings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mf-holding-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mf-holding-main {
+  display: flex;
+  gap: 8px;
+}
+
+.mf-holding-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pv-primary);
+  margin-top: 6px;
+}
+
+.mf-holding-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pv-text);
+}
+
+.mf-holding-sub {
+  font-size: 11px;
+  color: var(--pv-dim);
+}
+
+.mf-holding-values {
+  text-align: right;
+}
+
+.mf-holding-amount {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Market summary */
+.mf-market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.mf-market-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Profit banner */
+.mf-profit-banner {
+  margin-top: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.08);
+  color: var(--pv-success);
+  text-align: center;
+}
+
+/* SIP section */
+.mf-sip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mf-sip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.mf-sip-amount {
+  color: var(--pv-primary);
+}
+
+.mf-sip-next {
+  font-size: 11px;
+  color: var(--pv-dim);
+}
+
+.mf-sip-next span {
+  color: var(--pv-text);
+}
+
+.mf-sip-manage {
+  white-space: nowrap;
+}
+
+/* Portfolio holdings cards */
+.mf-holdings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.mf-holding-card {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--pv-border);
+  background: var(--pv-card);
+}
+
+.mf-link {
+  color: var(--pv-primary);
+  margin-top: 2px;
+}
+
+.mf-holding-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.mf-holding-details span {
+  color: var(--pv-dim);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.mf-holding-details strong {
+  color: var(--pv-text);
+  font-weight: 600;
+}
+
+.mf-holding-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mf-holding-btn {
+  flex: 1;
+}
+
+/* Explore funds */
+.mf-explore-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mf-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.mf-funds-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mf-fund-card {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--pv-border);
+  background: var(--pv-card);
+}
+
+.mf-fund-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mf-fund-nav {
+  text-align: right;
+}
+
+.mf-fund-nav-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pv-text);
+}
+
+.mf-fund-nav-label {
+  font-size: 11px;
+  color: var(--pv-dim);
+}
+
+.mf-fund-meta-top {
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.mf-fund-meta-text {
+  font-size: 11px;
+  color: var(--pv-dim);
+}
+
+.mf-fund-returns {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.mf-fund-returns span:first-child {
+  color: var(--pv-dim);
+  display: block;
+}
+
+.mf-fund-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.mf-fund-btn {
+  flex: 1;
+}
+
+/* Profile */
+.mf-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mf-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--pv-text);
+}
+
+.mf-profile-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--pv-text);
+}
+
+.mf-profile-email {
+  font-size: 12px;
+  color: var(--pv-dim);
+}
+
+.mf-profile-kyc {
+  font-size: 11px;
+  color: var(--pv-success);
+}
+
+.mf-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 12px;
+}
+
+.mf-profile-grid span {
+  color: var(--pv-dim);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.mf-profile-grid strong {
+  color: var(--pv-text);
+}
+
+/* Settings list */
+.mf-settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.mf-settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mf-settings-link {
+  color: var(--pv-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (min-width: 900px) {
+  .mf-grid-2 {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+  }
+
+  .mf-holdings-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mf-tab-layout {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mf-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mf-header-actions {
+    width: 100%;
+  }
+
+  .mf-header-actions > * {
+    flex: 1;
+  }
+}

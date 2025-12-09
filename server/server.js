@@ -7,6 +7,7 @@ import authRoutes from './router/auth.routes.js';
 import userRoutes from './router/user.routes.js';
 import leadRoutes from './router/lead.routes.js';
 import auditRoutes from "./router/audit.routes.js";
+import profileRoutes from "./router/profile.routes.js";
 
 
 const app = express();
@@ -44,6 +45,7 @@ app.get("/api/health", (req, res) => res.status(200).send("All Good!!!"));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/profiles', profileRoutes);
 
 app.use('/api/leads', leadRoutes);
 

@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.12.17",
     "mongoose": "^8.18.0",
-    "nodemailer": "^7.0.6"
+    "nodemailer": "^7.0.6",
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
