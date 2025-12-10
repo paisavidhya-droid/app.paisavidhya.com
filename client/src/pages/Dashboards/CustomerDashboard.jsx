@@ -102,7 +102,7 @@ export default function CustomerDashboard() {
   const [showPledgeModal, setShowPledgeModal] = useState(false);
   const [pledgeLoading, setPledgeLoading] = useState(false);
 
-    const viewCertificate = async () => {
+  const viewCertificate = async () => {
     try {
       const data = await userService.downloadCertificate();
 
@@ -116,6 +116,55 @@ export default function CustomerDashboard() {
     }
   };
 
+  const [showShareModal, setShowShareModal] = useState(false);
+  
+
+
+  // --------- SHARE CONFIG ---------
+  const shareUrl = "https://paisavidhya.com"; // change to specific pledge page if needed
+
+  const shareMessage =
+    `I’ve taken the “Financial Discipline & Safety Pledge” with PAISAVIDHYA ` +
+    `to stay away from loan traps, scams and risky schemes and to follow smart money habits. ` +
+    `You can take your pledge here: ${shareUrl}`;
+
+  const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareMessage);
+  const xUrl =
+    "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareMessage);
+
+  const handleShareClick = async () => {
+    // 1. Try native share (best UX on phone + modern desktop)
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Financial Safety Pledge with PAISAVIDHYA",
+          text: shareMessage,
+          url: shareUrl,
+        });
+        return; // done, no modal
+      } catch (err) {
+        if (err?.name === "AbortError") return; // user cancelled, no fallback
+        console.error("Native share error", err);
+        // continue to fallback modal below
+      }
+    }
+
+    // 2. Fallback: open modal with links & copy text
+    setShowShareModal(true);
+  };
+
+  const copyShareMessage = async () => {
+    try {
+      if (!navigator.clipboard) throw new Error("Clipboard not supported");
+      await navigator.clipboard.writeText(shareMessage);
+      toast.success("Share message copied. Paste it in any app to share!");
+    } catch (err) {
+      console.error("Clipboard error", err);
+      toast.error("Could not copy text. Please copy manually.");
+    }
+  };
+
+
   const submitPledge = async () => {
     try {
       setPledgeLoading(true);
@@ -125,8 +174,8 @@ export default function CustomerDashboard() {
       if (res.success) {
         setShowPledgeModal(false);
 
-          // refresh logged-in user to update UI
-  await dispatch(authenticateUser());
+        // refresh logged-in user to update UI
+        await dispatch(authenticateUser());
 
         // Optional small toast
         toast.success("Your Financial Safety Pledge has been saved.");
@@ -154,7 +203,7 @@ export default function CustomerDashboard() {
         // If they click "View My Certificate"
         if (result.isConfirmed) {
           await viewCertificate();
-        } 
+        }
         // else {
         //   // If you want to hard-refresh to get updated user.pledge in UI:
         //   window.location.reload();
@@ -250,17 +299,23 @@ export default function CustomerDashboard() {
                 Complete profile
               </Button>
               {!user?.pledge?.taken && (
-                <Button
-                  onClick={() => setShowPledgeModal(true)}
-                >
+                <Button onClick={() => setShowPledgeModal(true)}>
                   Take Financial Safety Pledge
                 </Button>
               )}
 
               {user?.pledge?.taken && (
-                <Button as={Link} onClick={viewCertificate} variant="ghost">
-                  View Certificate
-                </Button>
+                <>
+                  <Button onClick={viewCertificate} variant="ghost">
+                    View Certificate
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleShareClick}
+                  >
+                    Share My Pledge
+                  </Button>
+                </>
               )}
             </div>
           </Card>
@@ -367,8 +422,12 @@ export default function CustomerDashboard() {
             disciplined money habits with Paisavidhya’s guidance.
           </p>
           <ul>
-            <li>I will stay away from financial traps and misleading schemes.</li>
-            <li>I will avoid instant loan apps & high-interest credit traps.</li>
+            <li>
+              I will stay away from financial traps and misleading schemes.
+            </li>
+            <li>
+              I will avoid instant loan apps & high-interest credit traps.
+            </li>
             <li>I will borrow only when necessary & from legal sources.</li>
             <li>
               I will protect myself from online financial frauds & phishing.
@@ -379,6 +438,67 @@ export default function CustomerDashboard() {
             <li>I will follow smart money habits & maintain discipline.</li>
             <li>I will encourage others to stay financially safe.</li>
           </ul>
+        </div>
+      </Modal>
+
+       {/* Share Modal */}
+       <Modal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title="Share your Financial Safety Pledge"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setShowShareModal(false)}>
+              Close
+            </Button>
+            <Button onClick={copyShareMessage}>Copy Message</Button>
+          </>
+        }
+      >
+        <div className="pv-col" style={{ gap: 12 }}>
+          <p style={{ fontSize: 14, color: "var(--pv-dim)" }}>
+            If share options didn’t open automatically, use these links to share
+            your pledge:
+          </p>
+
+          <div className="pv-col" style={{ gap: 6 }}>
+            <Button
+              as="a"
+              href={whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+              variant="ghost"
+            >
+              Share on WhatsApp
+            </Button>
+            <Button
+              as="a"
+              href={xUrl}
+              target="_blank"
+              rel="noreferrer"
+              variant="ghost"
+            >
+              Share on X (Twitter)
+            </Button>
+          </div>
+
+          <div
+            style={{
+              fontSize: 12,
+              color: "var(--pv-dim)",
+              background: "#f9fafb",
+              padding: 8,
+              borderRadius: 6,
+            }}
+          >
+            <div style={{ marginBottom: 4, fontWeight: 600 }}>Post text:</div>
+            <div>{shareMessage}</div>
+          </div>
+
+          <div style={{ fontSize: 11, color: "var(--pv-dim)" }}>
+            Tip: Download your certificate and attach it as an image when you
+            share your pledge.
+          </div>
         </div>
       </Modal>
     </div>
