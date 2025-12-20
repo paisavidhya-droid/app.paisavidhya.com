@@ -3,8 +3,9 @@ import Profile from '../models/profile.model.js';
 import { addAudit } from '../utils/audit.js';
 
 const getAuthUserId = (req) => {
-  return req.auth?.sub || req.user?.sub || req.user?._id;
+  return req.auth?.sub || req.user?.id || req.user?._id;
 };
+
 
 /** GET /api/profiles/me  (auth) */
 const getMyProfile = async (req, res, next) => {
@@ -19,6 +20,7 @@ const getMyProfile = async (req, res, next) => {
 
     res.json({ profile });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };

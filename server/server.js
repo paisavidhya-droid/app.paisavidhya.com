@@ -26,11 +26,12 @@ app.set("trust proxy", 1);
 const corsOptions = {
   // origin: true, // reflects the request origin
   // origin: process.env.FRONTEND_URL || "http://localhost:3000",
-  origin: '*', 
   credentials: true, // 🔥 required for cookies, auth headers
   optionsSuccessStatus: 204,
+  maxAge: 86400,             // ✅ cache preflight for 24 hours (in seconds)
 };
 app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 
 

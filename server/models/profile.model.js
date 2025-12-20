@@ -55,10 +55,6 @@ const profileSchema = new mongoose.Schema({
     index: true,
   },
 
-  primaryPhone: {
-    number: { type: String, trim: true },
-    verified: { type: Boolean, default: false }
-  },
 
   photoUrl: String,
 

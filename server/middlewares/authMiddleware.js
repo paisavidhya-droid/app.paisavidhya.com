@@ -17,14 +17,14 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token.trim(), process.env.JWT_SECRET_KEY);
- // Accept common id fields and normalize to req.user.id
+    // Accept common id fields and normalize to req.user.id
     const id = decoded.sub || decoded.id || decoded.userId || decoded._id;
     if (!id) return res.status(401).json({ message: "Invalid token payload" });
 
 
     req.auth = decoded; // { sub, role, email, iat, exp, ... }
 
-  req.user = {
+    req.user = {
       id: String(id),
       role: decoded.role,
       email: decoded.email,
@@ -32,10 +32,12 @@ const authMiddleware = async (req, res, next) => {
 
     return next();
   } catch (err) {
+    next(err);
     const message = err.name === "TokenExpiredError"
       ? "Token expired"
       : "Invalid or malformed token";
     return res.status(401).json({ message });
+
   }
 };
 

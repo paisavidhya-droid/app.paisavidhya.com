@@ -161,7 +161,9 @@ function SignInForm({ setTabIndex, setPrefill }) {
         showToggle
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      />
+      /> <Link to="/resetPassword" style={{ alignSelf: "flex-end", fontSize: 14, marginBottom: 8 }}>
+        Forgot password?
+      </Link>
       <MathCaptcha onChange={setCaptchaOK} />
       <div
         className="pv-row"

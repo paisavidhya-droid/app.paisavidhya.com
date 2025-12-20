@@ -19,7 +19,6 @@ import { authenticateUser } from "../../app/slices/authSlice";
 import {
   FaCheckCircle,
   FaCopy,
-  FaFilePdf,
   FaLink,
   FaRegFilePdf,
   FaShareAlt,
@@ -358,7 +357,7 @@ export default function CustomerDashboard() {
             </h1>
           </div>
           <div className="pv-row" style={{ gap: 8 }}>
-            <Button as={Link} to="/leads" className="pv-btn">
+            <Button as={Link} to="/pfc" className="pv-btn">
               Start your financial Checkup
             </Button>
             <Button as={Link} to="/profile" variant="ghost">
@@ -535,7 +534,7 @@ export default function CustomerDashboard() {
               hint={<Progress value={summary?.profileCompletion ?? 0} />}
             />
           </Card>
-          <Card title="Overview">
+          {/* <Card title="Overview">
             <div className="pv-col" style={{ gap: 10 }}>
               <div
                 className="pv-row"
@@ -557,7 +556,7 @@ export default function CustomerDashboard() {
                 <span>{summary?.pipelineLabel ?? "—"}</span>
               </div>
             </div>
-          </Card>
+          </Card> */}
         </Col>
       </Row>
 

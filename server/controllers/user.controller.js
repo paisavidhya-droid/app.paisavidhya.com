@@ -137,7 +137,7 @@ const login = async (req, res, next) => {
 /** GET /api/auth/me  (auth) */
 const me = async (req, res, next) => {
   try {
-    const userId = req.auth?.sub || req.user?.sub;
+    const userId = req.auth?.sub || req.user?.id;
     const user = await User.findById(userId).select("-password").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
     const profile = await Profile.findOne({ userId }).lean();
@@ -219,7 +219,8 @@ const getById = async (req, res, next) => {
     const u = await User.findById(id).select('-password').lean();
     if (!u) return res.status(404).json({ message: 'User not found' });
 
-    const isSelf = String(req.user.sub) === String(id);
+    // const isSelf = String(req.user.sub) === String(id); this should be deleted if things are wotking fine
+    const isSelf = String(req.user.id) === String(id);
     if (req.user.role !== 'ADMIN' && !isSelf) return res.status(403).json({ message: 'Forbidden' });
 
     res.json(u);
@@ -375,7 +376,7 @@ const removeById = async (req, res, next) => {
     const removed = await User.findByIdAndDelete(id).select('-password').lean();
     if (!removed) return res.status(404).json({ message: 'User not found' });
 
-     // 🔹 Remove linked profile (if any)
+    // 🔹 Remove linked profile (if any)
     await Profile.findOneAndDelete({ userId: id });
 
     // AUDIT
