@@ -16,6 +16,15 @@ import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { authenticateUser } from "../../app/slices/authSlice";
+import {
+  FaCheckCircle,
+  FaCopy,
+  FaFilePdf,
+  FaLink,
+  FaRegFilePdf,
+  FaShareAlt,
+} from "react-icons/fa";
+const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || window.location.origin;
 
 // Local tiny UI helpers (no shared imports)
 function Stat({ label, value, hint }) {
@@ -102,31 +111,102 @@ export default function CustomerDashboard() {
   const [showPledgeModal, setShowPledgeModal] = useState(false);
   const [pledgeLoading, setPledgeLoading] = useState(false);
 
-  const viewCertificate = async () => {
-    try {
-      const data = await userService.downloadCertificate();
+  const [autoPrompted, setAutoPrompted] = useState(false);
 
-      const blob = new Blob([data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-
-      window.open(url, "_blank");
-    } catch (err) {
-      console.error("Certificate open error:", err);
-      toast.error("Unable to generate certificate. Please try again.");
+  useEffect(() => {
+    if (user && !user?.pledge?.taken && !autoPrompted) {
+      setShowPledgeModal(true);
+      setAutoPrompted(true);
     }
+  }, [user, autoPrompted]);
+
+  // --- Pledge clauses (single source of truth for modal) ---
+  const pledgeClauses = useMemo(
+    () => [
+      `I will stay away from “get-rich-quick” traps and misleading schemes.`,
+      `I will avoid high-interest loans, instant loan apps, and unnecessary EMIs.`,
+      `I will understand interest, fees, tenure, penalties, and total repayment before I commit.`,
+      `I will protect my digital financial security (no OTP/PIN/password sharing or screen-sharing access).`,
+      `I will verify legitimacy before I pay or invest, using trusted sources and documentation.`,
+      `I will protect my personal data (PAN/Aadhaar/bank details) and share it only when necessary via secure channels.`,
+      `I will build strong money habits and encourage financial safety in my community.`,
+    ],
+    []
+  );
+
+  // Track per-clause agreement
+  const [clauseChecks, setClauseChecks] = useState(() =>
+    Array(pledgeClauses.length).fill(false)
+  );
+
+  // Final “I agree” checkbox
+  const [agreeAll, setAgreeAll] = useState(false);
+
+  // Derived counts
+  const checkedCount = useMemo(
+    () => clauseChecks.filter(Boolean).length,
+    [clauseChecks]
+  );
+
+  const allClausesChecked = checkedCount === pledgeClauses.length;
+
+  // Gate submit (must satisfy both)
+  const canSubmitPledge = allClausesChecked && agreeAll && !pledgeLoading;
+
+  const toggleClause = (idx) => {
+    setClauseChecks((prev) => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      return next;
+    });
+  };
+
+  const setAllClauses = (checked) => {
+    setClauseChecks(Array(pledgeClauses.length).fill(checked));
+    if (!checked) setAgreeAll(false); // if user unselects all, reset final agree
+  };
+
+  // When opening the modal, reset checks (optional but recommended)
+  useEffect(() => {
+    if (showPledgeModal) {
+      setClauseChecks(Array(pledgeClauses.length).fill(false));
+      setAgreeAll(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPledgeModal]);
+
+  const viewCertificate = () => {
+    const certId = user?.pledge?.certificateId;
+    if (!certId) {
+      toast.error("Certificate ID not found. Please verify pledge again.");
+      return;
+    }
+
+    const API_BASE = import.meta.env.VITE_API_SERVER_URL || "";
+    const pdfUrl = `${API_BASE}/api/certificates/${encodeURIComponent(
+      certId
+    )}/pdf`;
+
+    window.open(pdfUrl, "_blank", "noreferrer");
   };
 
   const [showShareModal, setShowShareModal] = useState(false);
-  
 
+  const certId = user?.pledge?.certificateId;
 
   // --------- SHARE CONFIG ---------
-  const shareUrl = "https://paisavidhya.com"; // change to specific pledge page if needed
+  const pledgeLink = `${APP_ORIGIN}/financial-safety-pledge`;
+  const verifyLink = certId
+    ? `${APP_ORIGIN}/verify/${encodeURIComponent(certId)}`
+    : null;
 
   const shareMessage =
     `I’ve taken the “Financial Discipline & Safety Pledge” with PAISAVIDHYA ` +
-    `to stay away from loan traps, scams and risky schemes and to follow smart money habits. ` +
-    `You can take your pledge here: ${shareUrl}`;
+    `to stay away from loan traps, scams and risky schemes and to follow smart money habits.\n\n` +
+    `✅ Take your pledge here: ${pledgeLink}` +
+    (verifyLink
+      ? `\n\n🔎 You can verify my certificate here: ${verifyLink}`
+      : "");
 
   const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(shareMessage);
   const xUrl =
@@ -139,7 +219,7 @@ export default function CustomerDashboard() {
         await navigator.share({
           title: "Financial Safety Pledge with PAISAVIDHYA",
           text: shareMessage,
-          url: shareUrl,
+          // url: shareUrl,
         });
         return; // done, no modal
       } catch (err) {
@@ -164,7 +244,6 @@ export default function CustomerDashboard() {
     }
   };
 
-
   const submitPledge = async () => {
     try {
       setPledgeLoading(true);
@@ -180,34 +259,49 @@ export default function CustomerDashboard() {
         // Optional small toast
         toast.success("Your Financial Safety Pledge has been saved.");
 
+        const certId = res?.certificateId; // NEW
+        const verifyUrl = certId ? `${APP_ORIGIN}/verify/${certId}` : null; // NEW (match your domain)
+
         // Beautiful success popup
         const result = await Swal.fire({
           title: "Pledge Completed 🎉",
           html: `
-            <p style="margin-bottom:8px;">
-              Thank you, <b>${user?.name || "Investor"}</b>, for taking the
-              <b>Financial Discipline & Safety Pledge</b>.
-            </p>
-            <p style="font-size:14px; color:#6b7280;">
-              This is your first step towards a safe, disciplined and
-              long-term wealth journey with <b>Paisavidhya</b>.
-            </p>
-          `,
+    <p style="margin-bottom:8px;">
+      Thank you, <b>${user?.name || "Investor"}</b>, for taking the
+      <b>Financial Discipline & Safety Pledge</b>.
+    </p>
+
+    ${
+      certId
+        ? `<p style="margin:10px 0; font-size:14px;">
+             <b>Certificate ID:</b> <span style="font-family:monospace">${certId}</span>
+           </p>
+           <p style="font-size:13px; color:#6b7280;">
+             Verify anytime using this ID on Paisavidhya.
+           </p>`
+        : `<p style="font-size:13px; color:#6b7280;">
+             Certificate ID is not available yet. Please try View Certificate once.
+           </p>`
+    }
+  `,
           icon: "success",
-          confirmButtonText: "View My Certificate",
           showCancelButton: true,
+          showDenyButton: true,
+          showConfirmButton: true,
+          confirmButtonText: "View Certificate",
+          denyButtonText: "Share with Friends",
           cancelButtonText: "Close",
-          buttonsStyling: true,
         });
 
-        // If they click "View My Certificate"
         if (result.isConfirmed) {
           await viewCertificate();
+        } else if (result.isDenied) {
+          if (certId) {
+            window.open(verifyUrl, "_blank"); // NEW
+          } else {
+            await handleShareClick();
+          }
         }
-        // else {
-        //   // If you want to hard-refresh to get updated user.pledge in UI:
-        //   window.location.reload();
-        // }
       }
     } catch (err) {
       console.log(err);
@@ -218,6 +312,27 @@ export default function CustomerDashboard() {
       );
     } finally {
       setPledgeLoading(false);
+    }
+  };
+
+  const copyCertId = async () => {
+    if (!certId) return;
+    try {
+      await navigator.clipboard.writeText(certId);
+      toast.success("Certificate ID copied");
+    } catch {
+      toast.error("Copy failed. Please copy manually.");
+    }
+  };
+
+  const copyVerifyLink = async () => {
+    if (!certId) return;
+    const link = `${APP_ORIGIN}/verify/${encodeURIComponent(certId)}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Verify link copied");
+    } catch {
+      toast.error("Copy failed.");
     }
   };
 
@@ -244,7 +359,7 @@ export default function CustomerDashboard() {
           </div>
           <div className="pv-row" style={{ gap: 8 }}>
             <Button as={Link} to="/leads" className="pv-btn">
-              Book Checkup
+              Start your financial Checkup
             </Button>
             <Button as={Link} to="/profile" variant="ghost">
               Complete profile
@@ -260,7 +375,7 @@ export default function CustomerDashboard() {
       )}
 
       {/* Stats */}
-      <Row>
+      {/* <Row>
         {loading ? (
           <>
             <Skeleton height={90} style={{ flex: "1 1 200px" }} />
@@ -286,7 +401,7 @@ export default function CustomerDashboard() {
             />
           </>
         )}
-      </Row>
+      </Row> */}
 
       <Row>
         <Col style={{ flex: "1 1 520px" }}>
@@ -303,20 +418,6 @@ export default function CustomerDashboard() {
                   Take Financial Safety Pledge
                 </Button>
               )}
-
-              {user?.pledge?.taken && (
-                <>
-                  <Button onClick={viewCertificate} variant="ghost">
-                    View Certificate
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleShareClick}
-                  >
-                    Share My Pledge
-                  </Button>
-                </>
-              )}
             </div>
           </Card>
 
@@ -324,6 +425,13 @@ export default function CustomerDashboard() {
             summary.customerTips.length > 0 && (
               <Card title="Next steps">
                 <div className="pv-col" style={{ gap: 8 }}>
+                  {!user?.pledge?.taken && (
+                    <Alert type="warning">
+                      Take the pledge to unlock your certificate and
+                      verification link.
+                    </Alert>
+                  )}
+
                   {summary.customerTips.map((t, i) => (
                     <Alert key={i} type={t.type || "info"}>
                       {t.message}
@@ -332,9 +440,101 @@ export default function CustomerDashboard() {
                 </div>
               </Card>
             )}
+
+          <Card title="Shortcuts">
+            <div className="pv-col" style={{ gap: 8 }}>
+              <Button as="a" href="/profile" variant="ghost">
+                Edit profile
+              </Button>
+              <Button as="a" href="/calculators/sip" variant="ghost">
+                SIP Calculator
+              </Button>
+            </div>
+          </Card>
         </Col>
 
         <Col style={{ flex: "1 1 360px" }}>
+          {user?.pledge?.taken && (
+            <Card title="Financial Safety Pledge">
+              <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
+                {certId && (
+                  <div
+                    style={{
+                      padding: 10,
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 8,
+                      background: "#fafafa",
+                      fontSize: 13,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: 8,
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: "var(--pv-dim)", fontSize: 12 }}>
+                          Certificate ID
+                        </div>
+                        <div
+                          style={{ fontFamily: "monospace", fontWeight: 700 }}
+                        >
+                          {certId}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                      >
+                        <Button variant="ghost" onClick={copyCertId}>
+                          <FaCopy /> Copy ID
+                        </Button>
+                        <Button variant="ghost" onClick={copyVerifyLink}>
+                          <FaLink />
+                          Copy Verify Link
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <Button onClick={viewCertificate} variant="ghost">
+                  <FaRegFilePdf size={16} />
+                  View Certificate
+                </Button>
+
+                {user?.pledge?.certificateId && (
+                  <Button
+                    variant="ghost"
+                    as="a"
+                    // href={`${APP_ORIGIN}/verify/${user.pledge.certificateId}`}
+                    href={`${APP_ORIGIN}/verify/${encodeURIComponent(
+                      user.pledge.certificateId
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <FaCheckCircle size={16} />
+                    Verify Certificate
+                  </Button>
+                )}
+
+                <Button variant="ghost" onClick={handleShareClick}>
+                  <FaShareAlt />
+                  Share My Pledge
+                </Button>
+              </div>
+            </Card>
+          )}
+          <Card title="Profile completion">
+            <Stat
+              label="Profile completion"
+              value={`${summary?.profileCompletion ?? 0}%`}
+              hint={<Progress value={summary?.profileCompletion ?? 0} />}
+            />
+          </Card>
           <Card title="Overview">
             <div className="pv-col" style={{ gap: 10 }}>
               <div
@@ -356,17 +556,6 @@ export default function CustomerDashboard() {
                 <span>Stage</span>
                 <span>{summary?.pipelineLabel ?? "—"}</span>
               </div>
-            </div>
-          </Card>
-
-          <Card title="Shortcuts">
-            <div className="pv-col" style={{ gap: 8 }}>
-              <Button as="a" href="/profile" variant="ghost">
-                Edit profile
-              </Button>
-              <Button as="a" href="/calculators/sip" variant="ghost">
-                SIP Calculator
-              </Button>
             </div>
           </Card>
         </Col>
@@ -407,42 +596,112 @@ export default function CustomerDashboard() {
             >
               Cancel
             </Button>
-            <Button onClick={submitPledge} disabled={pledgeLoading}>
-              {pledgeLoading ? "Saving..." : "I Agree, Complete My Pledge"}
+            <Button onClick={submitPledge} disabled={!canSubmitPledge}>
+              {pledgeLoading
+                ? "Saving..."
+                : allClausesChecked
+                ? "Complete My Pledge"
+                : `Agree to all (${checkedCount}/${pledgeClauses.length})`}
             </Button>
           </>
         }
       >
-        <div
-          className="pledge-text"
-          style={{ maxHeight: 300, overflowY: "auto" }}
-        >
+        <div className="pledge-text">
           <p style={{ fontSize: 14, color: "var(--pv-dim)" }}>
-            By accepting this pledge, you are committing to practice safe,
-            disciplined money habits with Paisavidhya’s guidance.
+            By accepting this pledge, you commit to safer, disciplined money
+            habits.
           </p>
-          <ul>
-            <li>
-              I will stay away from financial traps and misleading schemes.
-            </li>
-            <li>
-              I will avoid instant loan apps & high-interest credit traps.
-            </li>
-            <li>I will borrow only when necessary & from legal sources.</li>
-            <li>
-              I will protect myself from online financial frauds & phishing.
-            </li>
-            <li>
-              I will not allow greed or fear to influence financial decisions.
-            </li>
-            <li>I will follow smart money habits & maintain discipline.</li>
-            <li>I will encourage others to stay financially safe.</li>
-          </ul>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 10,
+              flexWrap: "wrap",
+              margin: "10px 0 8px",
+            }}
+          >
+            <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>
+              {checkedCount}/{pledgeClauses.length} agreed
+            </div>
+
+            <Button
+              variant="ghost"
+              onClick={() => setAllClauses(!allClausesChecked)}
+              disabled={pledgeLoading}
+            >
+              {allClausesChecked ? "Unselect all" : "Select all"}
+            </Button>
+          </div>
+
+          <div className="pv-col" style={{ gap: 10 }}>
+            {pledgeClauses.map((text, idx) => (
+              <label
+                key={idx}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  padding: 10,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  background: clauseChecks[idx] ? "#f0fdf4" : "#fff", // light success tint
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={clauseChecks[idx]}
+                  onChange={() => toggleClause(idx)}
+                  disabled={pledgeLoading}
+                  style={{ marginTop: 4 }}
+                />
+                <span style={{ fontSize: 14, lineHeight: 1.35 }}>{text}</span>
+              </label>
+            ))}
+
+            <label
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: 10,
+                padding: 10,
+                border: "1px solid #e5e7eb",
+                borderRadius: 10,
+                background: agreeAll ? "#eff6ff" : "#fff",
+                cursor: allClausesChecked ? "pointer" : "not-allowed",
+                opacity: allClausesChecked ? 1 : 0.6,
+                marginTop: 6,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={agreeAll}
+                onChange={() => setAgreeAll((v) => !v)}
+                disabled={!allClausesChecked || pledgeLoading}
+                style={{ marginTop: 4 }}
+              />
+              <span style={{ fontSize: 14, lineHeight: 1.35 }}>
+                I confirm that I have read and agree to all of the above.
+                <div
+                  style={{ fontSize: 12, color: "var(--pv-dim)", marginTop: 4 }}
+                >
+                  Note: This pledge is educational and does not replace
+                  professional financial, legal, or tax advice.
+                </div>
+              </span>
+            </label>
+            {!allClausesChecked && (
+              <div style={{ fontSize: 12, color: "var(--pv-dim)" }}>
+                Please agree to all pledge points to continue.
+              </div>
+            )}
+          </div>
         </div>
       </Modal>
 
-       {/* Share Modal */}
-       <Modal
+      {/* Share Modal */}
+      <Modal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         title="Share your Financial Safety Pledge"

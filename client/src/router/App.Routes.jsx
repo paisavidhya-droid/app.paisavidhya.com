@@ -17,6 +17,7 @@ import SipCalculator from "../pages/calculators/SipCalculator";
 import ToolsHub from "../pages/ToolsHub";
 import InsuranceApplications from "../modules/Insurance/InsuranceApplications";
 import MutualFundsApp from "../modules/MutualFund/MutualFundsApp";
+import VerifyCertificate from "../pages/certificates/VerifyCertificate";
 // import ToolstestHub from "../pages/test";
 // import RequireRole from "../auth/RequireRole";
 
@@ -69,6 +70,7 @@ export default function AppRoutes() {
 
         <Route path="/insurance/apply" element={<InsuranceApplications />} />
          <Route path="/mf" element={<MutualFundsApp />} />
+         <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
 
         {/* <Route path="/test" element={<ToolstestHub/>} /> */}
 

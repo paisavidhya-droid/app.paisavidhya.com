@@ -31,6 +31,7 @@ router.get('/', auth, requireRole(ROLES.ADMIN), getAllUsers);
 router.post("/pledge", auth, takePledge);
 router.get("/certificate", auth, generateCertificate);
 
+
 // router.get("/certificate/:id", generateCertificate);
 
 // Admin or self

@@ -8,6 +8,7 @@ import userRoutes from './router/user.routes.js';
 import leadRoutes from './router/lead.routes.js';
 import auditRoutes from "./router/audit.routes.js";
 import profileRoutes from "./router/profile.routes.js";
+import certificatesRouter from "./router/certificates.routes.js";
 
 
 const app = express();
@@ -51,6 +52,9 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/leads', leadRoutes);
 
 app.use("/api/audit", auditRoutes);
+app.use("/api/certificates", certificatesRouter);
+
+
 
 
 

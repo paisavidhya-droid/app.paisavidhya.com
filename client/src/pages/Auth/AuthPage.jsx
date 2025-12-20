@@ -277,7 +277,7 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
       )}
       <Input
         label="Full name"
-        placeholder="Your name"
+        placeholder="Name as per PAN / Aadhaar"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />

@@ -16,7 +16,7 @@ app.get('/health', (req, res) => {
 });
 
 // BSE routes
-// app.use('/api/bse', bseRouter);
+app.use('/api/bse', bseRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
