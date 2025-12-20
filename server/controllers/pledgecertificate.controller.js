@@ -84,8 +84,9 @@ export const takePledge = async (req, res, next) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const APP_BASE_URL = process.env.APP_BASE_URL || "https://paisavidhya.com";
+// const APP_BASE_URL = process.env.APP_URL || "https://app.paisavidhya.com";
 
+const APP_BASE_URL = process.env.APP_URL;
 
 function drawCenteredText(page, text, y, size, font, color) {
   const { width } = page.getSize();

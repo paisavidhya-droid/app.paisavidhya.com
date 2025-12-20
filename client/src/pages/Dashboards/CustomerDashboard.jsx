@@ -295,11 +295,12 @@ export default function CustomerDashboard() {
         if (result.isConfirmed) {
           await viewCertificate();
         } else if (result.isDenied) {
-          if (certId) {
-            window.open(verifyUrl, "_blank"); // NEW
-          } else {
-            await handleShareClick();
-          }
+          await handleShareClick();
+          // if (certId) {
+          //   window.open(verifyUrl, "_blank"); // NEW
+          // } else {
+          //   await handleShareClick();
+          // }
         }
       }
     } catch (err) {

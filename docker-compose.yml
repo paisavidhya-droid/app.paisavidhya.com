@@ -4,27 +4,66 @@ services:
   server:
     build: ./server
     container_name: pv-server
-    restart: always
+    restart: unless-stopped
     ports:
       - "5000:5000"
     env_file:
       - ./server/.env
     environment:
       - NODE_ENV=production
-    volumes:
-      - ./bse-service/keys:/usr/src/app/keys:ro
-
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   bse-service:
     build: ./bse-service
     container_name: pv-bse-service
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
       - ./bse-service/.env
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./bse-service/keys:/app/keys:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+
+# this version on every push rebuilds and stops existing containers which caused me cors error
+# version: "3.8"
+
+# services:
+#   server:
+#     build: ./server
+#     container_name: pv-server
+#     restart: always
+#     ports:
+#       - "5000:5000"
+#     env_file:
+#       - ./server/.env
+#     environment:
+#       - NODE_ENV=production
+#     volumes:
+#       - ./bse-service/keys:/usr/src/app/keys:ro
+
+
+#   bse-service:
+#     build: ./bse-service
+#     container_name: pv-bse-service
+#     restart: always
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - ./bse-service/.env
+#     environment:
+#       - NODE_ENV=production
 
 
      
