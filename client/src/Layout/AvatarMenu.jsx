@@ -2,7 +2,7 @@
 // AvatarMenu.jsx
 // ===============================
 import React, { useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   FaChevronDown,
   FaCheckCircle,
@@ -11,7 +11,7 @@ import {
   FaSignOutAlt,
   FaLifeRing,
 } from "react-icons/fa";
-import { Badge } from "../components";
+import { Badge, Button } from "../components";
 import "./AvatarMenu.css";
 
 /**
@@ -28,11 +28,11 @@ export function AvatarMenu({
   kycStatus = "pending",
   mandateStatus = "pending",
   isNRI = false,
-  onSignOut,
 }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   const panelRef = useRef(null);
+  const navigate = useNavigate();
 
   // close on outside click
   useEffect(() => {
@@ -134,7 +134,6 @@ export function AvatarMenu({
           role="menu"
           aria-label="Account menu"
           className="avatar-menu__panel"
-          
         >
           {/* Header */}
           <div style={{ padding: 8, display: "grid", gap: 4 }}>
@@ -246,20 +245,17 @@ export function AvatarMenu({
           />
 
           {/* Sign out */}
-          <button
-            onClick={onSignOut}
-            className="menu-link"
-            role="menuitem"
+          <Button
+            as={Link}
+            to="/logout"
+            variant="ghost"
             style={{
               width: "100%",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              justifyContent: "flex-start",
+              // justifyContent: "flex-start",
             }}
           >
             <FaSignOutAlt /> Logout
-          </button>
+          </Button>
         </div>
       )}
 
@@ -272,4 +268,3 @@ export function AvatarMenu({
     </div>
   );
 }
- 

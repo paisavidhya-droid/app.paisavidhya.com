@@ -13,14 +13,19 @@ import {
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { login, register } from "../../services/authService";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { useDeviceSize } from "../../context/DeviceSizeContext";
 import MathCaptcha from "../../components/MathCaptcha";
 import FloatField from "../../components/ui/FancyInput/FloatField";
 
 /* --------------------------- Sign In --------------------------- */
-function SignInForm({ setTabIndex, setPrefill }) {
+function SignInForm({ setTabIndex, setPrefill, redirectTo }) {
   const navigate = useNavigate();
   const { isMobile } = useDeviceSize();
   const { storeTokenInLS } = useAuth();
@@ -86,7 +91,7 @@ function SignInForm({ setTabIndex, setPrefill }) {
 
       storeTokenInLS(token);
       toast.success("Welcome back!");
-      navigate("/start", { replace: true });
+      navigate(redirectTo || "/start", { replace: true });
     } catch (e) {
       // Normalize error coming from axios or a wrapped error
       const status = e?.response?.status;
@@ -154,14 +159,17 @@ function SignInForm({ setTabIndex, setPrefill }) {
         onChange={(e) => setIdentifier(e.target.value)}
         autoComplete="username"
       />
-
       <FloatField
         label="Password"
         type="password"
         showToggle
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-      /> <Link to="/resetPassword" style={{ alignSelf: "flex-end", fontSize: 14, marginBottom: 8 }}>
+      />{" "}
+      <Link
+        to="/resetPassword"
+        style={{ alignSelf: "flex-end", fontSize: 14, marginBottom: 8 }}
+      >
         Forgot password?
       </Link>
       <MathCaptcha onChange={setCaptchaOK} />
@@ -332,6 +340,22 @@ function SignUpForm({ prefill = { email: "", phoneNumber: "" } }) {
 export default function AuthPage() {
   const [search] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [loginRequiredMsg, setLoginRequiredMsg] = useState("");
+
+  useEffect(() => {
+    if (location.state?.reason === "LOGIN_REQUIRED") {
+      const label = location.state?.label || "this page";
+      toast(`Please login to continue to ${label}`, {
+        icon: "🔐",
+        id: "login-required",
+      });
+      setLoginRequiredMsg(`Please login to continue to ${label}.`);
+      // navigate("/auth", { replace: true, state: null });
+    } else {
+      setLoginRequiredMsg("");
+    }
+  }, [location.state, navigate]);
 
   const mode = (search.get("mode") || "").toLowerCase();
   const [tabIndex, setTabIndex] = useState(mode === "signup" ? 1 : 0);
@@ -339,18 +363,23 @@ export default function AuthPage() {
   useEffect(() => {
     if (mode) navigate("/auth", { replace: true });
   }, [mode, navigate]);
+  const redirectTo = location.state?.from || "/start";
 
   const tabs = useMemo(
     () => [
       {
         label: "Sign in",
         content: (
-          <SignInForm setTabIndex={setTabIndex} setPrefill={setPrefill} />
+          <SignInForm
+            setTabIndex={setTabIndex}
+            setPrefill={setPrefill}
+            redirectTo={redirectTo}
+          />
         ),
       },
       { label: "Sign up", content: <SignUpForm prefill={prefill} /> },
     ],
-    [prefill] // 👈 update when prefill changes
+    [prefill, redirectTo] // 👈 update when prefill changes
   );
 
   return (
@@ -374,6 +403,11 @@ export default function AuthPage() {
               Your Family’s Financial Doctor
             </div>
           </div>
+          {loginRequiredMsg && (
+            <Alert type="warning" title="Login required">
+              {loginRequiredMsg}
+            </Alert>
+          )}
           <Tabs tabs={tabs} selectedIndex={tabIndex} onChange={setTabIndex} />
           <div
             style={{

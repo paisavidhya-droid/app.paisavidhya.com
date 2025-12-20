@@ -106,7 +106,6 @@ export default function Navbar({ onOpenMobileSidebar }) {
               // kycStatus={kycStatus}
               // mandateStatus={mandateStatus}
               // isNRI={isNRI}
-              // onSignOut={onSignOut}
             />
           </>
         ) : (

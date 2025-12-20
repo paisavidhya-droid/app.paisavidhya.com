@@ -18,7 +18,6 @@ import ToolsHub from "../pages/ToolsHub";
 import InsuranceApplications from "../modules/Insurance/InsuranceApplications";
 import MutualFundsApp from "../modules/MutualFund/MutualFundsApp";
 import VerifyCertificate from "../pages/certificates/VerifyCertificate";
-import ResetPassword from "../pages/Auth/resetPassword.";
 // import ToolstestHub from "../pages/test";
 // import RequireRole from "../auth/RequireRole";
 
@@ -35,6 +34,7 @@ const LeadsOps = lazy(() => import("../pages/Leads/LeadsOps"));
 const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
 const AdminAudit = lazy(() => import("../pages/Admin/AdminAudit"));
 const AdminUsers = lazy(() => import("../pages/Admin/Users"));
+const ResetPassword = lazy(() => import("../pages/Auth/resetPassword"));
 
 // Error pages
 const Unauthorized401 = lazy(() => import("../pages/Error/Unauthorized401"));
@@ -58,10 +58,6 @@ export default function AppRoutes() {
         <Route path="/ui" element={<UIComponents />} />
         <Route path="/verify-email" element={<VerifyEmailLink />} />
         <Route path="/request-callback" element={<CallbackForm />} />
-        <Route path="/pfc" element={<PFC />} />
-        <Route path="/pfc/report" element={<PFCReport />} />
-        <Route path="/ffc" element={<FFC />} />
-        <Route path="/ffc/report" element={<FFCReport />} />
 
         {/* <Route path="/ffc" element={<Placeholder label="FFC coming soon" />} /> */}
         <Route path="/bfc" element={<Placeholder label="BFC coming soon" />} />
@@ -120,6 +116,11 @@ export default function AppRoutes() {
 
           {/* Common authenticated */}
           <Route path="/profile" element={<Profile />} />
+
+          <Route path="/pfc" element={<PFC />} />
+          <Route path="/pfc/report" element={<PFCReport />} />
+          <Route path="/ffc" element={<FFC />} />
+          <Route path="/ffc/report" element={<FFCReport />} />
 
           {/* Leads (staff+admin) 
           <Route
