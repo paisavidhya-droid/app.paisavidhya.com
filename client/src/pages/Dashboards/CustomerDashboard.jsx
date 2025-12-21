@@ -194,7 +194,7 @@ export default function CustomerDashboard() {
   const certId = user?.pledge?.certificateId;
 
   // --------- SHARE CONFIG ---------
-  const pledgeLink = `${APP_ORIGIN}/financial-safety-pledge`;
+  const pledgeLink = `https://paisavidhya.com/financial-safety-pledge`;
   const verifyLink = certId
     ? `${APP_ORIGIN}/verify/${encodeURIComponent(certId)}`
     : null;

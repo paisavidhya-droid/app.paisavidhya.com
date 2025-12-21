@@ -18,6 +18,7 @@ import ToolsHub from "../pages/ToolsHub";
 import InsuranceApplications from "../modules/Insurance/InsuranceApplications";
 import MutualFundsApp from "../modules/MutualFund/MutualFundsApp";
 import VerifyCertificate from "../pages/certificates/VerifyCertificate";
+import GuestHomeRoute from "./GuestHomeRoute";
 // import ToolstestHub from "../pages/test";
 // import RequireRole from "../auth/RequireRole";
 
@@ -52,7 +53,8 @@ export default function AppRoutes() {
     <Routes>
       <Route element={<AppLayout />}>
         {/* Public */}
-        <Route path="/" element={<Home />} />
+        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<GuestHomeRoute />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/ui" element={<UIComponents />} />
