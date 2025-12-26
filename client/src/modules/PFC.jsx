@@ -14,9 +14,10 @@ import {
 import "../styles/ui.css";
 import ModuleHeader from "../components/ui/ModuleHeader";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getMyProfile } from "../services/profileService";
+import { useDeviceSize } from "../context/DeviceSizeContext";
 
 const fmt = (n) => (isNaN(n) ? 0 : Number(n));
 
@@ -57,6 +58,7 @@ function CategoryGroup({ title, fields, data, setData }) {
 export default function PFC() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isMobile } = useDeviceSize();
 
   /* -------- basic info -------- */
   const [info, setInfo] = useState({
@@ -134,12 +136,11 @@ export default function PFC() {
     familySupport: 0,
   });
 
-  
-
-
   useEffect(() => {
     try {
-      const cached = JSON.parse(localStorage.getItem("pv_pfc_payload") || "null");
+      const cached = JSON.parse(
+        localStorage.getItem("pv_pfc_payload") || "null"
+      );
       if (!cached) return;
 
       const { info: cInfo, income: cIncome, expenses: cExp } = cached;
@@ -162,7 +163,6 @@ export default function PFC() {
       console.error("Failed to hydrate PFC from localStorage", e);
     }
   }, []);
-
 
   // ✅ Load profile and map to basic info (read-only)
   useEffect(() => {
@@ -196,8 +196,7 @@ export default function PFC() {
           .filter(Boolean)
           .join(", ");
 
-        const mobile =
-          profile.primaryPhone?.number || user?.phoneNumber || "";
+        const mobile = profile.primaryPhone?.number || user?.phoneNumber || "";
 
         setInfo((prev) => ({
           ...prev,
@@ -214,9 +213,6 @@ export default function PFC() {
 
     loadProfile();
   }, [user]);
-
-
-
 
   /* -------- results -------- */
   const totalIncome = useMemo(
@@ -238,10 +234,8 @@ export default function PFC() {
       </div>
     );
 
-    
-
   const goToReport = () => {
-        // block empty report
+    // block empty report
     // if (!hasAnyAmount()) {
     //   alert(
     //     ""
@@ -269,64 +263,91 @@ export default function PFC() {
     navigate("/pfc/report", { state: payload });
   };
 
+  const requiredFields = ["name", "dob", "gender", "city", "mobile"];
+
+  const missingFields = requiredFields.filter((field) => !info[field]);
+  const isProfileComplete = missingFields.length === 0;
+
   return (
     <>
       <ModuleHeader
-  title="Personal Financial Checkup (PFC)"
-  subtitle="Your money health report"
-  actions={<Button onClick={goToReport}>Generate Report</Button>}
-/>
+        title="Personal Financial Checkup (PFC)"
+        subtitle="Your money health report"
+        actions={<Button onClick={goToReport}>Generate Report</Button>}
+      />
 
       <div
         className="pv-col pv-container"
         style={{ gap: 24, padding: "16px 8px" }}
       >
-          {/* ---------- Basic Info (from Profile, read-only) ---------- */}
+        {/* ---------- Basic Info (from Profile, read-only) ---------- */}
         <Card title="Personal Details">
+          {/* If anything is missing, show a loud warning + CTA */}
+          {!isProfileComplete && (
+            <Alert type="warning" title="Some details are missing">
+              <div className="pv-row">
+                <div>
+                  Please complete your basic details in your{" "}
+                  <strong><Link to="/profile">My Profile</Link></strong> page.
+                </div>
+
+                {!isMobile && <Button onClick={() => navigate("/profile")}>
+                  Go to My Profile
+                </Button>}
+              </div>
+            </Alert>
+          )}
           <div className="pv-row" style={{ flexWrap: "wrap", gap: 12 }}>
             <Input
               label="Full Name"
               placeholder="Your name"
               value={info.name}
               disabled // ⬅️ read-only
+              style={{ cursor: "not-allowed" }}
             />
             <Input
               type="date"
               label="Date of Birth"
               value={info.dob}
               disabled // ⬅️ read-only
+              style={{ cursor: "not-allowed" }}
             />
-            <Select
+            <Input
               label="Gender"
-              value={info.gender}
+              value={info.gender || "Not set"}
               disabled // ⬅️ read-only
-            >
-              <option value="">{info.gender || "Select"}</option>
-            </Select>
+              style={{ cursor: "not-allowed" }}
+            />
+             
             <Input
               label="City & State"
-              value={info.city}
+              value={info.city|| "Not set"}
               disabled // ⬅️ read-only
+              style={{ cursor: "not-allowed" }}
             />
             <Input
-              label="WhatsApp Number"
+              label="Mobile No."
               placeholder="10-digit number"
               value={info.mobile}
               disabled // ⬅️ read-only
+              style={{ cursor: "not-allowed" }}
             />
           </div>
           <div
             style={{
               marginTop: 8,
-              fontSize: 12,
+              fontSize: 14,
               color: "var(--pv-dim)",
             }}
           >
-            To update these details, go to{" "}
-            <strong>My Profile</strong> page.
+            <span style={{ color: "red" }}>*</span>To update these details, go
+            to{" "}
+            <strong>
+              <Link to="/profile">My Profile</Link>
+            </strong>{" "}
+            page.
           </div>
         </Card>
-
 
         <Alert type="info" title="Tip">
           Enter all amounts as <strong>monthly</strong> values for best

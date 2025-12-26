@@ -61,6 +61,7 @@ const userSchema = new mongoose.Schema({
     taken: { type: Boolean, default: false },
     date: { type: Date },
     certificateId: { type: String },
+    org: { type: mongoose.Schema.Types.ObjectId, ref: "Org" }, // optional
   }
 
 },

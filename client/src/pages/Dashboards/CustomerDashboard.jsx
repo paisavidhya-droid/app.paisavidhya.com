@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Card,
   Button,
@@ -23,6 +23,9 @@ import {
   FaRegFilePdf,
   FaShareAlt,
 } from "react-icons/fa";
+import PledgeShareCard from "../../components/PledgeShareCard";
+import { toPng } from "html-to-image";
+import { getMyProfile } from "../../services/profileService";
 const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || window.location.origin;
 
 // Local tiny UI helpers (no shared imports)
@@ -51,6 +54,70 @@ const Col = ({ children, style }) => (
 export default function CustomerDashboard() {
   const dispatch = useDispatch();
   const { user } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+
+  // --- Load real profile for completion % ---
+  useEffect(() => {
+    let active = true;
+
+    async function loadProfile() {
+      try {
+        setProfileLoading(true);
+        const data = await getMyProfile();
+        if (!active) return;
+        setProfile(data || null);
+      } catch (err) {
+        console.error("Profile load error on dashboard", err);
+      } finally {
+        if (active) setProfileLoading(false);
+      }
+    }
+
+    loadProfile();
+    return () => {
+      active = false;
+    };
+  }, []);
+  const profileCompletion = useMemo(() => {
+    if (!profile) return 0;
+
+    // Define "important fields" that count towards completion
+    const fields = [
+      profile?.name?.first,
+      profile?.name?.last,
+      profile?.dob,
+      profile?.gender,
+
+      profile?.primaryPhone?.number || user?.phoneNumber,
+
+      profile?.kyc?.pan,
+      profile?.kyc?.residencyStatus,
+      profile?.kyc?.annualIncomeSlab,
+      profile?.kyc?.occupation,
+
+      profile?.address?.line1,
+      profile?.address?.city,
+      profile?.address?.state,
+      profile?.address?.pincode,
+
+      profile?.bank?.accountHolderName,
+      profile?.bank?.accountNumber,
+      profile?.bank?.ifsc,
+
+      profile?.nominee?.name,
+      profile?.nominee?.relation,
+      profile?.nominee?.dob,
+    ];
+
+    const total = fields.length;
+    const filled = fields.filter(
+      (v) => v !== null && v !== undefined && String(v).trim() !== ""
+    ).length;
+
+    if (total === 0) return 0;
+    return Math.min(100, Math.round((filled / total) * 100));
+  }, [profile, user?.phoneNumber]);
 
   // --- Dummy data only ---
   const [loading, setLoading] = useState(true);
@@ -193,6 +260,8 @@ export default function CustomerDashboard() {
 
   const certId = user?.pledge?.certificateId;
 
+  const shareCardRef = useRef(null);
+
   // --------- SHARE CONFIG ---------
   const pledgeLink = `https://paisavidhya.com/financial-safety-pledge`;
   const verifyLink = certId
@@ -211,24 +280,82 @@ export default function CustomerDashboard() {
   const xUrl =
     "https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareMessage);
 
+  const generateShareImageFile = async () => {
+    if (!shareCardRef.current) return null;
+    try {
+      const dataUrl = await toPng(shareCardRef.current, { cacheBust: true });
+
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], "paisavidhya-pledge.png", {
+        type: "image/png",
+      });
+      return file;
+    } catch (err) {
+      console.error("Failed to generate share image", err);
+      return null;
+    }
+  };
+
+  // const handleShareClick = async () => {
+  //   // 1. Try native share (best UX on phone + modern desktop)
+  //   if (typeof navigator !== "undefined" && navigator.share) {
+  //     try {
+  //       await navigator.share({
+  //         title: "Financial Safety Pledge with PAISAVIDHYA",
+  //         text: shareMessage,
+  //         // url: shareUrl,
+  //       });
+  //       return; // done, no modal
+  //     } catch (err) {
+  //       if (err?.name === "AbortError") return; // user cancelled, no fallback
+  //       console.error("Native share error", err);
+  //       // continue to fallback modal below
+  //     }
+  //   }
+
+  //   // 2. Fallback: open modal with links & copy text
+  //   setShowShareModal(true);
+  // };
+
   const handleShareClick = async () => {
-    // 1. Try native share (best UX on phone + modern desktop)
-    if (typeof navigator !== "undefined" && navigator.share) {
+    // 0. Try to generate the share image (card)
+    const file = await generateShareImageFile();
+
+    // 1. Best case: native share with image support (Web Share API v2)
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.share &&
+      file &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
       try {
         await navigator.share({
           title: "Financial Safety Pledge with PAISAVIDHYA",
           text: shareMessage,
-          // url: shareUrl,
+          files: [file],
         });
-        return; // done, no modal
+        return; // shared successfully
       } catch (err) {
-        if (err?.name === "AbortError") return; // user cancelled, no fallback
+        if (err?.name === "AbortError") return; // user cancelled, don't fallback
         console.error("Native share error", err);
-        // continue to fallback modal below
+        // we'll go to fallback below
       }
+    } else if (file) {
+      // 2. Fallback if we can't pass it into navigator.share: download image once
+      const url = URL.createObjectURL(file);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "paisavidhya-pledge.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Pledge image downloaded. Attach it when you share.");
     }
 
-    // 2. Fallback: open modal with links & copy text
+    // 3. Final fallback: open existing modal with links + caption
     setShowShareModal(true);
   };
 
@@ -259,7 +386,6 @@ export default function CustomerDashboard() {
         toast.success("Your Financial Safety Pledge has been saved.");
 
         const certId = res?.certificateId; // NEW
-        const verifyUrl = certId ? `${APP_ORIGIN}/verify/${certId}` : null; // NEW (match your domain)
 
         // Beautiful success popup
         const result = await Swal.fire({
@@ -461,9 +587,9 @@ export default function CustomerDashboard() {
                   <div
                     style={{
                       padding: 10,
-                      border: "1px solid #e5e7eb",
+                      border: "1px solid var(--pv-border)",
                       borderRadius: 8,
-                      background: "#fafafa",
+                      background: "var(--pv-bg)",
                       fontSize: 13,
                     }}
                   >
@@ -528,13 +654,44 @@ export default function CustomerDashboard() {
               </div>
             </Card>
           )}
-          <Card title="Profile completion">
+          {/* <Card title="Profile completion">
             <Stat
               label="Profile completion"
               value={`${summary?.profileCompletion ?? 0}%`}
               hint={<Progress value={summary?.profileCompletion ?? 0} />}
             />
+          </Card> */}
+          <Card title="Profile completion">
+            <Stat
+              value={
+                profileLoading ? "Calculating..." : `${profileCompletion}%`
+              }
+              hint={<Progress value={profileLoading ? 0 : profileCompletion} />}
+            />
+            {!profileLoading && (
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--pv-dim)",
+                  marginTop: 6,
+                  padding: "0 14px 8px",
+                }}
+              >
+                Complete your KYC, address, bank and nominee details in{" "}
+                <Link
+                  to="/profile"
+                  style={{
+                    color: "var(--pv-primary)",
+                    textDecoration: "underline",
+                  }}
+                >
+                  My Profile
+                </Link>{" "}
+                to reach 100%.
+              </div>
+            )}
           </Card>
+
           {/* <Card title="Overview">
             <div className="pv-col" style={{ gap: 10 }}>
               <div
@@ -760,6 +917,20 @@ export default function CustomerDashboard() {
           </div>
         </div>
       </Modal>
+      {/* Hidden share card for image generation */}
+      <div
+        style={{
+          position: "fixed",
+          inset: "-9999px",
+          opacity: 0,
+          pointerEvents: "none",
+          zIndex: -1,
+        }}
+      >
+        {user?.pledge?.taken && (
+          <PledgeShareCard ref={shareCardRef} user={user} certId={certId} />
+        )}
+      </div>
     </div>
   );
 }

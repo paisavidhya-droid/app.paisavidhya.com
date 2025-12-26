@@ -251,9 +251,7 @@ export default function ProfilePage() {
       nominee: {
         name: profile.nominee?.name || "",
         relation: profile.nominee?.relation || "",
-        dob: profile.nominee?.dob
-          ? profile.nominee.dob.substring(0, 10)
-          : "",
+        dob: profile.nominee?.dob ? profile.nominee.dob.substring(0, 10) : "",
         sharePercent:
           typeof profile.nominee?.sharePercent === "number"
             ? profile.nominee.sharePercent
@@ -293,7 +291,13 @@ export default function ProfilePage() {
 
   const renderField = (label, value, fallback = "Not set") => (
     <div className="pv-col" style={{ gap: 2 }}>
-      <span style={{ fontSize: 11, textTransform: "uppercase", color: "var(--pv-dim)" }}>
+      <span
+        style={{
+          fontSize: 11,
+          textTransform: "uppercase",
+          color: "var(--pv-dim)",
+        }}
+      >
         {label}
       </span>
       <span style={{ fontSize: 14, color: "var(--pv-text)" }}>
@@ -307,10 +311,7 @@ export default function ProfilePage() {
       <ModuleHeader
         title="My Profile"
         subtitle="View and update your personal, KYC and bank details securely."
-        breadcrumbs={[
-          { label: "Home", to: "/" },
-          { label: "My Profile" },
-        ]}
+        breadcrumbs={[{ label: "Home", to: "/" }, { label: "My Profile" }]}
       />
 
       <div
@@ -347,7 +348,9 @@ export default function ProfilePage() {
               <div className="pv-col" style={{ gap: 4 }}>
                 <div style={{ fontSize: 18, fontWeight: 600 }}>
                   {profile?.name?.full ||
-                    [form.name.first, form.name.last].filter(Boolean).join(" ") ||
+                    [form.name.first, form.name.last]
+                      .filter(Boolean)
+                      .join(" ") ||
                     user?.name ||
                     "Investor"}
                 </div>
@@ -362,11 +365,15 @@ export default function ProfilePage() {
               <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
                 <Badge
                   variant={user?.emailVerified ? "success" : "outline"}
-                  label={user?.emailVerified ? "Email verified" : "Email pending"}
+                  label={
+                    user?.emailVerified ? "Email verified" : "Email pending"
+                  }
                 />
                 <Badge
                   variant={user?.phoneVerified ? "success" : "outline"}
-                  label={user?.phoneVerified ? "Phone verified" : "Phone pending"}
+                  label={
+                    user?.phoneVerified ? "Phone verified" : "Phone pending"
+                  }
                 />
                 <Badge
                   variant={kycStatus === "VERIFIED" ? "success" : "outline"}
@@ -399,19 +406,28 @@ export default function ProfilePage() {
 
           <Card title="Investment readiness" style={{ marginTop: 16 }}>
             <div className="pv-col" style={{ gap: 8, fontSize: 13 }}>
-              <div className="pv-row" style={{ justifyContent: "space-between" }}>
+              <div
+                className="pv-row"
+                style={{ justifyContent: "space-between" }}
+              >
                 <span>PAN linked</span>
                 <span style={{ fontWeight: 600 }}>
                   {form.kyc.pan ? "Yes" : "No"}
                 </span>
               </div>
-              <div className="pv-row" style={{ justifyContent: "space-between" }}>
+              <div
+                className="pv-row"
+                style={{ justifyContent: "space-between" }}
+              >
                 <span>Bank details</span>
                 <span style={{ fontWeight: 600 }}>
                   {form.bank.accountNumber ? "Added" : "Missing"}
                 </span>
               </div>
-              <div className="pv-row" style={{ justifyContent: "space-between" }}>
+              <div
+                className="pv-row"
+                style={{ justifyContent: "space-between" }}
+              >
                 <span>Nominee</span>
                 <span style={{ fontWeight: 600 }}>
                   {form.nominee.name ? "Added" : "Missing"}
@@ -423,7 +439,9 @@ export default function ProfilePage() {
           <Card title="Paisavidhya services" style={{ marginTop: 16 }}>
             <div className="pv-col" style={{ gap: 8, fontSize: 13 }}>
               <div className="pv-col" style={{ gap: 4 }}>
-                <span style={{ fontWeight: 500 }}>Financial Fitness Check-up (FFC)</span>
+                <span style={{ fontWeight: 500 }}>
+                  Financial Fitness Check-up (FFC)
+                </span>
                 <span style={{ color: "var(--pv-dim)" }}>
                   Understand your overall financial health in minutes.
                 </span>
@@ -439,7 +457,9 @@ export default function ProfilePage() {
               </div>
 
               <div className="pv-col" style={{ gap: 4, marginTop: 8 }}>
-                <span style={{ fontWeight: 500 }}>Personal Financial Check-up (PFC)</span>
+                <span style={{ fontWeight: 500 }}>
+                  Personal Financial Check-up (PFC)
+                </span>
                 <span style={{ color: "var(--pv-dim)" }}>
                   Deep dive into income, expenses, goals & risk profile.
                 </span>
@@ -553,12 +573,21 @@ export default function ProfilePage() {
                           value={form.dob}
                           onChange={handleChange("dob")}
                         />
-                        <Select
-                          label="Gender"
-                          value={form.gender}
-                          onChange={handleChange("gender")}
-                          options={genderOptions}
-                        />
+                        <label className="pv-field">
+                          <div className="pv-field-label">Gender</div>
+                          <select
+                          className="pv-select"
+                            value={form.gender}
+                            onChange={handleChange("gender")}
+                          >
+                            {genderOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+
                         <Input
                           label="Primary phone"
                           value={form.primaryPhone.number}
@@ -591,9 +620,7 @@ export default function ProfilePage() {
                         )}
                         {renderField(
                           "Gender",
-                          profile?.gender ||
-                            form.gender ||
-                            "PREFER_NOT_TO_SAY"
+                          profile?.gender || form.gender || "PREFER_NOT_TO_SAY"
                         )}
                         {renderField(
                           "Primary phone",
@@ -622,29 +649,59 @@ export default function ProfilePage() {
                             onChange={handleChange("kyc.pan")}
                             placeholder="ABCDE1234F"
                           />
-                          <Select
-                            label="Residency status"
-                            value={form.kyc.residencyStatus}
-                            onChange={handleChange("kyc.residencyStatus")}
-                            options={residencyOptions}
-                          />
-                          <Select
-                            label="Annual income range"
-                            value={form.kyc.annualIncomeSlab}
-                            onChange={handleChange("kyc.annualIncomeSlab")}
-                            options={incomeOptions}
-                          />
+                          <label className="pv-field">
+                            <div className="pv-field-label">
+                              Residency status
+                            </div>
+                            <select
+                            className="pv-select"
+                              value={form.kyc.residencyStatus}
+                              onChange={handleChange("kyc.residencyStatus")}
+                            >
+                              {residencyOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
+                          <label className="pv-field">
+                            <div className="pv-field-label">
+                              Annual income range
+                            </div>
+                            <select
+                            className="pv-select"
+                              value={form.kyc.annualIncomeSlab}
+                              onChange={handleChange("kyc.annualIncomeSlab")}
+                            >
+                              {incomeOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
                           <Input
                             label="Occupation"
                             value={form.kyc.occupation}
                             onChange={handleChange("kyc.occupation")}
                           />
-                          <Select
-                            label="PEP status"
-                            value={form.kyc.pepStatus}
-                            onChange={handleChange("kyc.pepStatus")}
-                            options={pepOptions}
-                          />
+                          <label className="pv-field">
+                            <div className="pv-field-label">PEP status</div>
+                            <select
+                            className="pv-select"
+                              value={form.kyc.pepStatus}
+                              onChange={handleChange("kyc.pepStatus")}
+                            >
+                              {pepOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
                         </div>
 
                         <div
@@ -697,7 +754,10 @@ export default function ProfilePage() {
                             gap: 16,
                           }}
                         >
-                          {renderField("PAN", profile?.kyc?.pan || form.kyc.pan)}
+                          {renderField(
+                            "PAN",
+                            profile?.kyc?.pan || form.kyc.pan
+                          )}
                           {renderField(
                             "Residency status",
                             profile?.kyc?.residencyStatus ||
@@ -796,18 +856,20 @@ export default function ProfilePage() {
                               value={form.bank.branchName}
                               onChange={handleChange("bank.branchName")}
                             />
-                            <Select
-                              label="Account type"
-                              value={form.bank.accountType}
-                              onChange={handleChange("bank.accountType")}
-                              options={[
-                                { value: "SAVINGS", label: "Savings" },
-                                { value: "CURRENT", label: "Current" },
-                                { value: "NRE", label: "NRE" },
-                                { value: "NRO", label: "NRO" },
-                                { value: "OTHER", label: "Other" },
-                              ]}
-                            />
+                            <label className="pv-field">
+                              <div className="pv-field-label">Account type</div>
+                              <select
+                              className="pv-select"
+                                value={form.bank.accountType}
+                                onChange={handleChange("bank.accountType")}
+                              >
+                                <option value="SAVINGS">Savings</option>
+                                <option value="CURRENT">Current</option>
+                                <option value="NRE">NRE</option>
+                                <option value="NRO">NRO</option>
+                                <option value="OTHER">Other</option>
+                              </select>
+                            </label>
                           </div>
                         </div>
 
@@ -880,8 +942,7 @@ export default function ProfilePage() {
                             )}
                             {renderField(
                               "Branch name",
-                              profile?.bank?.branchName ||
-                                form.bank.branchName
+                              profile?.bank?.branchName || form.bank.branchName
                             )}
                             {renderField(
                               "Account type",

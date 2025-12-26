@@ -272,6 +272,8 @@ export default function AdminDashboard() {
               {features.exotel && <Button as="a" href="/admin/integrations/exotel" variant="ghost">Exotel (WhatsApp OTP)</Button>}
               {features.calculators && <Button as="a" href="/admin/calculators" variant="ghost">Calculators</Button>}
               <Button as="a" href="/admin/leads" variant="ghost">Leads</Button>
+              <Button as="a" href="/admin/partners" variant="ghost">Partners</Button>
+
             </div>
           </Section>
 

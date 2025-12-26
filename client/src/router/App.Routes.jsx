@@ -45,6 +45,10 @@ const NotFound404 = lazy(() => import("../pages/Error/NotFound404"));
 const PFC = lazy(() => import("../modules/PFC"));
 const PFCReport = lazy(() => import("../modules/PFCReport"));
 
+const AdminPartnersOrgs = lazy(() => import("../pages/Admin/PartnerOrgs"));
+const PledgeWithOrg = lazy(() => import("../pages/Admin/PledgeWithOrg"));
+
+
 // Single source of roles (or import from a constants file)
 const ROLES = { ADMIN: "admin", STAFF: "staff", CUSTOMER: "customer" };
 
@@ -72,6 +76,9 @@ export default function AppRoutes() {
         <Route path="/verify/:certificateId" element={<VerifyCertificate />} />
 
         <Route path="/resetPassword" element={<ResetPassword />} />
+
+        <Route path="/pledge/:orgCode" element={<PledgeWithOrg />} />
+
 
         {/* <Route path="/test" element={<ToolstestHub/>} /> */}
 
@@ -114,6 +121,7 @@ export default function AppRoutes() {
             <Route path="integrations" element={<div>Admin Integrations (example)</div>} />*/}
             <Route path="leads" element={<LeadsOps />} />
             <Route path="leads/:id" element={<LeadDetails />} />
+            <Route path="partners" element={<AdminPartnersOrgs />} />
           </Route>
 
           {/* Common authenticated */}
