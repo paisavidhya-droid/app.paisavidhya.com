@@ -9,6 +9,7 @@ import {
   updateOrg,
   deactivateOrg,
   getOrgByCodePublic,
+  generateOrgPledgeLink,
 } from "../controllers/org.controller.js";
 
 const router = Router();
@@ -19,6 +20,13 @@ router.get("/", auth, requireRole(ROLES.ADMIN), listOrgs);
 router.get("/:id", auth, requireRole(ROLES.ADMIN), getOrg);
 router.patch("/:id", auth, requireRole(ROLES.ADMIN), updateOrg);
 router.delete("/:id", auth, requireRole(ROLES.ADMIN), deactivateOrg);
+
+router.post(
+  "/:id/generate-link",
+  auth,
+  requireRole(ROLES.ADMIN),
+  generateOrgPledgeLink
+);
 
 // Public org lookup by short code (no auth)
 // Example: /api/orgs/public/PV-ABCSCH

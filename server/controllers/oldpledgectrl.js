@@ -1,10 +1,11 @@
+// this is all good working code for pledge without organization
+
 // server/controllers/pledgecertificate.controller.js
 
 
 
 import User from "../models/user.model.js";
 import Certificate from "../models/certificate.model.js";
-import Org from "../models/org.model.js";
 import { generateCertificateId } from "../generators/certificateId.js";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
@@ -14,71 +15,25 @@ import { fileURLToPath } from "url";
 import QRCode from "qrcode";
 
 
-
 // ---------------- TAKE PLEDGE ----------------
-
 export const takePledge = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthenticated" });
+      return res.status(401).json({ success: false, message: "Unauthenticated" });
     }
 
     const user = await User.findById(userId);
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const { orgCode } = req.body || {};
-
-    let org = null;
-    if (orgCode) {
-      // Inactive orgs should NOT issue new partner certificates
-      org = await Org.findOne({ shortCode: orgCode, isActive: true }).lean();
-    }
-
-    // If already taken
+    // If already taken: return existing cert + backfill pledge.certificateId if missing
     if (user.pledge?.taken) {
-      const existingCert = await Certificate.findOne({
-        userId,
-        type: "PV-FSP",
-      }).lean();
+      const existingCert = await Certificate.findOne({ userId, type: "PV-FSP" }).lean();
 
-      // Backfill certificateId into user.pledge if missing
-      if (existingCert?.certificateId && !user.pledge.certificateId) {
+      if (existingCert?.certificateId && !user.pledge?.certificateId) {
         user.pledge.certificateId = existingCert.certificateId;
-      }
-
-      // If this call came with a valid orgCode and user/ cert do not have org yet, link once
-      if (org && !user.pledge.org) {
-        user.pledge.org = org._id;
-        await user.save();
-
-        if (existingCert && !existingCert.org) {
-          await Certificate.updateOne(
-            { _id: existingCert._id },
-            {
-              $set: {
-                org: org._id,
-                orgNameSnapshot: org.name,
-                orgCodeSnapshot: org.shortCode,
-              },
-            }
-          );
-        }
-
-        await Org.updateOne(
-          { _id: org._id },
-          {
-            $inc: { "stats.totalPledges": 1 },
-            $set: { "stats.lastPledgeAt": new Date() },
-          }
-        );
-      } else {
         await user.save();
       }
 
@@ -90,55 +45,34 @@ export const takePledge = async (req, res, next) => {
       });
     }
 
-    // New pledge
+    // Use one pledgeDate consistently
     const pledgeDate = new Date();
 
-    // Create new certificate
-    const certificateId = generateCertificateId("PV-FSP");
+    // Find or create certificate
+    let cert = await Certificate.findOne({ userId, type: "PV-FSP" });
 
-    const certPayload = {
-      certificateId,
-      userId,
-      type: "PV-FSP",
-      issuedAt: pledgeDate,
-      status: "active",
-      nameSnapshot: user.name,
-    };
-
-    if (org) {
-      certPayload.org = org._id;
-      certPayload.orgNameSnapshot = org.name;
-      certPayload.orgCodeSnapshot = org.shortCode;
+    if (!cert) {
+      const certificateId = generateCertificateId("PV-FSP"); // MongoId-based (sync)
+      cert = await Certificate.create({
+        certificateId,
+        userId,
+        type: "PV-FSP",
+        issuedAt: pledgeDate,
+        status: "active",
+        nameSnapshot: user.name,
+      });
     }
 
-    const cert = await Certificate.create(certPayload);
-
-    // Save pledge on user
+    // Save pledge + certificateId in ONE save (clean + UI-friendly)
     user.pledge = {
       taken: true,
       date: pledgeDate,
       certificateId: cert.certificateId,
-      ...(org && { org: org._id }),
     };
     await user.save();
 
-    // Update org stats
-    if (org) {
-      await Org.updateOne(
-        { _id: org._id },
-        {
-          $inc: { "stats.totalPledges": 1 },
-          $set: { "stats.lastPledgeAt": pledgeDate },
-        }
-      );
-    }
-
     const safeUser = await User.findById(userId).select("-password").lean();
-    return res.json({
-      success: true,
-      user: safeUser,
-      certificateId: cert.certificateId,
-    });
+    return res.json({ success: true, user: safeUser, certificateId: cert.certificateId });
   } catch (err) {
     next(err);
   }
@@ -148,8 +82,11 @@ export const takePledge = async (req, res, next) => {
 
 
 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// const APP_BASE_URL = process.env.APP_URL || "https://app.paisavidhya.com";
 
 const APP_BASE_URL = process.env.APP_URL;
 
@@ -165,7 +102,7 @@ function drawCenteredText(page, text, y, size, font, color) {
   });
 }
 
-async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
+async function buildCertificatePdf({ name, issuedAt, certificateId }) {
   const templatePath = path.join(
     __dirname,
     "../assets/financial-pledge-certificate.png"
@@ -173,44 +110,55 @@ async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
   const templateBytes = fs.readFileSync(templatePath);
 
   const pdf = await PDFDocument.create();
+
+  // REQUIRED for custom fonts
   pdf.registerFontkit(fontkit);
 
+  // Embed Alex Brush
   const fontPath = path.join(__dirname, "../assets/fonts/AlexBrush-Regular.ttf");
   const fontBytes = fs.readFileSync(fontPath);
   const alexBrushFont = await pdf.embedFont(fontBytes);
 
+
+  // Embed template first so we can match exact dimensions (landscape)
   const bg = await pdf.embedPng(templateBytes);
+
+  // Create page exactly same size as template image
   const page = pdf.addPage([bg.width, bg.height]);
 
+  // Draw background
   page.drawImage(bg, { x: 0, y: 0, width: bg.width, height: bg.height });
 
+  // Fonts (closest built-ins; if you want exact script font, we can embed a .ttf)
   const serif = await pdf.embedFont(StandardFonts.TimesRoman);
   const italic = await pdf.embedFont(StandardFonts.TimesRomanItalic);
-  const boldItalic = await pdf.embedFont(StandardFonts.TimesRomanBoldItalic);
 
+  // Normalize values
   const safeName = (name || "User").trim();
-  const dateStr = new Date(issuedAt).toLocaleDateString("en-IN");
+  const dateStr = new Date(issuedAt).toLocaleDateString("en-IN"); // dd/mm/yyyy
 
-  // ---- NAME ----
+  // ---- NAME (centered under PRESENTED TO) ----
+  // Tuned for your new layout (landscape template)
   drawCenteredText(
     page,
     safeName,
-    770,
+    770, // Y position for name (matches the layout under PRESENTED TO)
     115,
     alexBrushFont,
     rgb(0.15, 0.15, 0.15)
   );
 
-  // ---- DATE ----
+  // ---- AWARDED ON (date near bottom-right "AWARDED ON") ----
+  // Place date just above/near the printed "AWARDED ON" label
   page.drawText(dateStr, {
-    x: bg.width - 520,
+    x: bg.width - 520, // adjust if you want more left/right
     y: 220,
     size: 26,
     font: serif,
     color: rgb(0.2, 0.2, 0.2),
   });
 
-  // ---- QR ----
+  // ---- QR (bottom-left) ----
   const verifyUrl = `${APP_BASE_URL}/verify/${encodeURIComponent(
     certificateId
   )}`;
@@ -223,13 +171,14 @@ async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
 
   const qrImg = await pdf.embedPng(qrPngBuffer);
 
+  // QR position (inside bottom-left box)
   const qrX = 200;
   const qrY = 150;
   const qrSize = 170;
 
   page.drawImage(qrImg, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
-  // ---- CERT DETAILS ----
+  // ---- CERT DETAILS (to the right of QR) ----
   const infoX = qrX + qrSize + 20;
   const line1Y = qrY + 120;
 
@@ -257,43 +206,6 @@ async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
     color: rgb(0.15, 0.15, 0.15),
   });
 
-  // // ---- PARTNER LINE (only for org pledges) ---- only italic font 
-  // if (orgName) {
-  //   page.drawText(`In association with: ${orgName}`, {
-  //     x: infoX,
-  //     y: line1Y - 106,
-  //     size: 26,
-  //     font: italic,
-  //     color: rgb(0.15, 0.15, 0.15),
-  //   });
-  // }
-
-  // ---- PARTNER LINE (only for org pledges) ----
-  if (orgName) {
-    const assocLabel = "In association with: ";
-    const assocSize = 26;
-    const assocLabelWidth = serif.widthOfTextAtSize(assocLabel, assocSize);
-
-    // 1) draw label (normal or italic, your choice)
-    page.drawText(assocLabel, {
-      x: infoX,
-      y: line1Y - 106,
-      size: assocSize,
-      font: serif, // or italic if you want the label slightly styled
-      color: rgb(0.15, 0.15, 0.15),
-    });
-
-    // 2) draw org name (bold + italic)
-    page.drawText(orgName, {
-      x: infoX + assocLabelWidth,
-      y: line1Y - 106,
-      size: assocSize,
-      font: boldItalic,
-      color: rgb(0.15, 0.15, 0.15),
-    });
-  }
-
-
   return pdf.save();
 }
 
@@ -304,29 +216,19 @@ export const generateCertificate = async (req, res, next) => {
   try {
     const userId = req.user?.id;
     const user = await User.findById(userId);
-    if (!user || !user.pledge?.taken)
-      return res.status(403).send("No pledge found");
+    if (!user || !user.pledge?.taken) return res.status(403).send("No pledge found");
 
     const cert = await Certificate.findOne({ userId, type: "PV-FSP" }).lean();
     if (!cert) return res.status(404).send("Certificate record not found");
-
-    let orgName = null;
-    if (cert.orgNameSnapshot) {
-      orgName = cert.orgNameSnapshot;
-    }
 
     const pdfBytes = await buildCertificatePdf({
       name: cert.nameSnapshot || user.name,
       issuedAt: cert.issuedAt,
       certificateId: cert.certificateId,
-      orgName,
     });
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${cert.certificateId}.pdf"`
-    );
+    res.setHeader("Content-Disposition", `inline; filename="${cert.certificateId}.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
     next(err);
@@ -343,23 +245,14 @@ export const generateCertificateById = async (req, res, next) => {
 
     const user = await User.findById(cert.userId).select("name").lean();
 
-    let orgName = null;
-    if (cert.orgNameSnapshot) {
-      orgName = cert.orgNameSnapshot;
-    }
-
     const pdfBytes = await buildCertificatePdf({
       name: cert.nameSnapshot || user?.name || "User",
       issuedAt: cert.issuedAt,
       certificateId: cert.certificateId,
-      orgName,
     });
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${cert.certificateId}.pdf"`
-    );
+    res.setHeader("Content-Disposition", `inline; filename="${cert.certificateId}.pdf"`);
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
     next(err);

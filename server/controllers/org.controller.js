@@ -22,12 +22,12 @@ export const createOrg = async (req, res, next) => {
       "-" +
       Math.random().toString(36).slice(2, 6);
 
-    const shortCode = generateShortCode(name);
+    // const shortCode = generateShortCode(name); it creates short code immediatly after org creation
 
     const org = await Org.create({
       ...req.body,
       slug,
-      shortCode,
+       // shortCode: generated later via dedicated endpoint
       createdBy: req.user.id,
     });
 
@@ -36,6 +36,40 @@ export const createOrg = async (req, res, next) => {
     next(err);
   }
 };
+
+export const generateOrgPledgeLink = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const org = await Org.findById(id);
+
+    if (!org) {
+      return res.status(404).json({ message: "Org not found" });
+    }
+
+    if (!org.isActive) {
+      return res
+        .status(400)
+        .json({ message: "Cannot generate link for inactive org" });
+    }
+
+    if (org.shortCode) {
+      // already has a link – just return it
+      return res.json(org);
+    }
+
+    const shortCode = generateShortCode(org.name);
+
+    org.shortCode = shortCode;
+    org.pledgeLinkGeneratedAt = new Date();
+
+    await org.save();
+
+    res.json(org);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 // LIST (admin)
 export const listOrgs = async (req, res, next) => {

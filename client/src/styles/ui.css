@@ -80,9 +80,10 @@ a:hover {
   border-color: var(--pv-primary);
 }
 
-.pv-textarea{
+.pv-textarea {
   min-width: 100%;
- resize: vertical;}
+  resize: vertical;
+}
 
 label.pv-label {
   font-size: 13px;
@@ -265,7 +266,14 @@ label.pv-label {
   border-left: 1px solid var(--pv-border);
   z-index: 60;
   right: 0;
-  box-shadow: var(--pv-shadow)
+  box-shadow: var(--pv-shadow);
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  /* auto | thin | none */
+  scrollbar-color: var(--pv-border) transparent;
 }
 
 
@@ -579,5 +587,3 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
-
-

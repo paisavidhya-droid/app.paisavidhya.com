@@ -13,8 +13,8 @@ const orgSchema = new mongoose.Schema(
     },
     shortCode: {
       type: String,
-      required: true,
       unique: true,
+      sparse: true,
       index: true,
     },
     type: {
@@ -36,6 +36,8 @@ const orgSchema = new mongoose.Schema(
     pincode: String,
 
     isActive: { type: Boolean, default: true },
+
+    pledgeLinkGeneratedAt: Date,
 
     stats: {
       totalPledges: { type: Number, default: 0 },

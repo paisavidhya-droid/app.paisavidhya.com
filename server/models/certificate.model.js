@@ -13,6 +13,11 @@ const certificateSchema = new mongoose.Schema(
 
     // Optional metadata (nice to have)
     nameSnapshot: { type: String }, // store name at issue time
+
+     
+    org: { type: mongoose.Schema.Types.ObjectId, ref: "Org" },
+    orgNameSnapshot: { type: String }, 
+    orgCodeSnapshot: { type: String },  
   },
   { timestamps: true }
 );

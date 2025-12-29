@@ -69,11 +69,12 @@ export const deleteUserById = async (id) => {
   return res.data; // { message, id }
 };
 
-
-export const takePledge = async () => {
-  const res = await axiosInstance.post(`${BASE}/pledge`);
-  return res.data;             
+// with org association
+export const takePledge = async (payload = {}) => {
+  const res = await axiosInstance.post(`${BASE}/pledge`, payload);
+  return res.data;
 };
+
 
 export const downloadCertificate = async () => {
   const res = await axiosInstance.get(`${BASE}/certificate`, {
@@ -81,3 +82,14 @@ export const downloadCertificate = async () => {
   });
   return res.data; 
 };
+
+
+
+
+
+
+// without org
+// export const takePledge = async () => {
+//   const res = await axiosInstance.post(`${BASE}/pledge`);
+//   return res.data;             
+// };

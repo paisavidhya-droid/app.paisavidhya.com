@@ -47,7 +47,7 @@ const PFCReport = lazy(() => import("../modules/PFCReport"));
 
 const AdminPartnersOrgs = lazy(() => import("../pages/Admin/PartnerOrgs"));
 const PledgeWithOrg = lazy(() => import("../pages/Admin/PledgeWithOrg"));
-
+const AdminPartnerOrgDetails = lazy(() => import("../pages/Admin/OrgDetails.jsx"));
 
 // Single source of roles (or import from a constants file)
 const ROLES = { ADMIN: "admin", STAFF: "staff", CUSTOMER: "customer" };
@@ -78,7 +78,6 @@ export default function AppRoutes() {
         <Route path="/resetPassword" element={<ResetPassword />} />
 
         <Route path="/pledge/:orgCode" element={<PledgeWithOrg />} />
-
 
         {/* <Route path="/test" element={<ToolstestHub/>} /> */}
 
@@ -122,6 +121,7 @@ export default function AppRoutes() {
             <Route path="leads" element={<LeadsOps />} />
             <Route path="leads/:id" element={<LeadDetails />} />
             <Route path="partners" element={<AdminPartnersOrgs />} />
+             <Route path="partners/:orgId" element={<AdminPartnerOrgDetails />} />
           </Route>
 
           {/* Common authenticated */}

@@ -1,3 +1,4 @@
+// this page is upto certificate generation and it should be deleted if the certificate flow is working normally with partner association flow
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Card,
@@ -27,8 +28,6 @@ import PledgeShareCard from "../../components/PledgeShareCard";
 import { toPng } from "html-to-image";
 import { getMyProfile } from "../../services/profileService";
 const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || window.location.origin;
-const PARTNER_CODE_KEY = "pv_partnerOrgCode";
-const PARTNER_ORG_DATA_KEY = "pv_partnerOrgData";
 
 // Local tiny UI helpers (no shared imports)
 function Stat({ label, value, hint }) {
@@ -61,16 +60,8 @@ export default function CustomerDashboard() {
   const location = useLocation();
   const [partnerOrgCode, setPartnerOrgCode] = useState(null);
 
-  const [partnerOrg, setPartnerOrg] = useState(() => {
-    try {
-      const raw = localStorage.getItem(PARTNER_ORG_DATA_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  });
-
   useEffect(() => {
+    // 1. Try query param
     const params = new URLSearchParams(location.search);
     const codeFromUrl = params.get("orgCode");
 
@@ -78,6 +69,7 @@ export default function CustomerDashboard() {
       setPartnerOrgCode(codeFromUrl);
       localStorage.setItem("pv_partnerOrgCode", codeFromUrl);
     } else {
+      // 2. Fallback to whatever we previously saved (e.g., user logged in on another screen)
       const saved = localStorage.getItem("pv_partnerOrgCode");
       if (saved) {
         setPartnerOrgCode(saved);
@@ -269,11 +261,8 @@ export default function CustomerDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showPledgeModal]);
 
-  const viewCertificate = (overrideCertId) => {
-    // const certId = user?.pledge?.certificateId;
-
-    const certId = overrideCertId || user?.pledge?.certificateId;
-
+  const viewCertificate = () => {
+    const certId = user?.pledge?.certificateId;
     if (!certId) {
       toast.error("Certificate ID not found. Please verify pledge again.");
       return;
@@ -425,10 +414,8 @@ export default function CustomerDashboard() {
 
         // Once pledged, clear partner org code (optional but recommended)
         if (partnerOrgCode) {
-          localStorage.removeItem(PARTNER_CODE_KEY);
-          localStorage.removeItem(PARTNER_ORG_DATA_KEY);
+          localStorage.removeItem("pv_partnerOrgCode");
           setPartnerOrgCode(null);
-          setPartnerOrg(null);
         }
 
         const certId = res?.certificateId; // NEW
@@ -465,7 +452,7 @@ export default function CustomerDashboard() {
         });
 
         if (result.isConfirmed) {
-          await viewCertificate(certId || user?.pledge?.certificateId);
+          await viewCertificate();
         } else if (result.isDenied) {
           await handleShareClick();
           // if (certId) {
@@ -672,12 +659,7 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
                 )}
-                <Button
-                  /*onClick={viewCertificate}*/ onClick={() =>
-                    viewCertificate()
-                  }
-                  variant="ghost"
-                >
+                <Button onClick={viewCertificate} variant="ghost">
                   <FaRegFilePdf size={16} />
                   View Certificate
                 </Button>
@@ -815,18 +797,10 @@ export default function CustomerDashboard() {
         }
       >
         <div className="pledge-text">
-          <p style={{ fontSize: 14, color: "var(--pv-dim)", margin: 0 }}>
+          <p style={{ fontSize: 14, color: "var(--pv-dim)" }}>
             By accepting this pledge, you commit to safer, disciplined money
             habits.
           </p>
-          {partnerOrg && (
-            <Alert type="info" style={{ marginBottom: 8 }}>
-              You are taking this pledge in association with{" "}
-              <strong>{partnerOrg.name}</strong>
-              {partnerOrg.shortCode ? ` (${partnerOrg.shortCode})` : ""}.
-            </Alert>
-          )}
-
           <div
             style={{
               display: "flex",

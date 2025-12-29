@@ -61,3 +61,9 @@ export const getOrgByCodePublic = async (code) => {
   const { data } = await axiosInstance.get(`${BASE}/public/code/${code}`);
   return data; // { name, shortCode, logoUrl, tagline, ... }
 };
+
+
+export const generateOrgPledgeLink = async (id) => {
+  const { data } = await axiosInstance.post(`${BASE}/${id}/generate-link`);
+  return data; // updated org
+};

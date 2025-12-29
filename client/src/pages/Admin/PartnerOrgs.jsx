@@ -21,10 +21,13 @@ import {
   updateOrgById,
   deactivateOrgById,
 } from "../../services/orgService";
+import { useNavigate } from "react-router-dom";
+import OrgFormModal from "./OrgFormModal";
 
 const PAGE_SIZE = 12;
 
 export default function PartnerOrgs() {
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -108,14 +111,14 @@ export default function PartnerOrgs() {
     setModalOpen(true);
   };
 
-  const openEdit = (org) => {
-    setEditing(org);
-    setForm({
-      ...getEmptyForm(),
-      ...org,
-    });
-    setModalOpen(true);
-  };
+  // const openEdit = (org) => {
+  //   setEditing(org);
+  //   setForm({
+  //     ...getEmptyForm(),
+  //     ...org,
+  //   });
+  //   setModalOpen(true);
+  // };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -150,29 +153,29 @@ export default function PartnerOrgs() {
     }
   };
 
-  const handleDeactivate = async (org) => {
-    const ok = window.confirm(
-      `Deactivate ${org.name}? Their link will stop working.`
-    );
-    if (!ok) return;
+  // const handleDeactivate = async (org) => {
+  //   const ok = window.confirm(
+  //     `Deactivate ${org.name}? Their link will stop working.`
+  //   );
+  //   if (!ok) return;
 
-    try{
-      await deactivateOrgById(org._id);
-      toast.success("Partner deactivated");
-      await load();
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to deactivate partner");
-    }
-  };
+  //   try {
+  //     await deactivateOrgById(org._id);
+  //     toast.success("Partner deactivated");
+  //     await load();
+  //   } catch (e) {
+  //     console.error(e);
+  //     toast.error("Failed to deactivate partner");
+  //   }
+  // };
 
-  const handleCopyLink = (org) => {
-    const url = `${window.location.origin}/pledge/${org.shortCode}`;
-    navigator.clipboard
-      .writeText(url)
-      .then(() => toast.success("Link copied"))
-      .catch(() => toast.error("Failed to copy link"));
-  };
+  // const handleCopyLink = (org) => {
+  //   const url = `${window.location.origin}/pledge/${org.shortCode}`;
+  //   navigator.clipboard
+  //     .writeText(url)
+  //     .then(() => toast.success("Link copied"))
+  //     .catch(() => toast.error("Failed to copy link"));
+  // };
 
   const totalPages = useMemo(
     () => (total ? Math.ceil(total / PAGE_SIZE) : 1),
@@ -180,7 +183,10 @@ export default function PartnerOrgs() {
   );
 
   return (
-    <div className="pv-container" style={{ padding: 16, maxWidth: 1220, margin: "0 auto" }}>
+    <div
+      className="pv-container"
+      style={{ padding: 16, maxWidth: 1220, margin: "0 auto" }}
+    >
       <ModuleHeader
         title="Partner Organizations"
         subtitle="Schools, colleges, businesses and institutes where Paisavidhya sessions are conducted."
@@ -189,9 +195,7 @@ export default function PartnerOrgs() {
           { label: "Admin", to: "/admin" },
           { label: "Partners" },
         ]}
-        actions={
-          <Button onClick={openCreate}>Add New Partner</Button>
-        }
+        actions={<Button onClick={openCreate}>Add New Partner</Button>}
         sticky={false}
         compact
       />
@@ -282,7 +286,13 @@ export default function PartnerOrgs() {
       ) : (
         <Card>
           {items.length === 0 ? (
-            <div style={{ padding: 32, textAlign: "center", color: "var(--pv-dim)" }}>
+            <div
+              style={{
+                padding: 32,
+                textAlign: "center",
+                color: "var(--pv-dim)",
+              }}
+            >
               No partners found. Create the first one using{" "}
               <strong>“Add New Partner”</strong>.
             </div>
@@ -307,10 +317,21 @@ export default function PartnerOrgs() {
                       display: "flex",
                       flexDirection: "column",
                       gap: 10,
+                      cursor: "pointer",
                     }}
+                    onClick={() => navigate(`/admin/partners/${org._id}`)}
                   >
-                    <div className="pv-row" style={{ justifyContent: "space-between", gap: 8 }}>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <div
+                      className="pv-row"
+                      style={{ justifyContent: "space-between", gap: 8 }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "center",
+                        }}
+                      >
                         {org.logoUrl && (
                           <img
                             src={org.logoUrl}
@@ -346,10 +367,16 @@ export default function PartnerOrgs() {
 
                     <div
                       className="pv-row"
-                      style={{ justifyContent: "space-between", fontSize: 12, color: "var(--pv-dim)" }}
+                      style={{
+                        justifyContent: "space-between",
+                        fontSize: 12,
+                        color: "var(--pv-dim)",
+                      }}
                     >
                       <div>
-                        <div>Code: <strong>{org.shortCode}</strong></div>
+                        <div>
+                          Code: <strong>{org.shortCode}</strong>
+                        </div>
                         <div>
                           Pledges:{" "}
                           <strong>{org.stats?.totalPledges ?? 0}</strong>
@@ -368,9 +395,13 @@ export default function PartnerOrgs() {
                       </div>
                     </div>
 
-                    <div
+                    {/* <div
                       className="pv-row"
-                      style={{ justifyContent: "space-between", marginTop: "auto", gap: 8 }}
+                      style={{
+                        justifyContent: "space-between",
+                        marginTop: "auto",
+                        gap: 8,
+                      }}
                     >
                       <Button
                         variant="ghost"
@@ -396,8 +427,15 @@ export default function PartnerOrgs() {
                             Deactivate
                           </Button>
                         )}
-                      </div>
-                    </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => navigate(`/admin/partners/${org._id}`)}
+                        >
+                          View
+                        </Button>
+                      </div> 
+                    </div>*/}
                   </div>
                 ))}
               </div>
@@ -431,7 +469,7 @@ export default function PartnerOrgs() {
         </Card>
       )}
 
-      <PartnerModal
+      <OrgFormModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         form={form}
@@ -441,133 +479,5 @@ export default function PartnerOrgs() {
         editing={!!editing}
       />
     </div>
-  );
-}
-
-function PartnerModal({ open, onClose, form, onChange, onSubmit, saving, editing }) {
-  if (!open) return null;
-
-  return (
-    <Modal
-      isOpen={open}
-      onClose={onClose}
-      title={editing ? "Edit Partner" : "New Partner"}
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button disabled={saving} onClick={onSubmit}>
-            {saving ? "Saving…" : editing ? "Save changes" : "Create partner"}
-          </Button>
-        </>
-      }
-    >
-      <div className="pv-col" style={{ gap: 10 }}>
-        <div className="pv-row" style={{ gap: 10, flexWrap: "wrap" }}>
-          <Input
-            label="Name *"
-            name="name"
-            value={form.name}
-            onChange={onChange}
-            placeholder="e.g., ABC International School"
-            required
-          />
-          <Select
-            label="Type"
-            name="type"
-            value={form.type}
-            onChange={onChange}
-          >
-            <option value="school">School</option>
-            <option value="college">College</option>
-            <option value="business">Business</option>
-            <option value="ngo">NGO</option>
-            <option value="institute">Institute</option>
-            <option value="other">Other</option>
-          </Select>
-        </div>
-
-        <Input
-          label="Tagline"
-          name="tagline"
-          value={form.tagline}
-          onChange={onChange}
-          placeholder="e.g., Financial Literacy Partner"
-        />
-
-        <div className="pv-row" style={{ gap: 10, flexWrap: "wrap" }}>
-          <Input
-            label="Logo URL"
-            name="logoUrl"
-            value={form.logoUrl}
-            onChange={onChange}
-            placeholder="https://…"
-          />
-          <Input
-            label="Website"
-            name="website"
-            value={form.website}
-            onChange={onChange}
-            placeholder="https://…"
-          />
-        </div>
-
-        <div className="pv-row" style={{ gap: 10, flexWrap: "wrap" }}>
-          <Input
-            label="Contact person"
-            name="contactPerson"
-            value={form.contactPerson}
-            onChange={onChange}
-          />
-          <Input
-            label="Contact email"
-            name="contactEmail"
-            value={form.contactEmail}
-            onChange={onChange}
-            type="email"
-          />
-          <Input
-            label="Contact phone"
-            name="contactPhone"
-            value={form.contactPhone}
-            onChange={onChange}
-          />
-        </div>
-
-        <Input
-          label="Address"
-          name="address"
-          value={form.address}
-          onChange={onChange}
-        />
-
-        <div className="pv-row" style={{ gap: 10, flexWrap: "wrap" }}>
-          <Input
-            label="City"
-            name="city"
-            value={form.city}
-            onChange={onChange}
-          />
-          <Input
-            label="State"
-            name="state"
-            value={form.state}
-            onChange={onChange}
-          />
-          <Input
-            label="Pincode"
-            name="pincode"
-            value={form.pincode}
-            onChange={onChange}
-          />
-        </div>
-
-        <Alert type="info">
-          Once created, a unique <strong>short code</strong> and{" "}
-          <strong>partner link</strong> will be generated automatically.
-        </Alert>
-      </div>
-    </Modal>
   );
 }
