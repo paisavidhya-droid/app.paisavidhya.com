@@ -4,6 +4,8 @@ import { LEAD_SOURCES } from '../models/_enums.js';
 import { logLeadActivity } from '../utils/logLeadActivity.js';
 import LeadActivityLog from '../models/LeadActivityLog.js';
 import { addAudit } from '../utils/audit.js';
+import User from '../models/user.model.js';
+import { notifyUsers } from '../utils/notify.js';
 
 /**
  * deriveSource:
