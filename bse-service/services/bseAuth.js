@@ -1,5 +1,6 @@
 // services/bseAuth.js
 import axios from "axios";
+import { BSE_CONFIG } from "../config/bse.config.js";
 
 let cached = {
   token: null,
@@ -16,7 +17,7 @@ function safetyBufferMs() {
 }
 
 export async function loginToBse() {
-  const baseURL = process.env.BSE_BASE_URL;
+ const baseURL = BSE_CONFIG.baseUrl;
   const username = process.env.BSE_USERNAME;
   const password = process.env.BSE_PASSWORD;
 
@@ -35,7 +36,7 @@ export async function loginToBse() {
     throw new Error(`BSE login failed: ${JSON.stringify(res.data)}`);
   }
 
-  const token = res.data?.data?.data?.access_token;
+  const token = res.data?.data?.access_token;
   if (!token) throw new Error("BSE login success but access_token missing");
 
   // NOTE: Doc says token has expiry decided by platform, but may not return exp.

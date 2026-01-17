@@ -19,7 +19,7 @@ const uccGenerator = async (pan, db) => {
 
 
     // 4. Format number as 3-digit (001, 002, 045, 300…)
-    const numberFormatted = number.toString().padStart(4, "0");
+    const numberFormatted = number.toString().padStart(3, "0");
 
     // 5. Build final UCC
     const ucc = `PV${prefix}${numberFormatted}`;

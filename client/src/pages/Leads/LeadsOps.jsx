@@ -1,102 +1,42 @@
-import { useEffect, useState } from "react";
+// src/pages/leads/LeadsOps.jsx
 import "./leads.css";
-import {
-  Card,
-  Input,
-  Select,
-  Button,
-  Badge,
-  Modal,
-  Pagination,
-  Spinner,
-  Tooltip,
-} from "../../components";
-import toast from "react-hot-toast";
-import OutreachEditor from "../../components/Leads/OutreachEditor";
-import { LeadsAPI } from "../../api/leads";
-import StatusBadge from "../../components/ui/StatusBadge";
-import { useNavigate } from "react-router-dom";
-import LeadActionsDropdown from "./LeadActionsDropdown";
-import TransferLeadModal from "./LeadTransferModal";
+import { Card, Pagination, Spinner } from "../../components";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { useAssignableUsers } from "../../hooks/useUsers";
 
-const STATUS = [
-  "",
-  "New",
-  "Contacted",
-  "Follow-Up",
-  "Meeting Scheduled",
-  "Won",
-  "Lost",
-];
-const SOURCES = [
-  "",
-  "Website",
-  "WhatsApp",
-  "Instagram",
-  "LinkedIn",
-  "Referral",
-  "Seminar",
-  "Campaign",
-  "Other",
-];
+import LeadsToolbar from "./components/LeadsToolbar";
+import LeadsTable from "./components/LeadsTable";
+import LeadsModals from "./components/LeadsModals";
+
+import { useLeadsOps } from "./useLeadsOps";
+import { useEffect } from "react";
 
 export default function LeadsOps() {
   const navigate = useNavigate();
-  // filters
-  const [status, setStatus] = useState("");
-  const [source, setSource] = useState("");
-  const [phone, setPhone] = useState("");
+  const { user, isAdmin } = useAuth();
 
-  // paging & data
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const ops = useLeadsOps({ user, isAdmin, limit: 10 });
 
-  // edit & details
-  const [editLead, setEditLead] = useState(null);
-  const [noteLead, setNoteLead] = useState(null);
-
-    const [transferLead, setTransferLead] = useState(null);
-
-  // helpers
-  const fmtDate = (d) => (d ? new Date(d).toLocaleString() : "");
-  const shortId = (id) => (id ? String(id).slice(-6) : "");
-
-  async function load() {
-    setLoading(true);
-    try {
-      const limit = 10;
-      const skip = (page - 1) * limit;
-      // normalize phone so +91/space/dash don’t break matches
-      const cleanedPhone = phone ? phone.replace(/\D/g, "") : "";
-      const data = await LeadsAPI.list({
-        status,
-        source,
-        phone: cleanedPhone,
-        limit,
-        skip,
-      });
-      setItems(data.items || []);
-      setTotal(data.total || 0);
-    } catch {
-      toast.error("Failed to load leads");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const location = useLocation();
 
   useEffect(() => {
-    load(); /* eslint-disable-next-line */
-  }, [page]);
-  const applyFilters = () => {
-    setPage(1);
-    load();
-  };
+    const params = new URLSearchParams(location.search);
+    const shouldCreate = params.get("create") === "1";
+    if (shouldCreate && !ops.createLeadOpen) {
+    ops.setCreateLeadOpen(true);
 
-  // table columns (important only)
-  // Name&Email | Phone | Source | Status | Assigned | Follow/Preferred | Last Activity | Actions
-  const minWidth = 1200;
+    // clean URL immediately so it does not re-trigger
+    params.delete("create");
+    navigate(
+      { pathname: location.pathname, search: params.toString() ? `?${params}` : "" },
+      { replace: true }
+    );
+  }
+  }, [location.search, location.pathname, navigate, ops]);
+
+  // assignable users for filter dropdown (safe to load on page mount)
+  const { assignable = [] } = useAssignableUsers(true);
 
   const truncate = (txt, n = 40) => {
     if (!txt) return "";
@@ -104,302 +44,113 @@ export default function LeadsOps() {
     return s.length > n ? s.slice(0, n).trim() + "…" : s;
   };
 
-  // new: simplified next-action formatter
-  const fmtNextAction = (lead) => {
-    const fu = lead?.outreach?.followUpAt;
-    const type = lead?.preferredTimeType;
-    const pref = lead?.preferredTimeAt;
-
-    if (fu) return `Follow-up • ${fmtDate(fu)}`;
-    if (type === "SCHEDULED" && pref) return `Scheduled • ${fmtDate(pref)}`;
-    return type && type !== "SCHEDULED" ? type : "ASAP";
-  };
-
   const fmtNextActionNode = (lead) => {
-    const t = fmtNextAction(lead);
-    return t === "Later" ? <Badge>Later</Badge> : t;
-    // return t === "ASAP" ? <Badge>ASAP</Badge> : t;
+    const t = ops.fmtNextAction(lead);
+    return t === "Later" ? <span>Later</span> : t;
   };
+
+  const goToLead = (id) => navigate(String(id));
 
   return (
-    <div className="pv-col" style={{ gap: 16 }}>
-      {/* Filters */}
-      <Card title="Lead Filters">
-        <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
-          <Select
-            label="Status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            {STATUS.map((s) => (
-              <option key={s || "all"} value={s}>
-                {s || "All statuses"}
-              </option>
-            ))}
-          </Select>
-          <Select
-            label="Source"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          >
-            {SOURCES.map((s) => (
-              <option key={s || "all"} value={s}>
-                {s || "All sources"}
-              </option>
-            ))}
-          </Select>
-          <Input
-            label="Phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+91…"
-          />
-          <Button onClick={applyFilters}>Apply</Button>
-        </div>
-      </Card>
+    <div className="pv-container leads-page">
+      <div style={{ marginBottom: 16 }}>
+        <LeadsToolbar
+          filters={ops.filters}
+          assignable={assignable}
+          setFilter={ops.setFilter}
+          onClearFilters={ops.clearFilters}
+          selectedCount={ops.selectedCount}
+          clearSelection={ops.clearSelection}
+          notManageableCount={ops.notManageableCount}
+          bulkArchiveIds={ops.bulkArchiveIds}
+          bulkRestoreIds={ops.bulkRestoreIds}
+          bulkDeleteIds={ops.bulkDeleteIds}
+          bulkTransferIds={ops.bulkTransferIds}
+          onBulkArchive={ops.bulkArchive}
+          onBulkRestore={ops.bulkRestore}
+          onBulkDelete={ops.bulkDelete}
+          onBulkTransfer={(ids) => ops.setTransferIds(ids)}
+          onCreate={() => ops.setCreateLeadOpen(true)}
+        />
+      </div>
 
-      {/* Table */}
-      <Card title="Leads">
-        {loading ? (
+      <Card title="Callback Requests">
+        {ops.loading ? (
           <div
             className="pv-row"
             style={{ justifyContent: "center", padding: 20 }}
           >
             <Spinner size={28} />
           </div>
-        ) : (
-          <div className="pv-col" style={{ gap: 8, overflowX: "auto" }}>
-            {/* Head */}
-            <div
-              className="pv-row pv-table-head"
-              style={{ fontWeight: 600, minWidth }}
-            >
-              <div style={{ width: "20%" }}>Name / Email</div>
-              <div style={{ width: "12%" }}>Phone</div>
-              <div style={{ width: "12%" }}>Source</div>
-              <div style={{ width: "12%" }}>Status</div>
-              <div style={{ width: "12%" }}>Assigned</div>
-              <div style={{ width: "25%" }}>
-                Next Action(Follow-up / Scheduled)
-              </div>
-              <div style={{ width: "12%" }}>Note</div>
-            </div>
-
-            {/* Rows */}
-            {items.map((lead) => (
-              <div
-                key={lead._id}
-                className="pv-row pv-table-row"
-                style={{ minWidth }}
-              >
-                {/* Name / Email */}
-                <div style={{ width: "20%" }}>
-                  <div>{lead.name}</div>
-                  {lead.email ? (
-                    <div
-                      className="pv-dim"
-                      style={{ overflow: "hidden", textOverflow: "ellipsis" }}
-                    >
-                      {lead.email}
-                    </div>
-                  ) : null}
-                </div>
-
-                {/* Phone */}
-                <div style={{ width: "12%" }}>
-                  {lead.phone || "••• masked •••"}
-                </div>
-
-                {/* Source */}
-                <div style={{ width: "12%" }}>
-                  {lead.source || <span className="pv-dim">—</span>}
-                </div>
-
-                {/* Status */}
-                <div style={{ width: "12%" }}>
-                  <StatusBadge status={lead.outreach?.status || "New"} />
-                </div>
-
-                {/* Assigned */}
-                <div style={{ width: "12%" }}>
-                  {lead.outreach?.assignedTo ? (
-                    <Tooltip content={String(lead.outreach.assignedTo)}>
-                      <Badge>…{shortId(lead.outreach.assignedTo)}</Badge>
-                    </Tooltip>
-                  ) : (
-                    <span className="pv-dim">—</span>
-                  )}
-                </div>
-
-                {/* Follow-up / Preferred */}
-                <div style={{ width: "18%" }}>{fmtNextActionNode(lead)}</div>
-
-                {/* Note (truncated with optional modal) */}
-                <div
-                  style={{
-                    width: "12%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  {lead.outreach?.note ? (
-                    <>
-                      {/* keep tooltip for short notes only */}
-                      {String(lead.outreach.note).length <= 36 ? (
-                        <Tooltip content={String(lead.outreach.note)}>
-                          <span className="pv-dim">
-                            {truncate(lead.outreach.note, 36)}
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        <>
-                          <span className="pv-dim">
-                            {truncate(lead.outreach.note, 36)}
-                          </span>
-                          <button
-                            className="view-note-btn"
-                            onClick={() => setNoteLead(lead)}
-                          >
-                            View
-                          </button>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <span className="pv-dim">—</span>
-                  )}
-                </div>
-
-                {/* Actions */}
-               
-                  <div>
-                    <LeadActionsDropdown
-                      lead={lead}
-                      onViewDetails={() => navigate(`/admin/leads/${lead._id}`)}
-                      onUpdateOutreach={() => setEditLead(lead)}
-                      // Optional: wire these if you have handlers
-                    onTransfer={() => setTransferLead(lead)} 
-                      onViewLogs={undefined /* () => openLogs(lead._id) */}
-                      // Role rules (example): only assignee can update/transfer
-                      canUpdate={
-                        !lead.outreach?.assignedTo ||
-                        String(lead.outreach.assignedTo) ===
-                          String(/* currentUserId */ "")
-                      }
-                      canTransfer={
-                        !lead.outreach?.assignedTo ||
-                        String(lead.outreach.assignedTo) ===
-                          String(/* currentUserId */ "")
-                      }
-                    />
-                  </div>
-                </div>
-              
-            ))}
-
-            {/* Pagination */}
-            <div
-              className="pv-row"
-              style={{ justifyContent: "center", marginTop: 8 }}
-            >
-              <Pagination
-                page={page}
-                total={Math.ceil(total / 10)}
-                onChange={setPage}
-              />
+        ) : ops.items.length === 0 ? (
+          <div className="pv-empty">
+            <div style={{ fontWeight: 800 }}>No leads found</div>
+            <div className="pv-dim">
+              Try changing filters or clearing the phone.
             </div>
           </div>
+        ) : (
+          <>
+            <LeadsTable
+              items={ops.items}
+              selectedIds={ops.selectedIds}
+              isAllSelectedOnPage={ops.isAllSelectedOnPage}
+              toggleAllOnPage={ops.toggleAllOnPage}
+              toggleOne={ops.toggleOne}
+              canUpdateLead={ops.canUpdateLead}
+              canTransferLead={ops.canTransferLead}
+              fmtNextActionNode={fmtNextActionNode}
+              truncate={truncate}
+              onEditOutreach={(lead) => ops.setEditLead(lead)}
+              onEditDetails={(lead) => ops.setEditDetailsLead(lead)}
+              onTransfer={(lead) => ops.setTransferIds([lead._id])}
+              onLogs={(lead) => ops.setLogsLead(lead)}
+              onArchive={ops.handleArchive}
+              onRestore={ops.handleRestore}
+              onDelete={ops.handleHardDelete}
+              goToLead={goToLead}
+              onClaim={(lead) => ops.claimLead(lead)}
+              isAdmin={isAdmin}
+            />
+
+            <div
+              className="pv-row"
+              style={{
+                justifyContent: "space-between",
+                padding: 12,
+                boxShadow: "0 -10px 16px -12px rgba(0, 0, 0, .22)",
+              }}
+            >
+              <div style={{ color: "var(--pv-dim)" }}>
+                {ops.total.toLocaleString()} leads
+              </div>
+
+              <Pagination
+                page={ops.page}
+                total={Math.max(1, Math.ceil(ops.total / ops.limit))}
+                onChange={ops.setPage}
+              />
+            </div>
+          </>
         )}
       </Card>
 
-      {/* Update modal (existing) */}
-      <Modal
-        isOpen={!!editLead}
-        onClose={() => setEditLead(null)}
-        title={`Update Outreach – ${editLead?.name || ""}`}
-        footer={null}
-      >
-        {editLead && (
-          <OutreachEditor
-            lead={editLead}
-            onClose={() => setEditLead(null)}
-            onSaved={() => {
-              setEditLead(null);
-              load();
-            }}
-          />
-        )}
-      </Modal>
-
-      <Modal
-        isOpen={!!noteLead}
-        onClose={() => setNoteLead(null)}
-        title={`Note – ${noteLead?.name || ""}`}
-        footer={
-          <div
-            className="pv-row"
-            style={{ justifyContent: "flex-end", gap: 8 }}
-          >
-            <Button
-              onClick={() => {
-                setEditLead(noteLead);
-                setNoteLead(null);
-              }}
-            >
-              Update Outreach
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => navigate(`/admin/leads/${noteLead?._id}`)}
-            >
-              Open Details
-            </Button>
-          </div>
-        }
-      >
-        {noteLead && (
-          <div className="pv-col" style={{ gap: 10 }}>
-            <div
-              className="pv-dim"
-              style={{
-                whiteSpace: "pre-wrap",
-                maxHeight: 280,
-                overflow: "auto",
-              }}
-            >
-              {noteLead.outreach?.note}
-            </div>
-            <div
-              className="pv-row"
-              style={{ gap: 12, marginTop: 6, flexWrap: "wrap" }}
-            >
-              <Badge>
-                <b>Status:</b>&nbsp;{noteLead.outreach?.status || "New"}
-              </Badge>
-              {noteLead.outreach?.followUpAt && (
-                <Badge>
-                  <b>Follow-up:</b>&nbsp;{fmtDate(noteLead.outreach.followUpAt)}
-                </Badge>
-              )}
-              {noteLead.outreach?.lastActivityAt && (
-                <Badge>
-                  <b>Last activity:</b>&nbsp;
-                  {fmtDate(noteLead.outreach.lastActivityAt)}
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-      </Modal>
-
-        {/* Transfer modal */}
-      <TransferLeadModal
-        isOpen={!!transferLead}
-        onClose={() => setTransferLead(null)}
-        lead={transferLead}
-        onTransferred={() => { setTransferLead(null); load(); }}
-        currentUserId={"" /* pass your auth user id if you want to block self-transfer */}
+      <LeadsModals
+        load={ops.load}
+        editLead={ops.editLead}
+        setEditLead={ops.setEditLead}
+        noteLead={ops.noteLead}
+        setNoteLead={ops.setNoteLead}
+        logsLead={ops.logsLead}
+        setLogsLead={ops.setLogsLead}
+        editDetailsLead={ops.editDetailsLead}
+        setEditDetailsLead={ops.setEditDetailsLead}
+        createLeadOpen={ops.createLeadOpen}
+        setCreateLeadOpen={ops.setCreateLeadOpen}
+        transferIds={ops.transferIds}
+        setTransferIds={ops.setTransferIds}
+        fmtDate={ops.fmtDate}
+        goToLead={goToLead}
       />
     </div>
   );

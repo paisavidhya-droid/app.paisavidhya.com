@@ -29,3 +29,7 @@ export { default as Placeholder} from "../components/ui/Placeholder";
 // this below both are same but just the differet names
 export { default as AmountInput } from "./ui/AmountInput.jsx";
 export { default as CurrencyInput } from "./ui/AmountInput";
+
+export { default as ActiveFilterPill } from "./ui/ActiveFilterPill/ActiveFilterPill.jsx";
+export { default as SearchNSelect } from "./ui/SearchNSelect.jsx";
+export { default as CopyButton } from "./ui/CopyButton.jsx";

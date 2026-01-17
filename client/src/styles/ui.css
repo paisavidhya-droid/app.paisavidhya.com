@@ -18,6 +18,10 @@
     --pv-fast: 150ms;
 }*/
 
+.pv-dim{
+  color: var(--pv-dim);
+}
+
 
 a {
   color: var(--pv-primary);
@@ -176,6 +180,9 @@ label.pv-label {
   border-radius: 18px;
   box-shadow: var(--pv-shadow);
   position: relative;
+   max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
 }
 
 .pv-modal-header {
@@ -185,8 +192,8 @@ label.pv-label {
 }
 
 .pv-modal-body {
-  height: 60vh;
   padding: 18px 20px;
+    flex: 1 1 auto;
   overflow-y: auto;
 }
 
@@ -195,7 +202,8 @@ label.pv-label {
   border-top: 1px solid var(--pv-border);
   display: flex;
   gap: 10px;
-  justify-content: flex-end
+  justify-content: flex-end;
+  box-shadow: 0 -10px 16px -12px rgba(0, 0, 0, 0.22);
 }
 
 .modal-close {
@@ -586,4 +594,105 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+
+/* ================================
+   PV TABLE SYSTEM 
+   ================================ */
+
+.pv-table-wrap{
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--pv-border);
+  border-radius: 12px;
+  background: var(--pv-card);
+}
+
+.pv-table{
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--pv-card);
+}
+
+.pv-table thead th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: color-mix(in oklab, var(--pv-card) 92%, var(--pv-bg));
+  color: var(--pv-dim);
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: .2px;
+  font-weight: 800;
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--pv-border);
+  white-space: nowrap;
+}
+
+.pv-table tbody td{
+  padding: 12px 12px;
+  border-bottom: 1px solid color-mix(in oklab, var(--pv-border) 70%, transparent);
+  vertical-align: middle;
+}
+
+.pv-table tbody tr:nth-child(even){
+  background: color-mix(in oklab, var(--pv-bg) 40%, transparent);
+}
+
+.pv-table tbody tr:hover{
+  background: color-mix(in oklab, var(--pv-primary) 6%, transparent);
+}
+
+/* Helpers */
+.pv-cell-main{
+  font-weight: 800;
+  color: var(--pv-text);
+}
+
+.pv-cell-sub{
+  font-size: 12px;
+  margin-top: 2px;
+  color: var(--pv-dim);
+}
+
+.pv-ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pv-mono{
+  font-variant-numeric: tabular-nums;
+}
+
+/* Common right-aligned narrow actions column */
+.pv-th-actions, .pv-td-actions{
+  width: 72px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Empty state card */
+.pv-empty{
+  padding: 22px;
+  border: 1px dashed var(--pv-border);
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--pv-bg) 40%, transparent);
+}
+
+
+ .pv-link {
+  color: var(--pv-text);
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+ .pv-link:hover {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--pv-primary);
 }

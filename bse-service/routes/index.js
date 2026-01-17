@@ -2,7 +2,8 @@
 import { Router } from 'express';
 import uccRoutes from './ucc.routes.js';
 import webhookRoutes from './webhook.routes.js';
-import authRoutes from './auth.routes.js';
+import authRoutes from './auth.routes.js'
+import orderRoutes from "./order.routes.js";;
 // order & mandate routes later
 
 const router = Router();
@@ -11,5 +12,6 @@ const router = Router();
 router.use('/ucc', uccRoutes);
 router.use('/webhook', webhookRoutes);
 router.use("/auth", authRoutes);
+router.use("/orders", orderRoutes);
 
 export default router;

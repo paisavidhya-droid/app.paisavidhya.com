@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Tooltip } from "../../components";
-import { FaEllipsisVertical } from "react-icons/fa6";
+import { FaArrowRotateLeft, FaEllipsisVertical } from "react-icons/fa6";
 import {
   FaEdit,
   FaListAlt,
@@ -8,81 +8,151 @@ import {
   FaExchangeAlt,
   FaTrash,
   FaHistory,
+  FaUserCheck,
 } from "react-icons/fa";
+import { useLayoutEffect } from "react";
+import Portal from "../../components/ui/Portal";
 
 // Minimal, dependency-free “meatball” dropdown.
 // Keyboard + outside-click + role-gating friendly.
 export default function LeadActionsDropdown({
   lead,
-  onViewDetails, // () => void
-  onUpdateOutreach, // () => void
-  onTransfer, // () => void (optional)
-  onViewLogs, // () => void (optional)
-  canUpdate = true, // booleans you can compute per row
-  canTransfer = true, // e.g., based on assignedTo/user
+  onViewDetails,
+  onUpdateOutreach,
+  onTransfer,
+  onViewLogs,
+  onDelete,
+  onRestore,
+  onArchive,
+  canUpdate = true,
+  canTransfer = true,
+  onEditDetails,
+  isUnassigned = false,
+  isAdmin = false,
+  onClaim,
 }) {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const btnRef = useRef(null);
 
-  // Close on outside click
-  useEffect(() => {
-    const onClick = (e) => {
-      if (!dropdownRef.current) return;
-      if (
-        !dropdownRef.current.contains(e.target) &&
-        !btnRef.current?.contains(e.target)
-      )
-        setOpen(false);
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
+  const menuRef = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 200 });
 
-  // Keyboard toggle
-  const onKeyToggle = (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      setOpen((p) => !p);
-    } else if (e.key === "Escape") {
-      setOpen(false);
-    }
+  const close = () => setOpen(false);
+
+  // outside click (works with portal)
+  useEffect(() => {
+    if (!open) return;
+
+    const onDown = (e) => {
+      const btn = btnRef.current;
+      const menu = menuRef.current;
+      if (btn?.contains(e.target)) return;
+      if (menu?.contains(e.target)) return;
+      close();
+    };
+
+    const onKey = (e) => {
+      if (e.key === "Escape") close();
+    };
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // position menu near button
+  const computePos = () => {
+    const el = btnRef.current;
+    if (!el) return;
+
+    const r = el.getBoundingClientRect();
+    const menuWidth = 220;
+
+    // align right edge with button right edge
+    let left = r.right - menuWidth;
+    let top = r.bottom + 8;
+
+    // keep inside viewport
+    left = Math.max(8, Math.min(left, window.innerWidth - menuWidth - 8));
+
+    setPos({ top, left, width: menuWidth });
   };
 
+  useLayoutEffect(() => {
+    if (!open) return;
+    computePos();
+
+    const onScroll = () => computePos();
+    const onResize = () => computePos();
+
+    window.addEventListener("scroll", onScroll, true); // capture scroll inside containers too
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open]);
+
   // Menu item helper
-  const Item = ({ children, onClick, disabled, title }) => (
+  const Item = ({ children, onClick, disabled }) => (
     <li
       role="menuitem"
       tabIndex={disabled ? -1 : 0}
-      onClick={() => !disabled && (onClick?.(), setOpen(false))}
+      onClick={() => {
+        if (disabled) return;
+        onClick?.();
+        close();
+      }}
       onKeyDown={(e) => {
         if (disabled) return;
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onClick?.();
-          setOpen(false);
+          close();
         }
       }}
       aria-disabled={disabled}
-      className="pv-row"
       style={{
         padding: "8px 10px",
+        display: "flex",
         gap: 8,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
+        borderRadius: 8,
       }}
-      title={title}
+      className="lead-menu-item"
     >
       {children}
     </li>
   );
 
+  const updateTip = !canUpdate
+    ? isUnassigned
+      ? "Unassigned lead - claim it first"
+      : "Only assignee can update"
+    : "Update lead status";
+
+  const claimTip = canTransfer
+  ? "Claim this lead (assign to you)"
+  : "You can’t claim this lead";
+
+const transferTip = canTransfer
+  ? "Transfer this lead"
+  : "Only assignee can transfer";
+
+
+  // Decide what the "assignment" action should be
+  const showClaim = isUnassigned && !isAdmin; // staff + unassigned
+  const showTransfer = !isUnassigned || isAdmin; // assigned OR admin (even if unassigned)
+
+  const canDelete = true;
+
   // You can swap this “⋯” for an icon button if you have one.
   return (
-    <div
-      style={{ position: "relative", display: "inline-block" }}
-      ref={dropdownRef}
-    >
+    <>
       <button
         ref={btnRef}
         className="dropdown-toggle"
@@ -90,72 +160,133 @@ export default function LeadActionsDropdown({
         aria-expanded={open}
         aria-label={`Actions for ${lead?.name || "lead"}`}
         onClick={() => setOpen((p) => !p)}
-        onKeyDown={onKeyToggle}
         style={{ padding: "6px 8px", minWidth: 0 }}
       >
-        <Tooltip content="Actions" placement="top">
+        <Tooltip content="More options">
           <FaEllipsisVertical />
         </Tooltip>
       </button>
 
       {open && (
-        <ul
-          role="menu"
-          style={{
-            position: "absolute",
-            right: 0,
-            marginTop: 6,
-            minWidth: 200,
-            background: "var(--pv-card, #fff)",
-            border: "1px solid var(--pv-border)",
-            borderRadius: 10,
-            boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
-            padding: 6,
-            zIndex: 20,
-            listStyle: "none",
-          }}
-        >
-          <Item
-            onClick={onUpdateOutreach}
-            disabled={!canUpdate}
-            title={!canUpdate ? "Only assignee can update" : ""}
+        <Portal>
+          <ul
+            ref={menuRef}
+            role="menu"
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              width: pos.width,
+              margin: 0,
+              background: "var(--pv-card, #fff)",
+              border: "1px solid var(--pv-border)",
+              borderRadius: 10,
+              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
+              padding: 6,
+              zIndex: 9999,
+              listStyle: "none",
+            }}
           >
-            <FaSyncAlt className="dropdown-icon" /> Update Status
-          </Item>
+            <Tooltip content={updateTip}>
+              <Item onClick={onUpdateOutreach} disabled={!canUpdate}>
+                <FaSyncAlt className="dropdown-icon" /> Update Status
+              </Item>
+            </Tooltip>
 
-          {onTransfer && (
-            <Item
-              onClick={onTransfer}
-              disabled={!canTransfer}
-              title={!canTransfer ? "Only assignee can transfer" : ""}
-            >
-              <FaExchangeAlt className="dropdown-icon" />
-              Transfer To
-            </Item>
-          )}
+            {/* {onTransfer && (
+              <Tooltip content={transferTip}>
+                <Item
+                  onClick={onTransfer}
+                  disabled={!canTransfer}
+                  title={!canTransfer ? "Only assignee can transfer" : ""}
+                >
+                  <FaExchangeAlt className="dropdown-icon" />
+                  Transfer To
+                </Item>
+              </Tooltip>
+            )} */}
+            {(showClaim || showTransfer) && (
+              <Tooltip content={showClaim ? claimTip : transferTip}>
+                <Item
+                  onClick={showClaim ? onClaim : onTransfer}
+                  disabled={!canTransfer}
+                >
+                  {showClaim ? (
+                    <>
+                      <FaUserCheck className="dropdown-icon" />
+                      Claim Lead
+                    </>
+                  ) : (
+                    <>
+                      <FaExchangeAlt className="dropdown-icon" />
+                      Transfer To
+                    </>
+                  )}
+                </Item>
+              </Tooltip>
+            )}
+            <Tooltip content="View lead details">
+              <Item onClick={onViewDetails}>
+                <FaListAlt className="dropdown-icon" />
+                View Details
+              </Item>
+            </Tooltip>
+            {onViewLogs && (
+              <Tooltip content="View activity logs">
+                <Item onClick={onViewLogs}>
+                  <FaHistory className="dropdown-icon" />
+                  Activity Logs
+                </Item>
+              </Tooltip>
+            )}
 
-          {!onViewLogs && (
-            <Item onClick={onViewLogs}>
-              <FaHistory className="dropdown-icon" />
-              View Activity Logs
-            </Item>
-          )}
+            {onEditDetails && (
+              <Tooltip content={updateTip} placement="right">
+                <Item onClick={onEditDetails} disabled={!canUpdate}>
+                  <FaEdit className="dropdown-icon" />
+                  Edit Details
+                </Item>
+              </Tooltip>
+            )}
 
-          <Item onClick={onViewDetails}>
-            <FaListAlt className="dropdown-icon" />
-            View Details
-          </Item>
-          <Item onClick={onViewDetails}>
+            {/* <Item onClick={onViewDetails}>
             <FaEdit className="dropdown-icon" />
             Edit Details
-          </Item>
+          </Item> */}
+            {!canDelete && (
+              <>
+                {lead?.archivedAt
+                  ? onRestore && (
+                      <Tooltip content="Restore lead">
+                        <Item onClick={onRestore}>
+                          <FaArrowRotateLeft className="dropdown-icon" />
+                          Restore Lead
+                        </Item>
+                      </Tooltip>
+                    )
+                  : onArchive && (
+                      <Tooltip content="Archive lead">
+                        <Item onClick={onArchive}>
+                          <FaTrash
+                            className="dropdown-icon"
+                            style={{ color: "red" }}
+                          />
+                          Archive Lead
+                        </Item>
+                      </Tooltip>
+                    )}
+              </>
+            )}
 
-          <Item onClick={onViewDetails}>
-            <FaTrash className="dropdown-icon" style={{ color: "red" }} />
-            Delete Lead
-          </Item>
-        </ul>
+            {!canDelete && (
+              <Item onClick={onDelete} disabled={!canDelete}>
+                <FaTrash className="dropdown-icon" style={{ color: "red" }} />
+                Delete Lead
+              </Item>
+            )}
+          </ul>
+        </Portal>
       )}
-    </div>
+    </>
   );
 }

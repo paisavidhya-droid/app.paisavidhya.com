@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, Button, Badge, Alert, Progress, Skeleton, Tooltip } from "../../components";
 import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 // Local tiny UI helpers
 function Stat({ label, value, hint }) {
@@ -82,8 +83,8 @@ export default function StaffDashboard() {
             </h1>
           </div>
           <div className="pv-row" style={{ gap:8 }}>
-            <Button as="a" href="/leads">Open Leads</Button>
-            <Button as="a" href="/staff/tasks" variant="ghost">My Tasks</Button>
+            <Button as={Link} to="./leads">Open Leads</Button>
+            <Button as={Link} to="./leads" variant="ghost">My Tasks</Button>
           </div>
         </div>
       </Card>
@@ -121,8 +122,8 @@ export default function StaffDashboard() {
 
           <Card title="Quick actions">
             <div className="pv-row" style={{ gap:8, flexWrap:"wrap" }}>
-              <Button as="a" href="/leads">Create lead</Button>
-              <Button variant="ghost" as="a" href="/staff">Team board</Button>
+              <Button as={Link} to="./leads?create=1">Create lead</Button>
+              <Button variant="ghost" as={Link} to="/staff">Team board</Button>
             </div>
           </Card>
         </Col>
@@ -144,8 +145,8 @@ export default function StaffDashboard() {
 
           <Card title="Shortcuts">
             <div className="pv-col" style={{ gap:8 }}>
-              <Button as="a" href="/leads" variant="ghost">View leads</Button>
-              <Button as="a" href="/staff/calendar" variant="ghost">Calendar</Button>
+              <Button as={Link} to="./leads" variant="ghost">View leads</Button>
+              <Button as={Link} to="/staff/calendar" variant="ghost">Calendar</Button>
             </div>
           </Card>
         </Col>

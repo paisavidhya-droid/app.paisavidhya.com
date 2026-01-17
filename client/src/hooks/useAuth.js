@@ -38,10 +38,16 @@ export const useAuth = () => {
     [dispatch]
   );
 
+  const isAdmin =
+  user?.role === "ADMIN" ||
+  user?.isAdmin === true;
+
+
 
   return {
     token,
     user,
+    isAdmin,
     isFetching,
     isLoggedIn,
     BASE_URL,

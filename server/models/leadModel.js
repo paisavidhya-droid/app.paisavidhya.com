@@ -61,7 +61,6 @@ const LeadSchema = new mongoose.Schema(
       default: "",
     },
 
-
     // Meta
     source: {
       type: String,
@@ -105,7 +104,7 @@ const LeadSchema = new mongoose.Schema(
     preferredTimeType: {
       type: String,
       enum: PREFERRED_TIME_TYPE,
-      default: "ASAP",
+      default: "Later",
       index: true,
     },
     preferredTimeAt: {
@@ -137,16 +136,12 @@ function bumpActivity(doc) {
   doc.outreach.lastActivityAt = new Date();
 }
 
-LeadSchema.pre('findOneAndUpdate', function (next) {
-  this.setOptions({ runValidators: true, context: 'query' });
-  next();
-});
 
 LeadSchema.path('preferredTimeAt').validate(function (v) {
   const u = this.getUpdate?.() || {};
   const set = u.$set || u;
   const type = this.preferredTimeType ?? set?.preferredTimeType ?? u?.preferredTimeType;
-  if (type === 'SCHEDULED') return v instanceof Date;
+  if (type === "SCHEDULED") return !!v;
   return true;
 }, 'preferredTimeAt is required when preferredTimeType is SCHEDULED');
 
@@ -165,24 +160,23 @@ LeadSchema.pre('save', function (next) {
 });
 
 // Mirror for findOneAndUpdate workflows
-LeadSchema.pre('findOneAndUpdate', function (next) {
+LeadSchema.pre("findOneAndUpdate", function (next) {
   const update = this.getUpdate() || {};
-  const hasOutreachChange =
-    'outreach' in update ||
-    'outreach.status' in update ||
-    'outreach.note' in update ||
-    'outreach.followUpAt' in update ||
-    (update.$set && (
-      'outreach' in update.$set ||
-      'outreach.status' in update.$set ||
-      'outreach.note' in update.$set ||
-      'outreach.followUpAt' in update.$set
-    ));
-  if (hasOutreachChange) {
-    this.set({ 'outreach.lastActivityAt': new Date() });
+  const set = update.$set || {};
+
+  const hasOutreachChange = Object.keys(set).some((k) =>
+    k.startsWith("outreach.")
+  );
+
+  if (hasOutreachChange && !set["outreach.lastActivityAt"]) {
+    set["outreach.lastActivityAt"] = new Date();
+    update.$set = set;
+    this.setUpdate(update);
   }
+
   next();
 });
+
 
 // ---- Lean API output ---------------------------------
 LeadSchema.set('toJSON', { versionKey: false });

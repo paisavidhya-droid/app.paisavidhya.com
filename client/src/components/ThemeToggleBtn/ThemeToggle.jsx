@@ -4,12 +4,12 @@ import "./ThemeToggle.css";
 
 
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ size = 10 }) {
    const { effective, toggle } = useTheme();
 
   return (
      <div style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
-    <label className="theme-switch">
+    <label className="theme-switch" style={{ "--toggle-size": `${size}px` }}>
       <input
         type="checkbox"
         className="theme-switch__checkbox"

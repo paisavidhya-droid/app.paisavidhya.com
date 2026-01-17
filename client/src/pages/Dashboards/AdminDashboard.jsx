@@ -177,7 +177,7 @@ export default function AdminDashboard() {
   const hasIncidents = (summary?.incidents || 0) > 0;
 
   return (
-    <div className="pv-container" style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 16px" }}>
+    <div className="pv-container" >
       {/* Top welcome & quick actions */}
       <Card>
         <div className="pv-row" style={{ justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>

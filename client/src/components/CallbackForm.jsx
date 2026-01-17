@@ -1,17 +1,53 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Button, Select, Checkbox, Alert } from "../../components";
+import { Card, Button, Select, Checkbox, Alert } from ".";
 import toast from "react-hot-toast";
-import useUTM from "../../hooks/useUTM";
-import { LeadsAPI } from "../../api/leads";
-import FloatField from "../ui/FancyInput/FloatField";
+import useUTM from "../hooks/useUTM";
+import FloatField from "./ui/FancyInput/FloatField";
 import { useNavigate } from "react-router-dom";
+import { createLead, createLeadOps } from "../services/leads.service";
+import { useAssignableUsers } from "../hooks/useUsers";
 
-export default function CallbackForm() {
+function Wrapper({ inModal, children }) {
+  if (inModal) return <>{children}</>;
+  return (
+    <div
+      style={{
+        minHeight: "100dvh",
+        display: "grid",
+        gridTemplateColumns: "minmax(0,520px)",
+        placeContent: "center",
+        padding: 24,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export default function CallbackForm({
+  mode = "public",
+  inModal = false,
+  onDone,
+}) {
   const navigate = useNavigate();
   const { utm, page } = useUTM();
 
+  const apiCreate = mode === "ops" ? createLeadOps : createLead;
+
+  const showAssign = mode === "ops";
+  const { assignable = [], loading: loadingUsers } =
+    useAssignableUsers(showAssign);
+
+  const [assignedTo, setAssignedTo] = useState(""); // "" means unassigned
+
+  useEffect(() => {
+    // reset when switching modes/modal open
+    if (!showAssign) setAssignedTo("");
+  }, [showAssign]);
+
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [success, setSuccess] = useState(null);
 
   const [form, setForm] = useState({
@@ -19,6 +55,7 @@ export default function CallbackForm() {
     phone: "",
     email: "",
     message: "",
+    interest: "",
     preferredTimeType: "Later",
     preferredTimeAt: "",
     consent: true,
@@ -40,22 +77,33 @@ export default function CallbackForm() {
     e.preventDefault();
     if (disabled || loading) return;
     setLoading(true);
+    setFieldErrors({});
     setSubmitError("");
     try {
       const payload = {
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim() || undefined,
+        interests: form.interest ? [form.interest] : [],
         message: form.message.trim() || undefined,
         preferredTimeType: form.preferredTimeType,
         preferredTimeAt:
           form.preferredTimeType === "SCHEDULED"
-            ? new Date(form.preferredTimeAt)
+            ? new Date(form.preferredTimeAt).toISOString()
             : undefined,
+
         consent: !!form.consent,
         context: { utm, page },
+        ...(mode === "ops" && assignedTo ? { outreach: { assignedTo } } : {}),
       };
-      const data = await LeadsAPI.create(payload, { dedupeMinutes: 10 });
+      const data = await apiCreate(payload, {
+        dedupeMinutes: mode === "ops" ? 0 : 10,
+      });
+      if (inModal) {
+        toast.success("Lead added");
+        onDone?.(data);
+        return; // ✅ don't show success screen / redirect
+      }
       toast.success(
         data?.deduped
           ? "We already have your request. We’ll call you shortly."
@@ -77,31 +125,34 @@ export default function CallbackForm() {
         consent: true,
       });
     } catch (err) {
-      const code = err?.response?.data?.error || err.message;
-      toast.error(
-        code === "validation_failed"
-          ? "Please check your details."
-          : "Something went wrong."
-      );
-      setSubmitError(
-        code === "validation_failed"
-          ? "Please check your details and try again."
-          : "Something went wrong. Please try again in a moment."
-      );
+      const data = err?.response?.data;
+
+      if (
+        err?.response?.status === 422 &&
+        data?.error === "validation_failed"
+      ) {
+        setFieldErrors(data?.fields || {});
+        toast.error(data?.message || "Please fix the highlighted fields.");
+        return;
+      }
+
+      toast.error("Something went wrong.");
+      setSubmitError("Something went wrong. Please try again in a moment.");
     } finally {
       setLoading(false);
     }
   }
 
-  // auto-redirect after success
+  // auto-redirect after success for public form
   useEffect(() => {
+    if (inModal) return;
     if (!success) return;
     const t = setTimeout(() => navigate("/"), 5000);
     return () => clearTimeout(t);
-  }, [success, navigate]);
+  }, [success, navigate, inModal]);
 
   // --- Success UI ---
-  if (success) {
+  if (!inModal && success) {
     return (
       <div
         style={{
@@ -176,16 +227,16 @@ export default function CallbackForm() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "grid",
-        gridTemplateColumns: "minmax(0,520px)",
-        placeContent: "center",
-        padding: "24px",
-      }}
-    >
-      <Card title="Request a Callback">
+    <Wrapper inModal={inModal}>
+      <Card
+        title={
+          inModal
+            ? null
+            : mode === "ops"
+            ? "Add CB Request"
+            : "Request a Callback"
+        }
+      >
         {isPast && <Alert type="error">Time must be in the future</Alert>}
         {submitError && <Alert type="error">{submitError}</Alert>}
         <form onSubmit={submit} className="pv-col" style={{ gap: 12 }}>
@@ -195,6 +246,7 @@ export default function CallbackForm() {
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
             maxLength={120}
+            error={fieldErrors.name}
           />
           <FloatField
             label="Mobile"
@@ -206,6 +258,7 @@ export default function CallbackForm() {
             required
             inputMode="tel"
             maxLength={10}
+            error={fieldErrors.phone}
           />
 
           <FloatField
@@ -213,6 +266,7 @@ export default function CallbackForm() {
             type="email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
+            error={fieldErrors.email}
           />
           <FloatField
             label="Message (optional)"
@@ -221,7 +275,7 @@ export default function CallbackForm() {
             onChange={(e) => setForm({ ...form, message: e.target.value })}
             maxLength={500}
           />
-          <div  >
+          <div>
             <Select
               label="I'm looking for"
               value={form.interest}
@@ -234,7 +288,7 @@ export default function CallbackForm() {
             </Select>
           </div>
 
-          <div >
+          <div>
             <Select
               label="Callback preference"
               value={form.preferredTimeType}
@@ -254,19 +308,42 @@ export default function CallbackForm() {
                   setForm({ ...form, preferredTimeAt: e.target.value })
                 }
                 required
+                error={fieldErrors.preferredTimeAt}
               />
             )}
           </div>
-          <Checkbox
-            label="I consent to be contacted via call/WhatsApp/SMS."
-            checked={form.consent}
-            onChange={(v) => setForm({ ...form, consent: v })}
-          />
+          {showAssign && (
+            <Select
+              label="Assign to"
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+              disabled={loadingUsers}
+            >
+              <option value="">Unassigned</option>
+              {assignable.map((u) => (
+                <option key={u._id} value={u._id}>
+                  {u.name}
+                  {u.email ? ` (${u.email})` : ""}
+                </option>
+              ))}
+            </Select>
+          )}
+          {mode !== "ops" && (
+            <Checkbox
+              label="I consent to be contacted via call/WhatsApp/SMS."
+              checked={form.consent}
+              onChange={(v) => setForm({ ...form, consent: v })}
+            />
+          )}
           <Button disabled={disabled || loading || !!isPast}>
-            {loading ? "Submitting…" : "Request a Callback"}
+            {loading
+              ? "Submitting…"
+              : mode === "ops"
+              ? "Add Request"
+              : "Request a Callback"}
           </Button>
         </form>
       </Card>
-    </div>
+    </Wrapper>
   );
 }

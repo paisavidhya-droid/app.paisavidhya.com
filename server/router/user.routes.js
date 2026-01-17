@@ -16,7 +16,7 @@ import { generateCertificate, takePledge } from "../controllers/pledgecertificat
 const router = Router();
 
 router.get('/staff', auth, requireRole(ROLES.ADMIN), listStaff);
-router.get('/assignable', auth, requireRole(ROLES.ADMIN), listAssignableUsers);
+router.get('/assignable', auth, requireRole(ROLES.ADMIN, ROLES.STAFF), listAssignableUsers);
 
 // router.get('/assignable', listAssignableUsers);
 

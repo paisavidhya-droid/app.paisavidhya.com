@@ -1,12 +1,6 @@
 // client\src\pages\certificates\FinancialSafetyPledge.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Card,
-  Button,
-  Badge,
-  Alert,
-  Modal,
-} from "../../components";
+import { Card, Button, Badge, Alert, Modal } from "../../components";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -484,9 +478,11 @@ export default function FinancialSafetyPledge({ user }) {
                   alignItems: "flex-start",
                   gap: 10,
                   padding: 10,
-                  border: "1px solid #e5e7eb",
+                  border: "1px solid var(--pv-border)",
                   borderRadius: 10,
-                  background: clauseChecks[idx] ? "#f0fdf4" : "#fff",
+                  background: clauseChecks[idx]
+                    ? `color-mix(in oklab, var(--pv-success) 12%, var(--pv-surface))`
+                    : `var(--pv-surface)`,
                   cursor: "pointer",
                 }}
               >
@@ -507,9 +503,11 @@ export default function FinancialSafetyPledge({ user }) {
                 alignItems: "flex-start",
                 gap: 10,
                 padding: 10,
-                border: "1px solid #e5e7eb",
+                border: "1px solid var(--pv-border)",
                 borderRadius: 10,
-                background: agreeAll ? "#eff6ff" : "#fff",
+                background: agreeAll
+                  ? `color-mix(in oklab, var(--pv-primary) 10%, var(--pv-surface))`
+                  : `var(--pv-surface)`,
                 cursor: allClausesChecked ? "pointer" : "not-allowed",
                 opacity: allClausesChecked ? 1 : 0.6,
                 marginTop: 6,

@@ -1,4 +1,104 @@
-.view-note-btn {
+/*  */
+.leads-page {
+  width: 100%;
+  max-width: calc(100vw - 150px);      
+}
+/* Leads table min-width to keep CRM readable */
+.leads-table{
+  min-width: 1180px;
+}
+
+/* Make message/note columns consistent on leads */
+.leads-col-message{ max-width: 260px; }
+.leads-col-note{ max-width: 240px; }
+
+/* Note "View" link - themed */
+.view-note-btn{
+  background: none;
+  color: var(--pv-primary);
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Dropdown toggle theme alignment */
+.dropdown-toggle{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  min-width: 0;
+  color: var(--pv-text);
+  transition: color 0.15s ease;
+}
+
+.dropdown-toggle:hover,
+.dropdown-toggle:focus{
+  color: var(--pv-primary);
+  outline: none;
+}
+
+.dropdown-icon{
+  color: var(--pv-dim);
+  font-size: 1rem;
+}
+
+/* Mobile: table scroll stays clean */
+@media (max-width: 640px){
+  .leads-table{
+    min-width: 980px;
+  }
+}
+
+
+/* Clear Filters Button */
+.btn-clear-filters {
+  font-size: 0.95rem;
+  color: #cc0000 !important;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-clear-filters:hover {
+  background-color: #ffecec;
+  border-color: #ff4d4d;
+  color: #b30000;
+}
+
+.btn-clear-filters svg {
+  transition: transform 0.2s ease;
+}
+
+.btn-clear-filters:hover svg {
+  transform: rotate(-15deg);
+}
+
+.btn-clear-x {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #0077cc;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.btn-clear-x svg {
+  display: block; /* removes inline SVG baseline gap */
+}
+.btn-clear-x:hover {
+  transform: rotate(90deg);
+  color: #cc0000;
+}
+
+
+
+
+
+/* Delete below code if ui looks good and works fine */
+/* .view-note-btn {
   background: none;
   color: #007bff; 
   border: none;
@@ -27,4 +127,4 @@
 .dropdown-icon {
   color: #555;
   font-size: 1rem;
-}
+} */

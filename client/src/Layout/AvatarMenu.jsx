@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { Badge, Button } from "../components";
 import "./AvatarMenu.css";
+import ThemeToggle from "../components/ThemeToggleBtn/ThemeToggle";
 
 /**
  * AvatarMenu
@@ -227,6 +228,8 @@ export function AvatarMenu({
                 Support
               </NavLink>
             </li>
+            <li className="menu-link" >Theme 
+            <ThemeToggle size={8}/></li>
             {isNRI && (
               <li>
                 <NavLink to="/nri" className="menu-link" role="menuitem">

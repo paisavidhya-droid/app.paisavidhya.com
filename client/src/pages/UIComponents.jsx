@@ -23,6 +23,9 @@ import {
   Skeleton,
   Pagination,
   AmountInput,
+  ActiveFilterPill,
+  SearchNSelect,
+  CopyButton,
 } from "../components";
 import OtpPin from "../components/ui/OtpPin";
 import toast from "react-hot-toast";
@@ -169,6 +172,7 @@ export default function UIComponents() {
             <IconButton title="Close" variant="ghost">
               ✖
             </IconButton>
+            <CopyButton value={"lead.email"} label="Email" />
           </div>
         </Section>
 
@@ -234,7 +238,34 @@ export default function UIComponents() {
               label={switchOn ? "Notifications On" : "Notifications Off"}
             />
           </div>
+          <SearchNSelect/>
         </Section>
+
+        <Section id="active-filter-pill" title="Active Filter Pill">
+  <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
+    <ActiveFilterPill
+      label="Assigned to: Me"
+      onClear={() => toast("Cleared assigned filter")}
+    />
+
+    <ActiveFilterPill
+      label="Today's Follow-Up"
+      onClear={() => toast("Cleared follow-up")}
+    />
+
+    <ActiveFilterPill
+      label="3 Selected"
+      separator
+      onClear={() => toast("Cleared selection")}
+    />
+  </div>
+
+  <p style={{ marginTop: 8, color: "var(--pv-dim)" }}>
+    Used for active filters, selections, and contextual state indicators with a
+    clear action.
+  </p>
+</Section>
+
 
         <Section id="badge-tooltip" title="Badge / Tooltip">
           <div className="pv-row">

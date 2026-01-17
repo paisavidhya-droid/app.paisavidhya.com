@@ -12,11 +12,15 @@ const STAGE_BOUNDARY_STATUSES = new Set([
   'Contacted', 'Qualified', 'Meeting Scheduled', 'Won', 'Lost',
 ]);
 
-export const shouldAuditGlobally = (action, payload = {}) => {
-  if (DEFAULT_GLOBAL_ACTIONS.has(action)) return true;
-  if (action === 'status_update') {
-    const to = (payload?.to ?? '').toString();
-    return STAGE_BOUNDARY_STATUSES.has(to);
-  }
-  return false;
-};
+export function shouldAuditGlobally({ action }) {
+  return action === "lead_created" || action === "lead_hard_deleted";
+}
+
+// export const shouldAuditGlobally = (action, payload = {}) => {
+//   if (DEFAULT_GLOBAL_ACTIONS.has(action)) return true;
+//   if (action === 'status_update') {
+//     const to = (payload?.to ?? '').toString();
+//     return STAGE_BOUNDARY_STATUSES.has(to);
+//   }
+//   return false;
+// };
