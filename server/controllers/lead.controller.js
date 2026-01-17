@@ -4,8 +4,6 @@ import { LEAD_SOURCES } from '../models/_enums.js';
 import { logLeadActivity } from '../utils/logLeadActivity.js';
 import LeadActivityLog from '../models/LeadActivityLog.js';
 import { addAudit } from '../utils/audit.js';
-import User from '../models/user.model.js';
-import { Expo } from "expo-server-sdk";
 
 /**
  * deriveSource:
@@ -106,24 +104,21 @@ export async function createLead(req, res, next) {
 
     const lead = await Lead.create(payload);
 
+    const staff = await User.find({ role: { $in: ["ADMIN", "STAFF"] } }).select("_id").lean();
+    await notifyUsers(
+      staff.map((u) => u._id),
+      {
+        title: "New Callback Request",
+        body: `${lead.name || "Someone"} requested a callback`,
+        data: { type: "lead.created", leadId: String(lead._id), screen: "/leads" },
+      }
+    );
+
     await logLeadActivity({
       req,
       leadId: lead._id,
       action: "lead_created",
     });
-
-
-    const receivers = await User.find({ role: { $in: ["ADMIN", "STAFF"] } })
-      .select("expoPushTokens name")
-      .lean();
-
-    const tokens = receivers.flatMap((u) => u.expoPushTokens || []);
-
-    sendPushToTokens(tokens, {
-      title: "New Callback Request",
-      body: `${lead.name} • ${lead.phone} • ${lead.source || "—"}`,
-      data: { leadId: String(lead._id) },
-    }).catch(console.error); // don't block API response
 
 
     return res.status(201).json({
@@ -869,18 +864,4 @@ export async function bulkHardDeleteLeads(req, res) {
     console.error("bulkHardDeleteLeads error:", err);
     return res.status(500).json({ error: "internal_error" });
   }
-}
-
-export async function savePushToken(req, res) {
-  const { token } = req.body || {};
-  if (!token || !Expo.isExpoPushToken(token)) {
-    return res.status(400).json({ error: "invalid_push_token" });
-  }
-
-  await User.updateOne(
-    { _id: req.user._id },
-    { $addToSet: { expoPushTokens: token } } // prevents duplicates
-  );
-
-  return res.json({ ok: true });
 }

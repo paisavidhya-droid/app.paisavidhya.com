@@ -1,28 +1,30 @@
-// Internal notifications (optional). No-op by default.
-// You can extend with Slack webhook or SMTP if env vars are set.
-import nodemailer from 'nodemailer';
+import PushToken from "../models/PushToken.js";
 
+const EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send";
 
-export async function notifyNewLead(lead) {
-    const { SLACK_WEBHOOK_URL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, NOTIFY_TO } = process.env;
+export async function notifyUsers(userIds, message) {
+  const tokens = await PushToken.find({ userId: { $in: userIds } })
+    .select("token")
+    .lean();
 
+  const expoTokens = tokens.map((t) => t.token).filter(Boolean);
+  if (!expoTokens.length) return { ok: true, sent: 0 };
 
-    // Example: Email notification if SMTP configured
-    if (SMTP_HOST && SMTP_USER && SMTP_PASS && NOTIFY_TO) {
-        const transporter = nodemailer.createTransport({
-            host: SMTP_HOST,
-            port: Number(SMTP_PORT || 587),
-            secure: false,
-            auth: { user: SMTP_USER, pass: SMTP_PASS },
-        });
-        await transporter.sendMail({
-            from: `Lead Bot <${SMTP_USER}>`,
-            to: NOTIFY_TO,
-            subject: `New Lead: ${lead.name} (${lead.phone})`,
-            text: `Source: ${lead.source}\nPreferred Time: ${lead.preferredTime || '-'}\nTags: ${lead.tags?.join(', ') || '-'}\nCreated At: ${lead.createdAt}`,
-        });
-    }
+  // Expo allows batching; keep it simple
+  const payloads = expoTokens.map((to) => ({
+    to,
+    title: message.title,
+    body: message.body,
+    data: message.data || {},
+    sound: "default",
+  }));
 
+  const r = await fetch(EXPO_PUSH_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payloads),
+  });
 
-    // TODO: Slack webhook support if SLACK_WEBHOOK_URL provided
+  const json = await r.json().catch(() => ({}));
+  return { ok: r.ok, sent: expoTokens.length, response: json };
 }
