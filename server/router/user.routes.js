@@ -12,8 +12,12 @@ import {
 import auth from "../middlewares/authMiddleware.js";
 import { requireRole, ROLES } from "../middlewares/roleMiddleware.js";
 import { generateCertificate, takePledge } from "../controllers/pledgecertificate.controller.js";
+import { savePushToken } from "../controllers/lead.controller.js";
 
 const router = Router();
+
+
+router.post("/me/push-token", auth, requireRole(ROLES.ADMIN, ROLES.STAFF), savePushToken);
 
 router.get('/staff', auth, requireRole(ROLES.ADMIN), listStaff);
 router.get('/assignable', auth, requireRole(ROLES.ADMIN, ROLES.STAFF), listAssignableUsers);

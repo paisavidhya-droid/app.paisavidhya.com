@@ -9,14 +9,11 @@ import {
 import auth from "../middlewares/authMiddleware.js";
 import authController from "../controllers/auth.controller.js";
 import {sendPhoneOtp,verifyPhoneOtp,sendEmailVerifyLink,verifyEmailLink,verifyEmailToken} from "../controllers/verify.controller.js";
-import { savePushToken } from "../controllers/lead.controller.js";
 const router = Router();
 
 router.post('/register', register); // public signup → CUSTOMER
 router.post('/login', login);       // public
 router.get('/me', auth, me);        // current user
-router.post("/me/push-token", auth, requireRole(ROLES.ADMIN, ROLES.STAFF), savePushToken);
-
 
 
 // password reset
