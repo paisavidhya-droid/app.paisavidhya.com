@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, Button, Badge, Alert, Progress, Skeleton, Tooltip, Input, Select } from "../../components"; // assume Input/Select exist in your kit
 import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 /**
  * AdminDashboard — production‑ready, extensible, and accessible.
@@ -190,7 +191,7 @@ export default function AdminDashboard() {
           <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
             <Button as="a" href="/admin/users">User management</Button>
             <Button as="a" href="/admin/roles" variant="ghost">Roles & permissions</Button>
-            {features.billing && <Button as="a" href="/admin/billing" variant="ghost">Billing</Button>}
+             <Button as={Link} to="/admin/leads" variant="ghost">Leads</Button>
             {features.auditLog && <Button as="a" href="/admin/audit" variant="ghost">Audit log</Button>}
           </div>
         </div>
@@ -271,7 +272,7 @@ export default function AdminDashboard() {
               {features.billing && <Button as="a" href="/admin/billing" variant="ghost">Billing</Button>}
               {features.exotel && <Button as="a" href="/admin/integrations/exotel" variant="ghost">Exotel (WhatsApp OTP)</Button>}
               {features.calculators && <Button as="a" href="/admin/calculators" variant="ghost">Calculators</Button>}
-              <Button as="a" href="/admin/leads" variant="ghost">Leads</Button>
+              <Button as={Link} to="/admin/leads" variant="ghost">Leads</Button>
               <Button as="a" href="/admin/partners" variant="ghost">Partners</Button>
 
             </div>

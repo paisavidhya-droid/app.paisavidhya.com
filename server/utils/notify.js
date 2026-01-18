@@ -18,6 +18,7 @@ export async function notifyUsers(userIds, message) {
     body: message.body,
     data: message.data || {},
     sound: "default",
+    channelId: "default",
   }));
 
   const r = await fetch(EXPO_PUSH_URL, {
@@ -27,5 +28,17 @@ export async function notifyUsers(userIds, message) {
   });
 
   const json = await r.json().catch(() => ({}));
-  return { ok: r.ok, sent: expoTokens.length, response: json };
+
+  // cleanup invalid tokens
+  const errors = json?.data?.filter((d) => d?.status === "error") || [];
+  const dead = errors
+    .filter((e) => e?.details?.error === "DeviceNotRegistered")
+    .map((e) => e?.details?.expoPushToken)
+    .filter(Boolean);
+
+  if (dead.length) {
+    await PushToken.deleteMany({ token: { $in: dead } });
+  }
+
+  return { ok: r.ok, sent: expoTokens.length, response: json, removed: dead.length };
 }

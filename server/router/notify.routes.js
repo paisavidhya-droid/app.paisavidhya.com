@@ -2,11 +2,15 @@
 import { Router } from "express";
 import auth from "../middlewares/authMiddleware.js";
 import PushToken from "../models/PushToken.js";
+import Expo from "expo-server-sdk";
 
 const router = Router();
 router.post("/push-tokens", auth, async (req, res) => {
-   try {
+  try {
     const { token, platform = "expo" } = req.body || {};
+    if (!Expo.isExpoPushToken(token)) {
+      return res.status(400).json({ error: "invalid_expo_push_token" });
+    }
     if (!token) return res.status(400).json({ error: "token_required" });
 
     await PushToken.updateOne(

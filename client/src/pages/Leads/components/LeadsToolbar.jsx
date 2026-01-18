@@ -61,7 +61,10 @@ export default function LeadsToolbar({
                 <Button
                   variant="ghost"
                   onClick={() => onBulkArchive(bulkArchiveIds)}
-                  style={{boxShadow:" 0 6px 8px rgba(0, 0, 0, 0.25)", border:"1.5px solid red"}}
+                  style={{
+                    boxShadow: " 0 6px 8px rgba(0, 0, 0, 0.25)",
+                    border: "1.5px solid red",
+                  }}
                 >
                   <FaTrashAlt style={{ color: "red" }} />
                   Archive ({bulkArchiveIds.length})
@@ -89,7 +92,10 @@ export default function LeadsToolbar({
               </Button>
             </div>
           ) : (
-            <Button onClick={onCreate}>
+            <Button
+              onClick={onCreate}
+              style={{ boxShadow: " 0 6px 8px rgba(0, 0, 0, 0.35)" }}
+            >
               <FaPlus /> Add CB Request
             </Button>
           )}

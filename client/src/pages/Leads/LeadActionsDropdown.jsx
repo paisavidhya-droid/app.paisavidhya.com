@@ -69,7 +69,7 @@ export default function LeadActionsDropdown({
     if (!el) return;
 
     const r = el.getBoundingClientRect();
-    const menuWidth = 220;
+    const menuWidth = 170;
 
     // align right edge with button right edge
     let left = r.right - menuWidth;
@@ -100,6 +100,7 @@ export default function LeadActionsDropdown({
   const Item = ({ children, onClick, disabled }) => (
     <li
       role="menuitem"
+      className="dropdown-item"
       tabIndex={disabled ? -1 : 0}
       onClick={() => {
         if (disabled) return;
@@ -116,14 +117,9 @@ export default function LeadActionsDropdown({
       }}
       aria-disabled={disabled}
       style={{
-        padding: "8px 10px",
-        display: "flex",
-        gap: 8,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
-        borderRadius: 8,
       }}
-      className="lead-menu-item"
     >
       {children}
     </li>
@@ -136,13 +132,12 @@ export default function LeadActionsDropdown({
     : "Update lead status";
 
   const claimTip = canTransfer
-  ? "Claim this lead (assign to you)"
-  : "You can’t claim this lead";
+    ? "Claim this lead (assign to you)"
+    : "You can’t claim this lead";
 
-const transferTip = canTransfer
-  ? "Transfer this lead"
-  : "Only assignee can transfer";
-
+  const transferTip = canTransfer
+    ? "Transfer this lead"
+    : "Only assignee can transfer";
 
   // Decide what the "assignment" action should be
   const showClaim = isUnassigned && !isAdmin; // staff + unassigned
@@ -152,7 +147,7 @@ const transferTip = canTransfer
 
   // You can swap this “⋯” for an icon button if you have one.
   return (
-    <>
+    <div className="dropdown-container">
       <button
         ref={btnRef}
         className="dropdown-toggle"
@@ -160,7 +155,6 @@ const transferTip = canTransfer
         aria-expanded={open}
         aria-label={`Actions for ${lead?.name || "lead"}`}
         onClick={() => setOpen((p) => !p)}
-        style={{ padding: "6px 8px", minWidth: 0 }}
       >
         <Tooltip content="More options">
           <FaEllipsisVertical />
@@ -172,19 +166,12 @@ const transferTip = canTransfer
           <ul
             ref={menuRef}
             role="menu"
+            className="dropdown-menu"
             style={{
               position: "fixed",
               top: pos.top,
               left: pos.left,
               width: pos.width,
-              margin: 0,
-              background: "var(--pv-card, #fff)",
-              border: "1px solid var(--pv-border)",
-              borderRadius: 10,
-              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
-              padding: 6,
-              zIndex: 9999,
-              listStyle: "none",
             }}
           >
             <Tooltip content={updateTip}>
@@ -287,6 +274,6 @@ const transferTip = canTransfer
           </ul>
         </Portal>
       )}
-    </>
+    </div>
   );
 }
