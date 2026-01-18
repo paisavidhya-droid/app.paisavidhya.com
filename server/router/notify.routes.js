@@ -8,10 +8,12 @@ const router = Router();
 router.post("/push-tokens", auth, async (req, res) => {
   try {
     const { token, platform = "expo" } = req.body || {};
+
+    if (!token) return res.status(400).json({ error: "token_required" });
+
     if (!Expo.isExpoPushToken(token)) {
       return res.status(400).json({ error: "invalid_expo_push_token" });
     }
-    if (!token) return res.status(400).json({ error: "token_required" });
 
     await PushToken.updateOne(
       { token },
@@ -27,7 +29,7 @@ router.post("/push-tokens", auth, async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
-    console.error("push-token error:", err.message);
+    // console.error("push-token error:", err.message);
     return res.status(500).json({ error: "internal_server_error" });
   }
 });
