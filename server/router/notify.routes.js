@@ -28,4 +28,17 @@ router.post("/push-tokens", auth, async (req, res) => {
   }
 });
 
+
+// server/router/notify.routes.js
+// router.post("/test", auth, async (req, res) => {
+//   const { notifyUsers } = await import("../utils/notify.js");
+//   const out = await notifyUsers([req.user._id], {
+//     title: "Test Notification",
+//     body: "If you see this, push is working.",
+//     data: { screen: "/leads", type: "test" },
+//   });
+//   res.json(out);
+// });
+
+
 export default router;
