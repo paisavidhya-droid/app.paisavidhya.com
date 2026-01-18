@@ -2,7 +2,7 @@
 import { Router } from "express";
 import auth from "../middlewares/authMiddleware.js";
 import PushToken from "../models/PushToken.js";
-import Expo from "expo-server-sdk";
+import { Expo } from "expo-server-sdk";
 
 const router = Router();
 router.post("/push-tokens", auth, async (req, res) => {
@@ -27,13 +27,13 @@ router.post("/push-tokens", auth, async (req, res) => {
 
     res.json({ ok: true });
   } catch (err) {
-    // console.error("push-token error:", err.message);
+    console.error("push-token error:", err.message);
     return res.status(500).json({ error: "internal_server_error" });
   }
 });
 
 
-// server/router/notify.routes.js
+// // server/router/notify.routes.js
 // router.post("/test", auth, async (req, res) => {
 //   const { notifyUsers } = await import("../utils/notify.js");
 //   const out = await notifyUsers([req.user._id], {
