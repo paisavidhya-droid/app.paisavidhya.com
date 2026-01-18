@@ -35,7 +35,7 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 const LeadsOps = lazy(() => import("../pages/Leads/LeadsOps"));
 const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
 const AdminAudit = lazy(() => import("../pages/Admin/AdminAudit"));
-const AdminUsers = lazy(() => import("../pages/Admin/Users"));
+const AdminUsers = lazy(() => import("../pages/Admin/UserManagement/UserManagement.jsx"));
 const ResetPassword = lazy(() => import("../pages/Auth/resetPassword"));
 
 // Error pages

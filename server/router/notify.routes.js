@@ -1,10 +1,9 @@
-// server/router/me.routes.js
+// server\router\notify.routes.js
 import { Router } from "express";
-import auth from "../middlewares/authMiddleware.js";
 import PushToken from "../models/PushToken.js";
 
 const router = Router();
-router.post("/push-tokens", auth, async (req, res) => {
+router.post("/push-tokens",  async (req, res) => {
    try {
     const { token, platform = "expo" } = req.body || {};
     if (!token) return res.status(400).json({ error: "token_required" });

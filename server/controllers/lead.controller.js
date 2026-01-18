@@ -131,6 +131,8 @@ export async function createLead(req, res, next) {
       preferredTimeAt: lead.preferredTimeAt,
     });
   } catch (err) {
+    console.log(err);
+    
     // Mongoose validation errors
     if (err?.name === "ValidationError") {
       const fields = {};

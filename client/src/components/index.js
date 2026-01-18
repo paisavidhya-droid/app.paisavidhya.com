@@ -23,6 +23,7 @@ export { default as Spinner } from "./ui/Spinner.jsx";
 export { default as Skeleton } from "./ui/Skeleton.jsx";
 export { default as Pagination } from "./ui/Pagination.jsx";
 export { default as OtpPin } from "./ui/OtpPin.jsx";
+export {default as Portal} from "./ui/Portal.jsx";
 
 export { default as Placeholder} from "../components/ui/Placeholder";
 
