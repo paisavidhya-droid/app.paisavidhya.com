@@ -11,6 +11,7 @@ import profileRoutes from "./router/profile.routes.js";
 import certificatesRouter from "./router/certificates.routes.js";
 import publicRoutes from "./router/public.routes.js";
 import orgRoutes from "./router/org.routes.js";
+import notifyRoutes from "./router/notify.routes.js";
 
 
 const app = express();
@@ -59,6 +60,7 @@ app.use("/api/audit", auditRoutes);
 app.use("/api/certificates", certificatesRouter);
 app.use("/api/public", publicRoutes);
 app.use("/api/orgs", orgRoutes);
+app.use("/api/notifications", notifyRoutes);
 
 
 
