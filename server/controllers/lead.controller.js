@@ -6,6 +6,7 @@ import LeadActivityLog from '../models/LeadActivityLog.js';
 import { addAudit } from '../utils/audit.js';
 import User from '../models/user.model.js';
 import { notifyUsers } from '../utils/notify.js';
+import { getAdminIds } from '../utils/notifyTargets.js';
 
 /**
  * deriveSource:
@@ -106,16 +107,28 @@ export async function createLead(req, res, next) {
 
     const lead = await Lead.create(payload);
 
-    const staff = await User.find({ role: { $in: ["ADMIN", "STAFF"] } }).select("_id").lean();
-    await notifyUsers(
-      staff.map((u) => u._id),
-      {
-        title: "New Callback Request",
-        body: `${lead.name || "Someone"} requested a callback`,
-        data: { type: "lead.created", leadId: String(lead._id), screen: "/leads" },
-      }
-    );
+    // this notifies all admin/staff users about new lead creation
+    // const staff = await User.find({ role: { $in: ["ADMIN", "STAFF"] } }).select("_id").lean();
+    // await notifyUsers(
+    //   staff.map((u) => u._id),
+    //   {
+    //     title: "New Callback Request",
+    //     body: `${lead.name || "Someone"} requested a callback`,
+    //     data: { type: "lead.created", leadId: String(lead._id), screen: "/leads" },
+    //   }
+    // );
 
+    const adminIds = await getAdminIds();
+
+    await notifyUsers(adminIds, {
+      title: "New Lead Created",
+      body: `${lead.name || "Someone"} requested a callback`,
+      data: {
+        type: "lead.created",
+        leadId: String(lead._id),
+        screen: "/leads",
+      },
+    });
     await logLeadActivity({
       req,
       leadId: lead._id,
@@ -132,7 +145,7 @@ export async function createLead(req, res, next) {
     });
   } catch (err) {
     console.log(err);
-    
+
     // Mongoose validation errors
     if (err?.name === "ValidationError") {
       const fields = {};
@@ -410,16 +423,37 @@ export async function updateOutreach(req, res) {
       });
     }
 
-    if ("assignedTo" in req.body && idOf(beforeAssignedTo) !== idOf(afterAssignedTo)) {
-      await logLeadActivity({
-        req,
-        leadId: id,
-        action: "assignedTo_update",
-        field: "outreach.assignedTo",
-        from: beforeAssignedTo,
-        to: afterAssignedTo,
+
+    // without notification
+    // if ("assignedTo" in req.body && idOf(beforeAssignedTo) !== idOf(afterAssignedTo)) {
+    //   await logLeadActivity({
+    //     req,
+    //     leadId: id,
+    //     action: "assignedTo_update",
+    //     field: "outreach.assignedTo",
+    //     from: beforeAssignedTo,
+    //     to: afterAssignedTo,
+    //   });
+    // }
+
+
+    // with notification
+    if (
+      "assignedTo" in req.body &&
+      idOf(beforeAssignedTo) !== idOf(afterAssignedTo) &&
+      afterAssignedTo
+    ) {
+      await notifyUsers([afterAssignedTo._id || afterAssignedTo], {
+        title: "New Lead Assigned",
+        body: `A lead has been assigned to you`,
+        data: {
+          type: "lead.assigned",
+          leadId: String(id),
+          screen: `/leads/${id}`,
+        },
       });
     }
+
 
     if (noteChanged) {
       await logLeadActivity({
