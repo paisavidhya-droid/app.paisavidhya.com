@@ -170,7 +170,7 @@ export default function Verify() {
                   {phoneErr}
                 </Alert>
               )}
-              <OtpPin disabled={submitting} onComplete={handleVerifyPhone} />
+              <OtpPin autoFocus disabled={submitting} onComplete={handleVerifyPhone} />
               <ResendTimer onResend={handleResendPhone} />
             </>
           ) : (

@@ -84,7 +84,7 @@ export default function CallbackForm({
         name: form.name.trim(),
         phone: form.phone.trim(),
         email: form.email.trim() || undefined,
-        interests: form.interest ? [form.interest] : [],
+        interests: form.interest || undefined,
         message: form.message.trim() || undefined,
         preferredTimeType: form.preferredTimeType,
         preferredTimeAt:

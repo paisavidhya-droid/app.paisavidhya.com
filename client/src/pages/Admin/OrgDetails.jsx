@@ -13,7 +13,6 @@ import {
   Drawer,
   Tabs,
 } from "../../components";
-import ModuleHeader from "../../components/ui/ModuleHeader";
 import StatusBadge from "../../components/ui/StatusBadge";
 import Placeholder from "../../components/ui/Placeholder";
 import toast from "react-hot-toast";
@@ -26,6 +25,7 @@ import {
 } from "../../services/orgService";
 import OrgFormModal from "./OrgFormModal";
 import { FaCopy, FaLink, FaShareAlt } from "react-icons/fa";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 
 export default function OrgDetails() {
   const { orgId } = useParams();
@@ -129,7 +129,7 @@ export default function OrgDetails() {
   const handleDeactivate = async () => {
     if (!org) return;
     const ok = window.confirm(
-      `Deactivate ${org.name}? Their public pledge link will stop working.`
+      `Deactivate ${org.name}? Their public pledge link will stop working.`,
     );
     if (!ok) return;
 
@@ -197,15 +197,11 @@ export default function OrgDetails() {
       >
         <ModuleHeader
           title="Partner Details"
-          subtitle="Loading partner information…"
-          brdcrumbs={[
-            { label: "Home", to: "/" },
-            { label: "Admin", to: "/admin" },
-            { label: "Partners", to: "/admin/partners" },
-          ]}
+          subtitle="Loading organization…"
+          backTo="/admin/partners"
           sticky={false}
-          compact
         />
+
         <div style={{ marginTop: 16 }}>
           <Card>
             <Skeleton height={24} width="60%" />

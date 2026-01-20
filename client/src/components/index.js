@@ -23,9 +23,9 @@ export { default as Spinner } from "./ui/Spinner.jsx";
 export { default as Skeleton } from "./ui/Skeleton.jsx";
 export { default as Pagination } from "./ui/Pagination.jsx";
 export { default as OtpPin } from "./ui/OtpPin.jsx";
-export {default as Portal} from "./ui/Portal.jsx";
+export { default as Portal } from "./ui/Portal.jsx";
 
-export { default as Placeholder} from "../components/ui/Placeholder";
+export { default as Placeholder } from "../components/ui/Placeholder";
 
 // this below both are same but just the differet names
 export { default as AmountInput } from "./ui/AmountInput.jsx";
@@ -34,3 +34,10 @@ export { default as CurrencyInput } from "./ui/AmountInput";
 export { default as ActiveFilterPill } from "./ui/ActiveFilterPill/ActiveFilterPill.jsx";
 export { default as SearchNSelect } from "./ui/SearchNSelect.jsx";
 export { default as CopyButton } from "./ui/CopyButton.jsx";
+
+// export { default as DashboardSection } from "./dashboard/DashboardSection.jsx";
+// export { default as StatCard } from "./dashboard/StatCard.jsx";
+// export { default as Sparkline } from "./dashboard/Sparkline.jsx";
+// export { default as Timeline } from "./dashboard/Timeline.jsx";
+export { Row, Col } from "./ui/rowCol.jsx";
+

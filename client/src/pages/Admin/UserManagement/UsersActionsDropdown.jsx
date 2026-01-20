@@ -53,7 +53,7 @@ export default function UsersActionsDropdown({
     if (!el) return;
 
     const r = el.getBoundingClientRect();
-    const menuWidth = 220;
+     const menuWidth = 170;
 
     let left = r.right - menuWidth;
     let top = r.bottom + 8;
@@ -80,6 +80,7 @@ export default function UsersActionsDropdown({
   const Item = ({ children, onClick, disabled, danger = false }) => (
     <li
       role="menuitem"
+        className="dropdown-item"
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled}
       onClick={() => {
@@ -95,15 +96,9 @@ export default function UsersActionsDropdown({
           close();
         }
       }}
-      className="pv-menu-item"
       style={{
-        padding: "8px 10px",
-        display: "flex",
-        gap: 8,
-        cursor: disabled ? "not-allowed" : "pointer",
+       cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
-        borderRadius: 8,
-        color: danger ? "var(--pv-danger, #d11)" : "inherit",
       }}
     >
       {children}
@@ -116,7 +111,7 @@ export default function UsersActionsDropdown({
 
 
   return (
-    <>
+       <div className="dropdown-container">
       <button
         ref={btnRef}
         className="dropdown-toggle"
@@ -124,8 +119,6 @@ export default function UsersActionsDropdown({
         aria-expanded={open}
         aria-label={`Actions for ${user?.name || user?.email || "user"}`}
         onClick={() => setOpen((p) => !p)}
-        style={{ padding: "6px 8px", minWidth: 0 }}
-        type="button"
       >
         <Tooltip content="More options">
           <FaEllipsisVertical />
@@ -137,19 +130,12 @@ export default function UsersActionsDropdown({
           <ul
             ref={menuRef}
             role="menu"
+             className="dropdown-menu"
             style={{
               position: "fixed",
               top: pos.top,
               left: pos.left,
               width: pos.width,
-              margin: 0,
-              padding: 6,
-              listStyle: "none",
-              background: "var(--pv-card, #fff)",
-              border: "1px solid var(--pv-border)",
-              borderRadius: 10,
-              boxShadow: "0 8px 30px rgba(0,0,0,0.18)",
-              zIndex: 9999,
             }}
           >
             {onView && (
@@ -163,7 +149,7 @@ export default function UsersActionsDropdown({
             {onEdit && (
               <Tooltip content="Edit user">
                 <Item onClick={() => onEdit(user)}>
-                  <FaEdit className="dropdown-icon" /> Edit
+                  <FaEdit className="dropdown-icon" /> Edit user info
                 </Item>
               </Tooltip>
             )}
@@ -186,6 +172,6 @@ export default function UsersActionsDropdown({
           </ul>
         </Portal>
       )}
-    </>
+    </div>
   );
 }

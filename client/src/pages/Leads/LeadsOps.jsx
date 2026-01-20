@@ -11,6 +11,7 @@ import LeadsModals from "./components/LeadsModals";
 
 import { useLeadsOps } from "./useLeadsOps";
 import { useEffect } from "react";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 
 export default function LeadsOps() {
   const navigate = useNavigate();
@@ -53,6 +54,14 @@ export default function LeadsOps() {
 
   return (
     <div className="pv-container leads-page">
+<ModuleHeader
+      title="Leads"
+      subtitle="Callback requests and follow-ups."
+      
+      // backTo={false} // uncomment if you don't want Back button here
+    />
+
+
       <div style={{ marginBottom: 16 }}>
         <LeadsToolbar
           filters={ops.filters}

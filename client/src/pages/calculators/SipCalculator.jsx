@@ -11,7 +11,6 @@ import {
   Progress,
   AmountInput,
 } from "../../components";
-import ModuleHeader from "../../components/ui/ModuleHeader";
 import AlertWithIcons from "../../components/ui/AlertWithIcons";
 import toast from "react-hot-toast";
 
@@ -28,6 +27,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 
 /**
  * SIP Calculator — Paisavidhya (Clean UX + Full Features)
@@ -256,7 +256,7 @@ export default function SipCalculator() {
 
   const totalMonths = useMemo(
     () => clamp(years * 12 + extraMonths, 1, 80 * 12), // ⬅️ respects Extra Months
-    [years, extraMonths]
+    [years, extraMonths],
   );
 
   const plan = useMemo(
@@ -270,7 +270,7 @@ export default function SipCalculator() {
         expenseRatioAnnual: toNumber(expense),
         startMonthIndex: toNumber(startMonth),
       }),
-    [sip, rate, totalMonths, stepUp, lumpsum, expense, startMonth]
+    [sip, rate, totalMonths, stepUp, lumpsum, expense, startMonth],
   );
 
   const inflFV = useMemo(
@@ -280,11 +280,11 @@ export default function SipCalculator() {
             fvInflationAdjusted(
               plan.summary.futureValue,
               toNumber(inflation),
-              totalMonths
-            )
+              totalMonths,
+            ),
           )
         : null,
-    [plan.summary.futureValue, inflation, showInflAdj, totalMonths]
+    [plan.summary.futureValue, inflation, showInflAdj, totalMonths],
   );
 
   const needSip = useMemo(() => {
@@ -304,7 +304,7 @@ export default function SipCalculator() {
     return clamp(
       Math.round((plan.summary.futureValue / toNumber(goal)) * 100),
       0,
-      100
+      100,
     );
   }, [goal, plan.summary.futureValue]);
 
@@ -319,7 +319,7 @@ export default function SipCalculator() {
       { name: "Total Invested", value: plan.summary.invested },
       { name: "Wealth Gain", value: Math.max(plan.summary.wealthGain, 0) },
     ],
-    [plan.summary]
+    [plan.summary],
   );
   const COLORS = ["#2E90FA", "#12B76A", "#FDB022", "#F97066"];
 
@@ -349,7 +349,7 @@ export default function SipCalculator() {
       `paisavidhya_sip_schedule_${Math.floor(totalMonths / 12)}y_${
         totalMonths % 12
       }m.csv`,
-      rows
+      rows,
     );
     toast.success("Exported CSV");
   };
@@ -532,20 +532,14 @@ export default function SipCalculator() {
       <ModuleHeader
         title="SIP Calculator"
         subtitle="Simple by default. Powerful when you need it."
-        brdcrumbs={[
-          { label: "Home", to: "/" },
-          { label: "Calculators", to: "/calculators" },
-          { label: "SIP" },
-        ]}
         actions={
           <>
-            <Button onClick={onExportCSV}>Export CSV</Button>
+            <Button onClick={onExportCSV}>Export</Button>
             <Button variant="ghost" onClick={onReset}>
               Reset
             </Button>
           </>
         }
-        sticky
       />
 
       {/* layout */}

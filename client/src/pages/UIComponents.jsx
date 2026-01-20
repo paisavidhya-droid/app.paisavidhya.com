@@ -33,7 +33,7 @@ import FloatField from "../components/ui/FancyInput/FloatField";
 import StatusBadge from "../components/ui/StatusBadge";
 import Placeholder from "../components/ui/Placeholder";
 import AlertWithIcons from "../components/ui/AlertWithIcons";
-import ModuleHeader from "../components/ui/ModuleHeader";
+import ModuleHeader from "../components/ui/moduleHeader/ModuleHeader";
 
 function Section({ id, title, children }) {
   return (
@@ -77,7 +77,7 @@ export default function UIComponents() {
         { id: "alert-icons", label: "Alert With Icons" },
         { id: "status-badge", label: "Status Badge" },
       ].filter((it) => it.label.toLowerCase().includes(q.toLowerCase())),
-    [q]
+    [q],
   );
 
   const tabsData = [
@@ -238,34 +238,33 @@ export default function UIComponents() {
               label={switchOn ? "Notifications On" : "Notifications Off"}
             />
           </div>
-          <SearchNSelect/>
+          <SearchNSelect />
         </Section>
 
         <Section id="active-filter-pill" title="Active Filter Pill">
-  <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-    <ActiveFilterPill
-      label="Assigned to: Me"
-      onClear={() => toast("Cleared assigned filter")}
-    />
+          <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
+            <ActiveFilterPill
+              label="Assigned to: Me"
+              onClear={() => toast("Cleared assigned filter")}
+            />
 
-    <ActiveFilterPill
-      label="Today's Follow-Up"
-      onClear={() => toast("Cleared follow-up")}
-    />
+            <ActiveFilterPill
+              label="Today's Follow-Up"
+              onClear={() => toast("Cleared follow-up")}
+            />
 
-    <ActiveFilterPill
-      label="3 Selected"
-      separator
-      onClear={() => toast("Cleared selection")}
-    />
-  </div>
+            <ActiveFilterPill
+              label="3 Selected"
+              separator
+              onClear={() => toast("Cleared selection")}
+            />
+          </div>
 
-  <p style={{ marginTop: 8, color: "var(--pv-dim)" }}>
-    Used for active filters, selections, and contextual state indicators with a
-    clear action.
-  </p>
-</Section>
-
+          <p style={{ marginTop: 8, color: "var(--pv-dim)" }}>
+            Used for active filters, selections, and contextual state indicators
+            with a clear action.
+          </p>
+        </Section>
 
         <Section id="badge-tooltip" title="Badge / Tooltip">
           <div className="pv-row">
@@ -281,29 +280,16 @@ export default function UIComponents() {
           id="module-header"
           title="Module Header (Breadcrumbs + Actions)"
         >
-          {/* render non-sticky so it doesn't fight the page header */}
           <ModuleHeader
-            title="Leads"
-            subtitle="Manage prospects and pipeline"
-            brdcrumbs={[
-              { label: "Home", to: "/" },
-              { label: "CRM", to: "/crm" },
-              { label: "Leads" },
-            ]}
-            actions={
-              <>
-                <Button onClick={() => toast.success("Created lead!")}>
-                  New Lead
-                </Button>
-                <Button variant="ghost">Export</Button>
-              </>
-            }
+            title="Components Gallery"
+            subtitle="Reusable UI building blocks"
             sticky={false}
-            compact
+            backTo={true}
           />
+
           <div style={{ paddingTop: 8, color: "var(--pv-dim)" }}>
-            This is an embedded preview. In real pages, keep <code>sticky</code>{" "}
-            to maintain context.
+            This is an embedded preview. In real module pages, keep sticky
+            enabled.
           </div>
         </Section>
 

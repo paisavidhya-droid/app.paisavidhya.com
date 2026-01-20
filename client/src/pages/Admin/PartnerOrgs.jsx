@@ -11,7 +11,6 @@ import {
   Alert,
   Pagination,
 } from "../../components";
-import ModuleHeader from "../../components/ui/ModuleHeader";
 import StatusBadge from "../../components/ui/StatusBadge";
 import toast from "react-hot-toast";
 
@@ -23,6 +22,7 @@ import {
 } from "../../services/orgService";
 import { useNavigate } from "react-router-dom";
 import OrgFormModal from "./OrgFormModal";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 
 const PAGE_SIZE = 12;
 
@@ -179,7 +179,7 @@ export default function PartnerOrgs() {
 
   const totalPages = useMemo(
     () => (total ? Math.ceil(total / PAGE_SIZE) : 1),
-    [total]
+    [total],
   );
 
   return (
@@ -190,14 +190,8 @@ export default function PartnerOrgs() {
       <ModuleHeader
         title="Partner Organizations"
         subtitle="Schools, colleges, businesses and institutes where Paisavidhya sessions are conducted."
-        brdcrumbs={[
-          { label: "Home", to: "/" },
-          { label: "Admin", to: "/admin" },
-          { label: "Partners" },
-        ]}
+        backTo="/admin"
         actions={<Button onClick={openCreate}>Add New Partner</Button>}
-        sticky={false}
-        compact
       />
 
       <div style={{ height: 12 }} />

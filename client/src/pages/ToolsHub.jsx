@@ -19,8 +19,7 @@ import {
   Placeholder,
 } from "../components";
 
-import toast from "react-hot-toast";
-import ModuleHeader from "../components/ui/ModuleHeader";
+import ModuleHeader from "../components/ui/moduleHeader/ModuleHeader";
 import { FaTimes } from "react-icons/fa";
 import { useDeviceSize } from "../context/DeviceSizeContext";
 import { useEffect } from "react";
@@ -216,15 +215,15 @@ export default function ToolsHub() {
       confirmButtonText: "Continue",
       background:
         getComputedStyle(document.documentElement).getPropertyValue(
-          "--pv-surface"
+          "--pv-surface",
         ) || "#111827",
       color:
         getComputedStyle(document.documentElement).getPropertyValue(
-          "--pv-text"
+          "--pv-text",
         ) || "#e5e7eb",
       confirmButtonColor:
         getComputedStyle(document.documentElement).getPropertyValue(
-          "--pv-primary"
+          "--pv-primary",
         ) || "#00c2a8",
       customClass: {
         popup: "pv-card", // use your card style (border-radius, shadow)
@@ -292,17 +291,10 @@ export default function ToolsHub() {
       <main className="pv-col" style={{ gap: 18 }}>
         <ModuleHeader
           title="All Tools"
-          subtitle="Everything you need — checkups, calculators & planners"
-          brdcrumbs={[
-            { label: "Home", to: "/" },
-            { label: "Advisory", to: "/advisory" },
-            { label: "Tools" },
-          ]}
+          subtitle="Checkups, calculators & planners"
           actions={
             <>
-              <Button onClick={() => setNewCheckupOpen(true)}>
-                Start Checkup
-              </Button>
+              <Button onClick={() => setNewCheckupOpen(true)}>Start</Button>
               <Button
                 variant="ghost"
                 onClick={() => (window.location.href = "/reports")}
@@ -311,8 +303,6 @@ export default function ToolsHub() {
               </Button>
             </>
           }
-          sticky
-          compact
         />
 
         {/* Featured row

@@ -22,6 +22,7 @@ import {
 } from "../../../app/slices/userSlice";
 import toast from "react-hot-toast";
 import UsersActionsDropdown from "./UsersActionsDropdown";
+import ModuleHeader from "../../../components/ui/moduleHeader/ModuleHeader";
 
 const ROLES = ["", "admin", "staff", "customer"];
 // Back-end uses enums: ACTIVE | SUSPENDED
@@ -179,10 +180,10 @@ export default function UserManagement() {
 
   const handleToggle = async (u) => {
     const to = u.status === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
-      const ok = window.confirm(
-    `${to === "SUSPENDED" ? "Suspend" : "Activate"} ${u.name || u.email}?`
-  );
-  if (!ok) return;
+    const ok = window.confirm(
+      `${to === "SUSPENDED" ? "Suspend" : "Activate"} ${u.name || u.email}?`,
+    );
+    if (!ok) return;
 
     try {
       await dispatch(updateUser({ id: u._id, patch: { status: to } })).unwrap();
@@ -198,25 +199,23 @@ export default function UserManagement() {
   return (
     <div className="pv-col" style={{ gap: 16 }}>
       {/* Header */}
-      <Card>
-        <div
-          className="pv-row"
-          style={{
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
-          <div className="pv-col" style={{ gap: 2 }}>
-            <div style={{ fontWeight: 800 }}>User management</div>
-            <div className="pv-dim" style={{ fontSize: 12 }}>
-              View, edit roles, and manage access.
-            </div>
-          </div>
-          {/* Invite removed as requested for now */}
-        </div>
-      </Card>
+      <ModuleHeader
+        title="User Management"
+        subtitle="View, edit roles, and manage access."
+        routeLabels={{
+          admin: "Admin",
+          usermanagement: "User Management",
+          users: "Users",
+        }}
+        actions={
+          <>
+            {/* Keep 1–2 actions max */}
+            <Button variant="ghost" onClick={() => applyFilters()}>
+              Refresh
+            </Button>
+          </>
+        }
+      />
 
       {/* Filters */}
       <Card>

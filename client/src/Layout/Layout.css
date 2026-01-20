@@ -485,6 +485,7 @@
   background: var(--pv-bg);
   color: var(--pv-text);
   padding: 24px;
+  overflow-anchor: none;
 }
 
 /* Suppress outline when focus is set programmatically or by mouse */

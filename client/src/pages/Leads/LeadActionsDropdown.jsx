@@ -88,7 +88,7 @@ export default function LeadActionsDropdown({
     const onScroll = () => computePos();
     const onResize = () => computePos();
 
-    window.addEventListener("scroll", onScroll, true); // capture scroll inside containers too
+    window.addEventListener("scroll", onScroll, true); 
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("scroll", onScroll, true);

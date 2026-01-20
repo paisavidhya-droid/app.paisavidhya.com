@@ -1,0 +1,78 @@
+/* client\src\components\ui\moduleHeader\moduleHeader.css */
+.mh {
+  padding: 12px 8px;
+  background: var(--pv-bg, transparent);
+}
+
+.mh-sticky {
+  position: sticky;
+  top: 64px; /* adjust to your app header height */
+  z-index: 20;
+  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--pv-bg, #0b1220) 80%, transparent);
+  border-bottom: 1px solid var(--pv-border);
+}
+
+.mh-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mh-bc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--pv-dim);
+}
+
+.mh-sep {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+
+.mh-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mh-link:hover {
+  text-decoration: underline;
+}
+
+.mh-current {
+  color: var(--pv-text);
+  font-weight: 600;
+}
+
+.mh-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+
+.mh-back:hover {
+  filter: brightness(1.05);
+}
+
+.mh-main {
+  margin-bottom: 8px;
+}
+
+.mh-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.mh-subtitle {
+  margin-top: 4px;
+  color: var(--pv-dim);
+  font-size: 13px;
+  line-height: 1.35;
+}

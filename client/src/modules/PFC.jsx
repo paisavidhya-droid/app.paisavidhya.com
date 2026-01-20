@@ -12,12 +12,12 @@ import {
   AmountInput,
 } from "../components";
 import "../styles/ui.css";
-import ModuleHeader from "../components/ui/ModuleHeader";
 import { useAuth } from "../hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getMyProfile } from "../services/profileService";
 import { useDeviceSize } from "../context/DeviceSizeContext";
+import ModuleHeader from "../components/ui/moduleHeader/ModuleHeader";
 
 const fmt = (n) => (isNaN(n) ? 0 : Number(n));
 
@@ -35,7 +35,7 @@ function Row({ label, value, onChange }) {
 function CategoryGroup({ title, fields, data, setData }) {
   const total = useMemo(
     () => Object.values(data).reduce((a, b) => a + fmt(b), 0),
-    [data]
+    [data],
   );
 
   return (
@@ -139,7 +139,7 @@ export default function PFC() {
   useEffect(() => {
     try {
       const cached = JSON.parse(
-        localStorage.getItem("pv_pfc_payload") || "null"
+        localStorage.getItem("pv_pfc_payload") || "null",
       );
       if (!cached) return;
 
@@ -217,22 +217,21 @@ export default function PFC() {
   /* -------- results -------- */
   const totalIncome = useMemo(
     () => Object.values(income).reduce((a, b) => a + fmt(b), 0),
-    [income]
+    [income],
   );
 
   const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
   const getTotal = (obj) =>
     Object.values(obj).reduce((a, b) => a + (Number(b) || 0), 0);
 
-  const renderAccTitle = (label, amount) => (expanded) =>
-    (
-      <div className="acc-title">
-        <span>{label}</span>
-        {!expanded && amount > 0 && (
-          <span className="acc-amt">₹{inr.format(amount)}</span>
-        )}
-      </div>
-    );
+  const renderAccTitle = (label, amount) => (expanded) => (
+    <div className="acc-title">
+      <span>{label}</span>
+      {!expanded && amount > 0 && (
+        <span className="acc-amt">₹{inr.format(amount)}</span>
+      )}
+    </div>
+  );
 
   const goToReport = () => {
     // block empty report
@@ -271,9 +270,16 @@ export default function PFC() {
   return (
     <>
       <ModuleHeader
-        title="Personal Financial Checkup (PFC)"
-        subtitle="Your money health report"
-        actions={<Button onClick={goToReport}>Generate Report</Button>}
+        title="Personal Finance Calculator"
+        subtitle="Add monthly income and expenses to generate a report."
+        actions={
+          <>
+            <Button variant="ghost" onClick={() => navigate("/profile")}>
+              Profile
+            </Button>
+            <Button onClick={() => navigate("/pfc/report")}>Report</Button>
+          </>
+        }
       />
 
       <div
@@ -288,12 +294,17 @@ export default function PFC() {
               <div className="pv-row">
                 <div>
                   Please complete your basic details in your{" "}
-                  <strong><Link to="/profile">My Profile</Link></strong> page.
+                  <strong>
+                    <Link to="/profile">My Profile</Link>
+                  </strong>{" "}
+                  page.
                 </div>
 
-                {!isMobile && <Button onClick={() => navigate("/profile")}>
-                  Go to My Profile
-                </Button>}
+                {!isMobile && (
+                  <Button onClick={() => navigate("/profile")}>
+                    Go to My Profile
+                  </Button>
+                )}
               </div>
             </Alert>
           )}
@@ -318,10 +329,10 @@ export default function PFC() {
               disabled // ⬅️ read-only
               style={{ cursor: "not-allowed" }}
             />
-             
+
             <Input
               label="City & State"
-              value={info.city|| "Not set"}
+              value={info.city || "Not set"}
               disabled // ⬅️ read-only
               style={{ cursor: "not-allowed" }}
             />
@@ -464,7 +475,7 @@ export default function PFC() {
             {
               title: renderAccTitle(
                 "Financial Obligations",
-                getTotal(obligations)
+                getTotal(obligations),
               ),
               content: (
                 <CategoryGroup

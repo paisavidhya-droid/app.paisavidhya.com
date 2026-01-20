@@ -32,6 +32,7 @@ import {
 import toast from "react-hot-toast";
 import { formatDisplayDate } from "../../utils/dateUtils";
 import { downloadAuditCsv } from "../../services/auditService";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 
 const ACTIONS = [
   "LOGIN_SUCCESS",
@@ -134,7 +135,7 @@ export default function AdminAudit() {
   useEffect(() => {
     const t = setTimeout(
       () => dispatch(setFilter({ key: "q", value: qInput })),
-      250
+      250,
     );
     return () => clearTimeout(t);
   }, [qInput, dispatch]);
@@ -208,6 +209,28 @@ export default function AdminAudit() {
       style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 16px" }}
     >
       {/* Header */}
+      <ModuleHeader
+        title="Audit Log"
+        subtitle="Security & Compliance"
+        backTo="/admin"
+        actions={
+          <>
+            <Tooltip content="Export latest entries as CSV">
+              <Button onClick={downloadCsv} variant="ghost">
+                Export CSV
+              </Button>
+            </Tooltip>
+
+            <Button
+              variant="ghost"
+              onClick={() => dispatch(fetchAuditLogsThunk())}
+            >
+              Refresh
+            </Button>
+          </>
+        }
+      />
+
       <Card>
         <Row style={{ justifyContent: "space-between", alignItems: "center" }}>
           <Col>
@@ -503,7 +526,7 @@ export default function AdminAudit() {
                         <IconButton
                           onClick={async () => {
                             await navigator.clipboard.writeText(
-                              String(row.entityId ?? "")
+                              String(row.entityId ?? ""),
                             );
                             toast.success("Entity ID copied");
                           }}

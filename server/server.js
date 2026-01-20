@@ -12,6 +12,8 @@ import certificatesRouter from "./router/certificates.routes.js";
 import publicRoutes from "./router/public.routes.js";
 import orgRoutes from "./router/org.routes.js";
 import notifyRoutes from "./router/notify.routes.js";
+import adminRoutes from "./router/admin.routes.js";
+
 
 
 const app = express();
@@ -46,7 +48,17 @@ app.options(/.*/, cors(corsOptions));
 // app.use(morgan('dev'));
 app.use(express.json());
 
-app.get("/api/health", (req, res) => res.status(200).send("All Good!!!"));
+// app.get("/api/health", (req, res) => res.status(200).send("All Good!!!"));
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    now: new Date().toISOString(),
+    uptimeSec: Math.floor(process.uptime()),
+    node: process.version,
+    region: process.env.REGION || process.env.AWS_REGION || "unknown",
+  });
+});
+
 
 
 // Routes
@@ -61,6 +73,9 @@ app.use("/api/certificates", certificatesRouter);
 app.use("/api/public", publicRoutes);
 app.use("/api/orgs", orgRoutes);
 app.use("/api/notifications", notifyRoutes);
+
+app.use("/api/admin", adminRoutes);
+
 
 
 

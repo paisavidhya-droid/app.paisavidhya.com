@@ -91,7 +91,7 @@ export async function createLead(req, res, next) {
       message: req.body.message || "",
       source,
       tags: req.body.tags || [],
-      interests: req.body.interests || [],
+      interests: req.body.interests || undefined,
       consent: req.body.consent !== false, // default true
       context: req.body.context || {},
       outreach: req.body.outreach || undefined,

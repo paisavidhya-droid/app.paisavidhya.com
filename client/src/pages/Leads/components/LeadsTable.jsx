@@ -144,7 +144,7 @@ export default function LeadsTable({
                 {/* Requested for */}
                 <td
                   className="pv-ellipsis"
-                  title={(lead.interests || []).join(", ")}
+                  title={lead.interests }
                 >
                   {Array.isArray(lead.interests) && lead.interests.length ? (
                     lead.interests.join(", ")

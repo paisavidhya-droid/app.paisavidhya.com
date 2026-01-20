@@ -71,8 +71,8 @@ const LeadSchema = new mongoose.Schema(
     tags: { type: [String], default: [], index: true },
 
     interests: {
-      type: [String],
-      default: [],
+      type: String,
+      default: "Callback",
       enum: LEAD_INTERESTS,
       index: true,
     },

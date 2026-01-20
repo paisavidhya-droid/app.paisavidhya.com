@@ -104,6 +104,10 @@
 
 /* Mobile: table scroll stays clean */
 @media (max-width: 640px) {
+  .leads-page {
+    max-width: 100vw;
+  }
+
   .leads-table {
     min-width: 980px;
   }

@@ -29,7 +29,7 @@ const OtpPin = forwardRef(function OtpPin(
     value,
     onChange,
     onComplete,
-    autoFocus = true,
+    autoFocus = false,
     disabled = false,
     error = false,
     success = false,

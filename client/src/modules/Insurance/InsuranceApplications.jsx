@@ -12,7 +12,6 @@ import {
   AmountInput,
 } from "../../components";
 import FloatField from "../../components/ui/FancyInput/FloatField";
-import ModuleHeader from "../../components/ui/ModuleHeader";
 import toast from "react-hot-toast";
 import { useDeviceSize } from "../../context/DeviceSizeContext";
 
@@ -59,29 +58,12 @@ function HealthInsuranceForm() {
 
       <Section title="Proposer Details">
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <FloatField
-            label="Full Name"
-            name="proposerName"
-            required
-          />
-          <FloatField
-            label="Mobile Number"
-            name="mobile"
-            required
-          />
-          <FloatField
-            label="Email"
-            name="email"
-            type="email"
-          />
+          <FloatField label="Full Name" name="proposerName" required />
+          <FloatField label="Mobile Number" name="mobile" required />
+          <FloatField label="Email" name="email" type="email" />
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <Input
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            required
-          />
+          <Input label="Date of Birth" name="dob" type="date" required />
           <Select label="Gender" name="gender" required>
             <option value="">Select…</option>
             <option value="male">Male</option>
@@ -204,7 +186,10 @@ function HealthInsuranceForm() {
         <div className="pv-row" style={{ gap: 16, flexWrap: "wrap" }}>
           <Checkbox label="Need maternity coverage" name="maternity" />
           <Checkbox label="Need parents to be covered" name="parentsCover" />
-          <Checkbox label="Okay with waiting period for some illnesses" name="waitingOk" />
+          <Checkbox
+            label="Okay with waiting period for some illnesses"
+            name="waitingOk"
+          />
         </div>
       </Section>
 
@@ -262,29 +247,12 @@ function LifeInsuranceForm() {
 
       <Section title="Personal & Contact Details">
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <FloatField
-            label="Full Name"
-            name="fullName"
-            required
-          />
-          <FloatField
-            label="Mobile Number"
-            name="mobile"
-            required
-          />
-          <FloatField
-            label="Email"
-            name="email"
-            type="email"
-          />
+          <FloatField label="Full Name" name="fullName" required />
+          <FloatField label="Mobile Number" name="mobile" required />
+          <FloatField label="Email" name="email" type="email" />
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <Input
-            label="Date of Birth"
-            name="dob"
-            type="date"
-            required
-          />
+          <Input label="Date of Birth" name="dob" type="date" required />
           <Select label="Gender" name="gender">
             <option value="">Select…</option>
             <option value="male">Male</option>
@@ -301,10 +269,7 @@ function LifeInsuranceForm() {
           </Select>
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <AmountInput
-            label="Monthly Income (₹)"
-            name="monthlyIncome"
-          />
+          <AmountInput label="Monthly Income (₹)" name="monthlyIncome" />
           <Input label="PAN (optional)" name="pan" placeholder="ABCDE1234F" />
         </div>
       </Section>
@@ -396,17 +361,9 @@ function LifeInsuranceForm() {
             <option value="sibling">Sibling</option>
             <option value="other">Other</option>
           </Select>
-          <Input
-            label="Nominee Age"
-            name="nomineeAge"
-            type="number"
-            min={1}
-          />
+          <Input label="Nominee Age" name="nomineeAge" type="number" min={1} />
         </div>
-        <Input
-          label="Nominee Mobile (optional)"
-          name="nomineeMobile"
-        />
+        <Input label="Nominee Mobile (optional)" name="nomineeMobile" />
       </Section>
 
       <Section title="Existing Life Insurance">
@@ -471,21 +428,9 @@ function MotorGeneralInsuranceForm() {
 
       <Section title="Basic Contact Details">
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <FloatField
-            label="Full Name"
-            name="fullName"
-            required
-          />
-          <FloatField
-            label="Mobile Number"
-            name="mobile"
-            required
-          />
-          <FloatField
-            label="Email"
-            name="email"
-            type="email"
-          />
+          <FloatField label="Full Name" name="fullName" required />
+          <FloatField label="Mobile Number" name="mobile" required />
+          <FloatField label="Email" name="email" type="email" />
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
           <Input label="City" name="city" />
@@ -513,9 +458,7 @@ For travel: Destination, dates, number of travellers…"
       <Section title="Coverage Preferences">
         <Select label="Type of cover" name="coverageType">
           <option value="">Select…</option>
-          <option value="comprehensive_vehicle">
-            Comprehensive (vehicle)
-          </option>
+          <option value="comprehensive_vehicle">Comprehensive (vehicle)</option>
           <option value="third_party">Third Party Only</option>
           <option value="home_building_contents">
             Home – Building + Contents
@@ -555,11 +498,7 @@ For travel: Destination, dates, number of travellers…"
             <option value="yes">Yes</option>
           </Select>
         </div>
-        <Textarea
-          label="Claim details (if any)"
-          name="claimDetails"
-          rows={3}
-        />
+        <Textarea label="Claim details (if any)" name="claimDetails" rows={3} />
       </Section>
 
       <div
@@ -596,7 +535,11 @@ function GroupInsuranceForm() {
             name="companyName"
             required
           />
-          <Input label="Industry" name="industry" placeholder="e.g., IT, FMCG" />
+          <Input
+            label="Industry"
+            name="industry"
+            placeholder="e.g., IT, FMCG"
+          />
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
           <Input
@@ -629,11 +572,7 @@ function GroupInsuranceForm() {
 
       <Section title="Contact Person">
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <FloatField
-            label="Contact Person Name"
-            name="contactName"
-            required
-          />
+          <FloatField label="Contact Person Name" name="contactName" required />
           <Input
             label="Designation"
             name="designation"
@@ -641,37 +580,16 @@ function GroupInsuranceForm() {
           />
         </div>
         <div className="pv-row" style={{ gap: 12, flexWrap: "wrap" }}>
-          <FloatField
-            label="Mobile Number"
-            name="mobile"
-            required
-          />
-          <FloatField
-            label="Work Email"
-            name="email"
-            type="email"
-            required
-          />
+          <FloatField label="Mobile Number" name="mobile" required />
+          <FloatField label="Work Email" name="email" type="email" required />
         </div>
       </Section>
 
       <Section title="Type of Group Coverage">
-        <Checkbox
-          name="groupHealth"
-          label="Group Health Insurance"
-        />
-        <Checkbox
-          name="groupTerm"
-          label="Group Term Life"
-        />
-        <Checkbox
-          name="personalAccident"
-          label="Personal Accident Cover"
-        />
-        <Checkbox
-          name="wellnessBenefits"
-          label="Wellness / OPD benefits"
-        />
+        <Checkbox name="groupHealth" label="Group Health Insurance" />
+        <Checkbox name="groupTerm" label="Group Term Life" />
+        <Checkbox name="personalAccident" label="Personal Accident Cover" />
+        <Checkbox name="wellnessBenefits" label="Wellness / OPD benefits" />
         <Textarea
           label="Any specific requirements?"
           name="specialRequirements"
@@ -732,7 +650,7 @@ export default function InsuranceApplications() {
       content: <HealthInsuranceForm />,
     },
     {
-     label: isMobile ? "Life" : "Life Insurance",
+      label: isMobile ? "Life" : "Life Insurance",
       content: <LifeInsuranceForm />,
     },
     {
@@ -746,17 +664,14 @@ export default function InsuranceApplications() {
   ];
 
   return (
-    <div className="pv-container" style={{ maxWidth: 980, margin: "0 auto", padding: "16px 0 32px" }}>
+    <div
+      className="pv-container"
+      style={{ maxWidth: 980, margin: "0 auto", padding: "16px 0 32px" }}
+    >
       <ModuleHeader
         title="Insurance Applications"
-        subtitle="Collect accurate, compliant details to suggest the right coverage."
-        brdcrumbs={[
-          { label: "Home", to: "/" },
-          { label: "Insurance", to: "/insurance" },
-          { label: "Applications" },
-        ]}
+        subtitle="Collect compliant details to suggest the right coverage."
         sticky={false}
-        compact
       />
 
       <Card title="Choose Insurance Type" style={{ marginTop: 16 }}>

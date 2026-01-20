@@ -81,8 +81,20 @@ export default function AppLayout() {
   // Close mobile sidebar & move focus to main on route change
   useEffect(() => {
     setMobileSidebarOpen(false);
-    // small timeout lets the DOM update before focusing
-    const id = setTimeout(() => mainRef.current?.focus(), 0);
+
+    const id = setTimeout(() => {
+      const el = mainRef.current;
+      if (!el) return;
+      try {
+        el.focus({ preventScroll: true });
+      } catch {
+        const x = window.scrollX;
+        const y = window.scrollY;
+        el.focus();
+        window.scrollTo(x, y);
+      }
+    }, 0);
+
     return () => clearTimeout(id);
   }, [location.pathname]);
 

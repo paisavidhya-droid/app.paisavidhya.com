@@ -18,7 +18,7 @@
     --pv-fast: 150ms;
 }*/
 
-.pv-dim{
+.pv-dim {
   color: var(--pv-dim);
 }
 
@@ -35,7 +35,9 @@ a:hover {
 .pv-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 24px
+  /* padding: 24px; */
+  display: flex;
+  flex-direction: column;
 }
 
 /* primitives */
@@ -180,7 +182,7 @@ label.pv-label {
   border-radius: 18px;
   box-shadow: var(--pv-shadow);
   position: relative;
-   max-height: min(80vh, 720px);
+  max-height: min(80vh, 720px);
   display: flex;
   flex-direction: column;
 }
@@ -193,7 +195,7 @@ label.pv-label {
 
 .pv-modal-body {
   padding: 18px 20px;
-    flex: 1 1 auto;
+  flex: 1 1 auto;
   overflow-y: auto;
 }
 
@@ -601,7 +603,7 @@ input[type="number"] {
    PV TABLE SYSTEM 
    ================================ */
 
-.pv-table-wrap{
+.pv-table-wrap {
   max-width: 100%;
   overflow: auto;
   border: 1px solid var(--pv-border);
@@ -609,14 +611,14 @@ input[type="number"] {
   background: var(--pv-card);
 }
 
-.pv-table{
+.pv-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: var(--pv-card);
 }
 
-.pv-table thead th{
+.pv-table thead th {
   position: sticky;
   top: 0;
   z-index: 2;
@@ -631,51 +633,52 @@ input[type="number"] {
   white-space: nowrap;
 }
 
-.pv-table tbody td{
+.pv-table tbody td {
   padding: 12px 12px;
   border-bottom: 1px solid color-mix(in oklab, var(--pv-border) 70%, transparent);
   vertical-align: middle;
 }
 
-.pv-table tbody tr:nth-child(even){
+.pv-table tbody tr:nth-child(even) {
   background: color-mix(in oklab, var(--pv-bg) 40%, transparent);
 }
 
-.pv-table tbody tr:hover{
+.pv-table tbody tr:hover {
   background: color-mix(in oklab, var(--pv-primary) 6%, transparent);
 }
 
 /* Helpers */
-.pv-cell-main{
+.pv-cell-main {
   font-weight: 800;
   color: var(--pv-text);
 }
 
-.pv-cell-sub{
+.pv-cell-sub {
   font-size: 12px;
   margin-top: 2px;
   color: var(--pv-dim);
 }
 
-.pv-ellipsis{
+.pv-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.pv-mono{
+.pv-mono {
   font-variant-numeric: tabular-nums;
 }
 
 /* Common right-aligned narrow actions column */
-.pv-th-actions, .pv-td-actions{
+.pv-th-actions,
+.pv-td-actions {
   width: 72px;
   text-align: right;
   white-space: nowrap;
 }
 
 /* Empty state card */
-.pv-empty{
+.pv-empty {
   padding: 22px;
   border: 1px dashed var(--pv-border);
   border-radius: 12px;
@@ -683,14 +686,14 @@ input[type="number"] {
 }
 
 
- .pv-link {
+.pv-link {
   color: var(--pv-text);
   text-decoration: none;
   font-weight: 600;
   opacity: 0.92;
 }
 
- .pv-link:hover {
+.pv-link:hover {
   opacity: 1;
   text-decoration: underline;
   text-underline-offset: 3px;

@@ -1,8 +1,8 @@
 // src/modules/PFCReport.jsx
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, Badge, Button, Alert, Modal } from "../components";
-import ModuleHeader from "../components/ui/ModuleHeader";
 import InsightsList from "../components/InsightsList";
+import ModuleHeader from "../components/ui/moduleHeader/ModuleHeader.jsx";
 import {
   PieChart,
   Pie,
@@ -15,8 +15,8 @@ import toast from "react-hot-toast";
 import { useMemo, useState, useRef } from "react";
 import RatioCoach from "./RatioCoach";
 import { useDeviceSize } from "../context/DeviceSizeContext.jsx";
- import jsPDF from "jspdf";
- import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const COLORS = [
   "#0071E3",
@@ -43,7 +43,7 @@ export default function PFCReport() {
   if (!safeState) {
     try {
       const cached = JSON.parse(
-        localStorage.getItem("pv_pfc_payload") || "null"
+        localStorage.getItem("pv_pfc_payload") || "null",
       );
       if (cached && cached.info && cached.income && cached.expenses) {
         safeState = cached;
@@ -117,7 +117,7 @@ export default function PFCReport() {
         .map(([name, value]) => ({ name, value }))
         .filter((d) => d.value > 0)
         .sort((a, b) => b.value - a.value),
-    [totals]
+    [totals],
   );
 
   // Fixed/variable & 50/30/20 helpers
@@ -164,19 +164,19 @@ export default function PFCReport() {
 
   const fixedTotal = useMemo(
     () => fixedFrom({ housing, health, obligations, lifestyle }),
-    [housing, health, obligations, lifestyle]
+    [housing, health, obligations, lifestyle],
   );
   const variableTotal = Math.max(0, totalExpenses - fixedTotal);
 
   const needAmt = useMemo(
     () =>
       Math.max(0, needsFrom({ housing, food, transport, health, obligations })),
-    [housing, food, transport, health, obligations]
+    [housing, food, transport, health, obligations],
   );
   const wantAmt = useMemo(
     () =>
       Math.max(0, wantsFrom({ lifestyle, leisure, giving, food, transport })),
-    [lifestyle, leisure, giving, food, transport]
+    [lifestyle, leisure, giving, food, transport],
   );
   const savingAmt = trueSavingsFrom(obligations);
 
@@ -249,7 +249,7 @@ export default function PFCReport() {
         type: "info",
         title: "Deploy Your Surplus",
         detail: `You have a monthly surplus of ₹${inr.format(
-          surplus
+          surplus,
         )}. Channel more into SIP/NPS to reach 20–30% savings.`,
       });
     }
@@ -277,9 +277,9 @@ export default function PFCReport() {
         type: "warning",
         title: "50/30/20 Balance Off",
         detail: `Needs ${needsPct.toFixed(1)}%, Wants ${wantsPct.toFixed(
-          1
+          1,
         )}%, Savings ${savingPct.toFixed(
-          1
+          1,
         )}%. Move gradually toward ~50/30/20.`,
       });
     } else {
@@ -287,7 +287,7 @@ export default function PFCReport() {
         type: "success",
         title: "Balanced Budget Mix",
         detail: `Your mix is close to 50/30/20: Needs ${needsPct.toFixed(
-          1
+          1,
         )}%, Wants ${wantsPct.toFixed(1)}%, Savings ${savingPct.toFixed(1)}%.`,
       });
     }
@@ -328,28 +328,28 @@ export default function PFCReport() {
     const a = [];
     if (surplus < 0)
       a.push(
-        "Freeze discretionary spends for 30 days; target immediate 10–15% cut in Lifestyle/Leisure."
+        "Freeze discretionary spends for 30 days; target immediate 10–15% cut in Lifestyle/Leisure.",
       );
     if (savingPct < 20 && surplus > 0)
       a.push(
         `Increase SIP by ₹${inr.format(
-          Math.max(500, Math.floor(surplus * 0.5))
-        )} this month; enable auto-debit.`
+          Math.max(500, Math.floor(surplus * 0.5)),
+        )} this month; enable auto-debit.`,
       );
     if (dti > 30)
       a.push(
-        "Explore loan refinance/part-prepayment to bring EMI load under 25% of income."
+        "Explore loan refinance/part-prepayment to bring EMI load under 25% of income.",
       );
     if (ccPct > 10)
       a.push(
-        "Pay card in full; move recurring payments to debit/UPI; keep utilization < 30%."
+        "Pay card in full; move recurring payments to debit/UPI; keep utilization < 30%.",
       );
     if ((totals.Lifestyle || 0) / (totalExpenses || 1) > 0.3)
       a.push(
-        "Cancel/trim subscriptions, reduce shopping/weekend outings by 20%."
+        "Cancel/trim subscriptions, reduce shopping/weekend outings by 20%.",
       );
     a.push(
-      "Build/maintain 3–6 months emergency fund in liquid instruments before upping risk."
+      "Build/maintain 3–6 months emergency fund in liquid instruments before upping risk.",
     );
     return a.slice(0, 5);
   })();
@@ -372,42 +372,41 @@ export default function PFCReport() {
   const renderPieLabel = ({ name, value }) => `${name} — ₹${inr.format(value)}`;
 
   function neutralizeOklabColors(rootEl = document.documentElement) {
-  const styles = getComputedStyle(rootEl);
-  for (let i = 0; i < styles.length; i++) {
-    const prop = styles[i];
-    const val = styles.getPropertyValue(prop);
-    if (val.includes("oklab")) {
-      rootEl.style.setProperty(prop, "rgb(100,100,100)");
+    const styles = getComputedStyle(rootEl);
+    for (let i = 0; i < styles.length; i++) {
+      const prop = styles[i];
+      const val = styles.getPropertyValue(prop);
+      if (val.includes("oklab")) {
+        rootEl.style.setProperty(prop, "rgb(100,100,100)");
+      }
     }
   }
-}
-
 
   const exportPDF = async () => {
-  const input = reportRef.current;
-  if (!input) return;
-  try {
-    neutralizeOklabColors(); // <-- call before capture
+    const input = reportRef.current;
+    if (!input) return;
+    try {
+      neutralizeOklabColors(); // <-- call before capture
 
-    const canvas = await html2canvas(input, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff",
-    });
+      const canvas = await html2canvas(input, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
 
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
-    pdf.save(`${info?.name || "PFC_Report"}.pdf`);
-  } catch (err) {
-    console.error("PDF export failed:", err);
-    toast.error("Could not generate PDF");
-  }
-};
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, imgHeight);
+      pdf.save(`${info?.name || "PFC_Report"}.pdf`);
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      toast.error("Could not generate PDF");
+    }
+  };
 
   const msisdnDisplay = String(info?.mobile || "")
     .replace(/\D/g, "")
@@ -420,7 +419,7 @@ export default function PFCReport() {
         `Surplus: ₹${surplus.toLocaleString()}\n` +
         `Savings Rate: ${savingsRate.toFixed(1)}%\n` +
         `EMI Load: ${emiLoad.toFixed(1)}%\n` +
-        `Check your financial health at paisavidhya.com`
+        `Check your financial health at paisavidhya.com`,
     );
     if (msisdnDisplay.length < 10) {
       toast.error("Enter a valid 10-digit WhatsApp number");
@@ -433,28 +432,13 @@ export default function PFCReport() {
     <>
       <ModuleHeader
         title="PFC Report"
-        subtitle={
-          info?.name
-            ? `Financial summary for ${info.name}`
-            : "Financial summary"
-        }
-        breadcrumbs={[
-          { label: "Home", to: "/" },
-          { label: "PFC", to: "/pfc" },
-          { label: "Report" },
-        ]}
+        subtitle={info?.name ? `Summary for ${info.name}` : "Summary"}
         actions={
           <>
             <Button variant="ghost" onClick={() => navigate("/pfc")}>
               Edit
             </Button>
-            <Button onClick={() => setShowModal(true)}>
-              Share via WhatsApp
-            </Button>
-
-            <Button onClick={exportPDF}>Download PDF</Button>
-
-            {!isMobile && <Button onClick={handlePrint}>Print</Button>}
+            <Button onClick={exportPDF}>Download</Button>
           </>
         }
       />
@@ -577,7 +561,7 @@ export default function PFCReport() {
                   <div style={{ fontWeight: 800, fontSize: 20 }}>
                     {totalIncome
                       ? `${needsPct.toFixed(0)}/${wantsPct.toFixed(
-                          0
+                          0,
                         )}/${savingPct.toFixed(0)}`
                       : "-"}
                   </div>

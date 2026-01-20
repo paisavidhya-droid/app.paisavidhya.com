@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, Button, Badge, Alert, Progress, Skeleton, Tooltip, Input, Select } from "../../components"; // assume Input/Select exist in your kit
-import { useAuth } from "../../hooks/useAuth";
-
+import { Card, Button, Badge, Alert, Progress, Skeleton, Tooltip, Input, Select } from "../../components"; 
 /**
  * AdminDashboard — production‑ready, extensible, and accessible.
  *
@@ -121,8 +119,6 @@ function useAdminSummary(filters) {
 }
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
-
   // Global filters
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -184,7 +180,7 @@ export default function AdminDashboard() {
           <div className="pv-col" style={{ gap: 4 }}>
             <div style={{ fontSize: 14, color: "var(--pv-dim)" }}>Welcome</div>
             <h1 style={{ margin: 0, fontSize: 26 }}>
-              {user?.name || "Admin"} <Badge>Admin</Badge> <Badge>{env}</Badge>
+              { "Admin"} <Badge>Admin</Badge> <Badge>{env}</Badge>
             </h1>
           </div>
           <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>

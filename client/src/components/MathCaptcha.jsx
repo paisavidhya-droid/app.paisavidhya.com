@@ -126,7 +126,7 @@ export default function MathCaptcha({
         {valid && (
           <Badge
             style={{
-              width: "110px",
+              width: "112px",
               backgroundColor: "#d1fae5",
               color: "#047857",
 
