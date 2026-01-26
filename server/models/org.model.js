@@ -13,9 +13,6 @@ const orgSchema = new mongoose.Schema(
     },
     shortCode: {
       type: String,
-      unique: true,
-      sparse: true,
-      index: true,
     },
     type: {
       type: String,
@@ -47,6 +44,16 @@ const orgSchema = new mongoose.Schema(
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
+);
+
+orgSchema.index(
+  { shortCode: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      shortCode: { $type: "string", $ne: "" },
+    },
+  }
 );
 
 export default mongoose.model("Org", orgSchema);

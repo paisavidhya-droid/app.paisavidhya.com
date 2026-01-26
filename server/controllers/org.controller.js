@@ -14,7 +14,7 @@ function generateShortCode(name) {
 // CREATE
 export const createOrg = async (req, res, next) => {
   try {
-    const { name } = req.body;
+    const { name, shortCode, ...safeBody } = req.body;
     if (!name) return res.status(400).json({ message: "Name is required" });
 
     const slug =
@@ -25,9 +25,10 @@ export const createOrg = async (req, res, next) => {
     // const shortCode = generateShortCode(name); it creates short code immediatly after org creation
 
     const org = await Org.create({
-      ...req.body,
+      ...safeBody,
+      name,
       slug,
-       // shortCode: generated later via dedicated endpoint
+      // shortCode: generated later via dedicated endpoint
       createdBy: req.user.id,
     });
 

@@ -26,6 +26,7 @@ import {
 import PledgeShareCard from "../../components/PledgeShareCard";
 import { toPng } from "html-to-image";
 import { getMyProfile } from "../../services/profileService";
+import DashboardSection from "./components/DashboardSection";
 const APP_ORIGIN = import.meta.env.VITE_APP_ORIGIN || window.location.origin;
 const PARTNER_CODE_KEY = "pv_partnerOrgCode";
 const PARTNER_ORG_DATA_KEY = "pv_partnerOrgData";
@@ -140,7 +141,7 @@ export default function CustomerDashboard() {
 
     const total = fields.length;
     const filled = fields.filter(
-      (v) => v !== null && v !== undefined && String(v).trim() !== ""
+      (v) => v !== null && v !== undefined && String(v).trim() !== "",
     ).length;
 
     if (total === 0) return 0;
@@ -225,12 +226,12 @@ export default function CustomerDashboard() {
       `I will protect my personal data (PAN/Aadhaar/bank details) and share it only when necessary via secure channels.`,
       `I will build strong money habits and encourage financial safety in my community.`,
     ],
-    []
+    [],
   );
 
   // Track per-clause agreement
   const [clauseChecks, setClauseChecks] = useState(() =>
-    Array(pledgeClauses.length).fill(false)
+    Array(pledgeClauses.length).fill(false),
   );
 
   // Final “I agree” checkbox
@@ -239,7 +240,7 @@ export default function CustomerDashboard() {
   // Derived counts
   const checkedCount = useMemo(
     () => clauseChecks.filter(Boolean).length,
-    [clauseChecks]
+    [clauseChecks],
   );
 
   const allClausesChecked = checkedCount === pledgeClauses.length;
@@ -281,7 +282,7 @@ export default function CustomerDashboard() {
 
     const API_BASE = import.meta.env.VITE_API_SERVER_URL || "";
     const pdfUrl = `${API_BASE}/api/certificates/${encodeURIComponent(
-      certId
+      certId,
     )}/pdf`;
 
     window.open(pdfUrl, "_blank", "noreferrer");
@@ -480,7 +481,7 @@ export default function CustomerDashboard() {
       Swal.fire(
         "Error",
         "Error saving your pledge. Please try again.",
-        "error"
+        "error",
       );
     } finally {
       setPledgeLoading(false);
@@ -593,6 +594,31 @@ export default function CustomerDashboard() {
             </div>
           </Card>
 
+          <DashboardSection
+            title="Financial Tools"
+            subtitle="Checkups, calculators & planners"
+            right={
+              <Tooltip content="View all Admin tools">
+                <Link to="/tools" style={{ marginTop: "-15px" }}>
+                  <Badge>View all</Badge>
+                </Link>
+              </Tooltip>
+            }
+          >
+            <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
+              <Button as={Link} to="./pfc">
+                PFC
+              </Button>
+              <Button as={Link} to="./ffc" variant="ghost">
+                FFC
+              </Button>
+            
+              <Button as={Link} to="./tools/sip-calculator" variant="ghost">
+                SIP Calculator
+              </Button>
+            </div>
+          </DashboardSection>
+
           {Array.isArray(summary?.customerTips) &&
             summary.customerTips.length > 0 && (
               <Card title="Next steps">
@@ -613,16 +639,7 @@ export default function CustomerDashboard() {
               </Card>
             )}
 
-          <Card title="Shortcuts">
-            <div className="pv-col" style={{ gap: 8 }}>
-              <Button as="a" href="/profile" variant="ghost">
-                Edit profile
-              </Button>
-              <Button as="a" href="/calculators/sip" variant="ghost">
-                SIP Calculator
-              </Button>
-            </div>
-          </Card>
+        
         </Col>
 
         <Col style={{ flex: "1 1 360px" }}>
@@ -688,7 +705,7 @@ export default function CustomerDashboard() {
                     as="a"
                     // href={`${APP_ORIGIN}/verify/${user.pledge.certificateId}`}
                     href={`${APP_ORIGIN}/verify/${encodeURIComponent(
-                      user.pledge.certificateId
+                      user.pledge.certificateId,
                     )}`}
                     target="_blank"
                     rel="noreferrer"
@@ -741,6 +758,16 @@ export default function CustomerDashboard() {
                 to reach 100%.
               </div>
             )}
+          </Card>
+            <Card title="Shortcuts">
+            <div className="pv-col" style={{ gap: 8 }}>
+              <Button as="a" href="/profile" variant="ghost">
+                Edit profile
+              </Button>
+              <Button as="a" href="/calculators/sip" variant="ghost">
+                SIP Calculator
+              </Button>
+            </div>
           </Card>
 
           {/* <Card title="Overview">
@@ -808,8 +835,8 @@ export default function CustomerDashboard() {
               {pledgeLoading
                 ? "Saving..."
                 : allClausesChecked
-                ? "Complete My Pledge"
-                : `Agree to all (${checkedCount}/${pledgeClauses.length})`}
+                  ? "Complete My Pledge"
+                  : `Agree to all (${checkedCount}/${pledgeClauses.length})`}
             </Button>
           </>
         }

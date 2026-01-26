@@ -11,7 +11,6 @@ import {
   Skeleton,
   Tooltip,
   Input,
-  Select,
   Row,
   Col,
 } from "../../components";
@@ -379,6 +378,15 @@ export default function AdminDashboard() {
               intent="ok"
             />
           </Card>
+          {/* <Card>
+            <StatCard
+              className="pv-row"
+              label="Total Pledges"
+              value={0}
+              hint="All Time"
+              intent="ok"
+            />
+          </Card> */}
           <DashboardSection
             title="Status"
             subtitle="Backend health + server stats"

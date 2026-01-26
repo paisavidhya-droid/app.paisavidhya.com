@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import QRCode from "qrcode";
+import { addAudit } from "../utils/audit.js";
 
 
 
@@ -19,7 +20,7 @@ import QRCode from "qrcode";
 
 export const takePledge = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     if (!userId) {
       return res
         .status(401)
@@ -134,12 +135,40 @@ export const takePledge = async (req, res, next) => {
     }
 
     const safeUser = await User.findById(userId).select("-password").lean();
+    addAudit({
+      req,
+      action: "PLEDGE_TAKEN",
+      entity: "Certificate",
+      entityId: cert._id,
+      after: {
+        userId: String(userId),
+        certificateId: cert.certificateId,
+        type: cert.type,
+        issuedAt: cert.issuedAt,
+        orgId: org?._id ? String(org._id) : null,
+        orgCode: org?.shortCode || null,
+        orgName: org?.name || null,
+      },
+    });
+
     return res.json({
       success: true,
       user: safeUser,
       certificateId: cert.certificateId,
     });
   } catch (err) {
+    addAudit({
+      req,
+      action: "PLEDGE_FAILED",
+      entity: "Certificate",
+      entityId: null,
+      after: {
+        userId: req.user?._id ? String(req.user._id) : null,
+        orgCode: req.body?.orgCode || null,
+        message: err?.message || "unknown_error",
+        name: err?.name || "Error",
+      },
+    });
     next(err);
   }
 };
@@ -166,10 +195,17 @@ function drawCenteredText(page, text, y, size, font, color) {
 }
 
 async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
-  const templatePath = path.join(
-    __dirname,
-    "../assets/financial-pledge-certificate.png"
-  );
+  // const templatePath = path.join(
+  //   __dirname,
+  //   "../assets/financial-pledge-certificate.png"
+  // );
+  // const templateBytes = fs.readFileSync(templatePath);
+
+  const templateFile = orgName
+    ? "financial-pledge-certificate-with-org.png"
+    : "financial-pledge-certificate.png";
+
+  const templatePath = path.join(__dirname, "../assets", templateFile);
   const templateBytes = fs.readFileSync(templatePath);
 
   const pdf = await PDFDocument.create();
@@ -200,6 +236,41 @@ async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
     alexBrushFont,
     rgb(0.15, 0.15, 0.15)
   );
+
+  // ---- ORG LINE BELOW NAME (only for org pledges) ----
+  // ---- ORG LINE BELOW NAME (centered, emphasized) ----
+  if (orgName) {
+    const label = "In association with ";
+    const size = 45; // slightly larger than before (26 → 30)
+
+    const labelWidth = italic.widthOfTextAtSize(label, size);
+    const orgWidth = boldItalic.widthOfTextAtSize(orgName, size);
+    const totalWidth = labelWidth + orgWidth;
+
+    const { width } = page.getSize();
+    const startX = (width - totalWidth) / 2;
+    const y = 700; // same vertical position
+
+    // label
+    page.drawText(label, {
+      x: startX,
+      y,
+      size,
+      font: italic,
+      color: rgb(0.25, 0.25, 0.25),
+    });
+
+    // org name (bold emphasis)
+    page.drawText(orgName, {
+      x: startX + labelWidth,
+      y,
+      size,
+      font: boldItalic, // 👈 emphasis
+      color: rgb(0.15, 0.15, 0.15),
+    });
+  }
+
+
 
   // ---- DATE ----
   page.drawText(dateStr, {
@@ -302,7 +373,7 @@ async function buildCertificatePdf({ name, issuedAt, certificateId, orgName }) {
 // Authenticated: logged-in user gets own certificate
 export const generateCertificate = async (req, res, next) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?._id;
     const user = await User.findById(userId);
     if (!user || !user.pledge?.taken)
       return res.status(403).send("No pledge found");

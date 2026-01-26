@@ -11,7 +11,7 @@ import {
   Spinner,
   Tabs,
 } from "../../components";
-import ModuleHeader from "../../components/ui/ModuleHeader.jsx";
+import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth";
 import { getMyProfile, saveMyProfile } from "../../services/profileService";
@@ -198,7 +198,7 @@ export default function ProfilePage() {
         ? e.target.value === ""
           ? ""
           : Number(e.target.value)
-        : e?.target?.value ?? e;
+        : (e?.target?.value ?? e);
     setForm((prev) => {
       const clone = structuredClone(prev);
       const keys = path.split(".");
@@ -310,8 +310,19 @@ export default function ProfilePage() {
     <div className="pv-page">
       <ModuleHeader
         title="My Profile"
-        subtitle="View and update your personal, KYC and bank details securely."
-        breadcrumbs={[{ label: "Home", to: "/" }, { label: "My Profile" }]}
+        subtitle="Manage your personal details, KYC, bank and nominee information"
+        backTo={false} // profile is usually a top-level page
+        actions={
+          !editMode ? (
+            <Button
+              onClick={() => setEditMode(true)}
+              disabled={loading}
+              size="sm"
+            >
+              Edit profile
+            </Button>
+          ) : null
+        }
       />
 
       <div
@@ -381,8 +392,8 @@ export default function ProfilePage() {
                     kycStatus === "VERIFIED"
                       ? "KYC verified"
                       : panPresent
-                      ? "KYC in progress"
-                      : "KYC not started"
+                        ? "KYC in progress"
+                        : "KYC not started"
                   }
                 />
               </div>
@@ -576,7 +587,7 @@ export default function ProfilePage() {
                         <label className="pv-field">
                           <div className="pv-field-label">Gender</div>
                           <select
-                          className="pv-select"
+                            className="pv-select"
                             value={form.gender}
                             onChange={handleChange("gender")}
                           >
@@ -605,28 +616,28 @@ export default function ProfilePage() {
                       >
                         {renderField(
                           "First name",
-                          profile?.name?.first || form.name.first
+                          profile?.name?.first || form.name.first,
                         )}
                         {renderField(
                           "Last name",
-                          profile?.name?.last || form.name.last
+                          profile?.name?.last || form.name.last,
                         )}
                         {renderField(
                           "Date of birth",
                           profile?.dob
                             ? profile.dob.substring(0, 10)
                             : form.dob,
-                          "Not set"
+                          "Not set",
                         )}
                         {renderField(
                           "Gender",
-                          profile?.gender || form.gender || "PREFER_NOT_TO_SAY"
+                          profile?.gender || form.gender || "PREFER_NOT_TO_SAY",
                         )}
                         {renderField(
                           "Primary phone",
                           profile?.primaryPhone?.number ||
                             form.primaryPhone.number ||
-                            user?.phoneNumber
+                            user?.phoneNumber,
                         )}
                       </div>
                     ),
@@ -654,7 +665,7 @@ export default function ProfilePage() {
                               Residency status
                             </div>
                             <select
-                            className="pv-select"
+                              className="pv-select"
                               value={form.kyc.residencyStatus}
                               onChange={handleChange("kyc.residencyStatus")}
                             >
@@ -671,7 +682,7 @@ export default function ProfilePage() {
                               Annual income range
                             </div>
                             <select
-                            className="pv-select"
+                              className="pv-select"
                               value={form.kyc.annualIncomeSlab}
                               onChange={handleChange("kyc.annualIncomeSlab")}
                             >
@@ -691,7 +702,7 @@ export default function ProfilePage() {
                           <label className="pv-field">
                             <div className="pv-field-label">PEP status</div>
                             <select
-                            className="pv-select"
+                              className="pv-select"
                               value={form.kyc.pepStatus}
                               onChange={handleChange("kyc.pepStatus")}
                             >
@@ -756,26 +767,26 @@ export default function ProfilePage() {
                         >
                           {renderField(
                             "PAN",
-                            profile?.kyc?.pan || form.kyc.pan
+                            profile?.kyc?.pan || form.kyc.pan,
                           )}
                           {renderField(
                             "Residency status",
                             profile?.kyc?.residencyStatus ||
                               form.kyc.residencyStatus ||
-                              "RESIDENT"
+                              "RESIDENT",
                           )}
                           {renderField(
                             "Annual income range",
                             profile?.kyc?.annualIncomeSlab ||
-                              form.kyc.annualIncomeSlab
+                              form.kyc.annualIncomeSlab,
                           )}
                           {renderField(
                             "Occupation",
-                            profile?.kyc?.occupation || form.kyc.occupation
+                            profile?.kyc?.occupation || form.kyc.occupation,
                           )}
                           {renderField(
                             "PEP status",
-                            profile?.kyc?.pepStatus || form.kyc.pepStatus
+                            profile?.kyc?.pepStatus || form.kyc.pepStatus,
                           )}
                         </div>
 
@@ -789,28 +800,28 @@ export default function ProfilePage() {
                         >
                           {renderField(
                             "Address line 1",
-                            profile?.address?.line1 || form.address.line1
+                            profile?.address?.line1 || form.address.line1,
                           )}
                           {renderField(
                             "Address line 2",
                             profile?.address?.line2 || form.address.line2,
-                            "-"
+                            "-",
                           )}
                           {renderField(
                             "City",
-                            profile?.address?.city || form.address.city
+                            profile?.address?.city || form.address.city,
                           )}
                           {renderField(
                             "State",
-                            profile?.address?.state || form.address.state
+                            profile?.address?.state || form.address.state,
                           )}
                           {renderField(
                             "Pincode",
-                            profile?.address?.pincode || form.address.pincode
+                            profile?.address?.pincode || form.address.pincode,
                           )}
                           {renderField(
                             "Country",
-                            profile?.address?.country || form.address.country
+                            profile?.address?.country || form.address.country,
                           )}
                         </div>
                       </div>
@@ -859,7 +870,7 @@ export default function ProfilePage() {
                             <label className="pv-field">
                               <div className="pv-field-label">Account type</div>
                               <select
-                              className="pv-select"
+                                className="pv-select"
                                 value={form.bank.accountType}
                                 onChange={handleChange("bank.accountType")}
                               >
@@ -925,30 +936,30 @@ export default function ProfilePage() {
                             {renderField(
                               "Account holder name",
                               profile?.bank?.accountHolderName ||
-                                form.bank.accountHolderName
+                                form.bank.accountHolderName,
                             )}
                             {renderField(
                               "Account number",
                               profile?.bank?.accountNumber ||
-                                form.bank.accountNumber
+                                form.bank.accountNumber,
                             )}
                             {renderField(
                               "IFSC",
-                              profile?.bank?.ifsc || form.bank.ifsc
+                              profile?.bank?.ifsc || form.bank.ifsc,
                             )}
                             {renderField(
                               "Bank name",
-                              profile?.bank?.bankName || form.bank.bankName
+                              profile?.bank?.bankName || form.bank.bankName,
                             )}
                             {renderField(
                               "Branch name",
-                              profile?.bank?.branchName || form.bank.branchName
+                              profile?.bank?.branchName || form.bank.branchName,
                             )}
                             {renderField(
                               "Account type",
                               profile?.bank?.accountType ||
                                 form.bank.accountType ||
-                                "SAVINGS"
+                                "SAVINGS",
                             )}
                           </div>
                         </div>
@@ -965,24 +976,24 @@ export default function ProfilePage() {
                           >
                             {renderField(
                               "Nominee name",
-                              profile?.nominee?.name || form.nominee.name
+                              profile?.nominee?.name || form.nominee.name,
                             )}
                             {renderField(
                               "Relationship",
                               profile?.nominee?.relation ||
-                                form.nominee.relation
+                                form.nominee.relation,
                             )}
                             {renderField(
                               "Nominee DOB",
                               profile?.nominee?.dob
                                 ? profile.nominee.dob.substring(0, 10)
-                                : form.nominee.dob
+                                : form.nominee.dob,
                             )}
                             {renderField(
                               "Share %",
                               profile?.nominee?.sharePercent ??
                                 form.nominee.sharePercent ??
-                                100
+                                100,
                             )}
                           </div>
                         </div>

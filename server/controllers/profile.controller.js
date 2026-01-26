@@ -20,7 +20,7 @@ const getMyProfile = async (req, res, next) => {
 
     res.json({ profile });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     next(err);
   }
 };
