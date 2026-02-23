@@ -50,7 +50,11 @@ server/old
 client/src/old
 
 client/src/pages/Leads/old
+client/src/pages/Leads/olddetails.jsx
+client/src/pages/Leads/workingallinonelops.jsx
+
 client/src/pages/Admin/olduser.jsx
+client/src/pages/Admin/UserManagement/workingallinoneusers.jsx
 
 client/src/Layout/resLayout.css
 

@@ -1,7 +1,7 @@
 // authMiddleware.js
 import jwt from "jsonwebtoken";
 
-
+const ACTIVITY_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
 
 
 const authMiddleware = async (req, res, next) => {
@@ -33,10 +33,10 @@ const authMiddleware = async (req, res, next) => {
     return next();
   } catch (err) {
     next(err);
-    const message = err.name === "TokenExpiredError"
-      ? "Token expired"
-      : "Invalid or malformed token";
-    return res.status(401).json({ message });
+    // const message = err.name === "TokenExpiredError"
+    //   ? "Token expired"
+    //   : "Invalid or malformed token";
+    // return res.status(401).json({ message });
 
   }
 };

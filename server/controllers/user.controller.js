@@ -112,8 +112,24 @@ const login = async (req, res, next) => {
     }
 
     const isCustomer = user.role === 'CUSTOMER';
-    const newIp = user.lastLoginIp && user.lastLoginIp !== ip;
-    const newUa = user.lastLoginUa && user.lastLoginUa !== ua;
+
+    const ip =
+      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+      req.ip ||
+      "";
+
+    const ua = req.headers["user-agent"] || "";
+
+    // compute "new device/ip" safely if you still want those audit flags
+    const newIp = !!(user.lastLoginIp && user.lastLoginIp !== ip);
+    const newUa = !!(user.lastLoginUa && user.lastLoginUa !== ua);
+
+    // update last-login fields
+    user.lastLoginAt = new Date();
+    user.lastLoginIp = ip;
+    user.lastLoginUa = ua;
+
+    await user.save();
 
     const token = user.generateAuthToken();
     const safe = await User.findById(user._id).select('-password').lean();
@@ -122,7 +138,7 @@ const login = async (req, res, next) => {
     if (shouldAuditLoginSuccess({ role: user.role, isCustomer, newIp, newUa })) {
       await addAudit({
         req, action: 'AUTH_LOGIN_SUCCESS', entity: 'User', entityId: user._id,
-        after: { id: user._id, email: user.email, role: user.role, newIp: !!newIp, newDevice: !!newUa }
+        after: { id: user._id, email: user.email, role: user.role, newIp: newIp, newDevice: newUa }
       });
     }
 
@@ -191,7 +207,11 @@ const getAllUsers = async (req, res, next) => {
       q = "", role = "", status = "", limit = 10, skip = 0
     } = req.query || {};
 
-    const filter = {};
+    const EXCLUDED_PHONES = ["1", "2", "3"];
+
+    const filter = {
+      phoneNumber: { $nin: EXCLUDED_PHONES }
+    };
     if (role) filter.role = role;
     if (status) filter.status = status;
 
@@ -308,8 +328,11 @@ const listStaff = async (req, res, next) => {
     const { q = "", limit = 50, skip = 0 } = req.query;
 
     // Only filter by role = STAFF or ADMIN
-    const filter = { role: { $in: ['ADMIN', 'STAFF'] } };
-
+    const EXCLUDED_PHONES = ["1", "2", "3"];
+    const filter = {
+      role: { $in: ["ADMIN", "STAFF"] },
+      phoneNumber: { $nin: EXCLUDED_PHONES }
+    };
     if (q) {
       filter.$or = [
         { name: { $regex: q, $options: 'i' } },
@@ -372,6 +395,18 @@ const removeById = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (req.user.role !== 'ADMIN') return res.status(403).json({ message: 'Forbidden' });
+
+    // ✅ Protect test/system users from deletion
+    const PROTECTED_PHONES = ["1", "2", "3"];
+
+    const target = await User.findById(id).select("phoneNumber").lean();
+    if (!target) return res.status(404).json({ message: "User not found" });
+
+    if (PROTECTED_PHONES.includes(String(target.phoneNumber))) {
+      return res.status(400).json({
+        message: "This user is protected (test/system user) and cannot be deleted.",
+      });
+    }
 
     const removed = await User.findByIdAndDelete(id).select('-password').lean();
     if (!removed) return res.status(404).json({ message: 'User not found' });

@@ -88,7 +88,7 @@ export default function LeadActionsDropdown({
     const onScroll = () => computePos();
     const onResize = () => computePos();
 
-    window.addEventListener("scroll", onScroll, true); 
+    window.addEventListener("scroll", onScroll, true);
     window.addEventListener("resize", onResize);
     return () => {
       window.removeEventListener("scroll", onScroll, true);
@@ -97,10 +97,10 @@ export default function LeadActionsDropdown({
   }, [open]);
 
   // Menu item helper
-  const Item = ({ children, onClick, disabled }) => (
+  const Item = ({ children, onClick, disabled, className }) => (
     <li
       role="menuitem"
-      className="dropdown-item"
+      className={`dropdown-item ${className || ""}`}
       tabIndex={disabled ? -1 : 0}
       onClick={() => {
         if (disabled) return;
@@ -143,7 +143,7 @@ export default function LeadActionsDropdown({
   const showClaim = isUnassigned && !isAdmin; // staff + unassigned
   const showTransfer = !isUnassigned || isAdmin; // assigned OR admin (even if unassigned)
 
-  const canDelete = true;
+  const canDelete = false;
 
   // You can swap this “⋯” for an icon button if you have one.
   return (
@@ -240,12 +240,12 @@ export default function LeadActionsDropdown({
             <FaEdit className="dropdown-icon" />
             Edit Details
           </Item> */}
-            {!canDelete && (
+            {canDelete && (
               <>
                 {lead?.archivedAt
                   ? onRestore && (
                       <Tooltip content="Restore lead">
-                        <Item onClick={onRestore}>
+                        <Item onClick={onRestore} className="restore-hover">
                           <FaArrowRotateLeft className="dropdown-icon" />
                           Restore Lead
                         </Item>
@@ -253,7 +253,7 @@ export default function LeadActionsDropdown({
                     )
                   : onArchive && (
                       <Tooltip content="Archive lead">
-                        <Item onClick={onArchive}>
+                        <Item onClick={onArchive} className="dlt-hover">
                           <FaTrash
                             className="dropdown-icon"
                             style={{ color: "red" }}
@@ -265,8 +265,12 @@ export default function LeadActionsDropdown({
               </>
             )}
 
-            {!canDelete && (
-              <Item onClick={onDelete} disabled={!canDelete}>
+            {canDelete && (
+              <Item
+                onClick={onDelete}
+                disabled={canDelete}
+                className="dlt-hover"
+              >
                 <FaTrash className="dropdown-icon" style={{ color: "red" }} />
                 Delete Lead
               </Item>

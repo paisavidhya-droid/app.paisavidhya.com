@@ -95,6 +95,8 @@
 .dropdown-item:focus {
   background: color-mix(in oklab, var(--pv-primary) 6%, transparent);
   outline: none;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .dropdown-icon {
@@ -155,6 +157,44 @@
 .btn-clear-x:hover {
   transform: rotate(90deg);
   color: #cc0000;
+}
+
+/* Restore (activate) hover */
+
+/* .restore-hover {
+  color: #065f46;
+} */
+.restore-hover:hover {
+  background: #d1fae5;   /* light green background */
+  color: #065f46;        /* dark green text */
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Make icon inherit color */
+.restore-hover .dropdown-icon {
+  color: inherit;
+}
+
+
+/* delete item baseline *//* red-ish text 
+.dlt-hover {
+  color: #b00020;              
+}*/
+
+/* hover state */
+.dlt-hover:hover {
+  background: #fee2e2; /* light red background */
+  color: #b91c1c;;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* ensure icon follows color */
+.dlt-hover .dropdown-icon {
+  color: inherit;
 }
 
 

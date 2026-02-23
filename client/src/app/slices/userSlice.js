@@ -1,7 +1,6 @@
 // src/store/userSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as userService from "../../services/userService";
-import toast from "react-hot-toast";
 
 /* =========================
    Thunks
@@ -59,14 +58,13 @@ export const fetchUserById = createAsyncThunk(
     }
   }
 );
-
+ 
 // Create user (admin)
 export const createUser = createAsyncThunk(
   "users/createUser",
   async (payload, { rejectWithValue, dispatch, getState }) => {
     try {
       const data = await userService.adminCreateUser(payload);
-      toast.success("User created");
       // refresh current list with existing filters/pagination
       const { users: { list } } = getState();
       dispatch(fetchUsers({
@@ -79,7 +77,6 @@ export const createUser = createAsyncThunk(
       return data;
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;
-      toast.error(msg);
       return rejectWithValue(msg);
     }
   }
@@ -91,7 +88,6 @@ export const updateUser = createAsyncThunk(
   async ({ id, patch }, { rejectWithValue, dispatch, getState }) => {
     try {
       const data = await userService.updateUserById(id, patch);
-      toast.success("User updated");
       // refresh list
       const { users: { list } } = getState();
       dispatch(fetchUsers({
@@ -104,7 +100,6 @@ export const updateUser = createAsyncThunk(
       return data;
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;
-      toast.error(msg);
       return rejectWithValue(msg);
     }
   }
@@ -116,7 +111,6 @@ export const deleteUser = createAsyncThunk(
   async (id, { rejectWithValue, dispatch, getState }) => {
     try {
       await userService.deleteUserById(id);
-      toast.success("User deleted");
       // refresh list
       const { users: { list } } = getState();
       dispatch(fetchUsers({
@@ -129,7 +123,6 @@ export const deleteUser = createAsyncThunk(
       return { id };
     } catch (err) {
       const msg = err?.response?.data?.message || err.message;
-      toast.error(msg);
       return rejectWithValue(msg);
     }
   }

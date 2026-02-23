@@ -1,7 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaEllipsisVertical } from "react-icons/fa6";
-import { FaEdit, FaUserSlash, FaUserCheck, FaTrash, FaEye } from "react-icons/fa";
-import { Portal, Tooltip } from "../../../components";
+import {
+  FaEdit,
+  FaUserSlash,
+  FaUserCheck,
+  FaTrash,
+  FaEye,
+} from "react-icons/fa";
+import { Portal, Tooltip } from "../../../../components";
 
 /**
  * UsersActionsDropdown
@@ -13,7 +19,7 @@ export default function UsersActionsDropdown({
   user,
   onEdit,
   onToggleStatus, // required for suspend/activate
-  onView, 
+  onView,
   onDelete,
 }) {
   const [open, setOpen] = useState(false);
@@ -53,7 +59,7 @@ export default function UsersActionsDropdown({
     if (!el) return;
 
     const r = el.getBoundingClientRect();
-     const menuWidth = 170;
+    const menuWidth = 160;
 
     let left = r.right - menuWidth;
     let top = r.bottom + 8;
@@ -77,10 +83,10 @@ export default function UsersActionsDropdown({
     };
   }, [open]);
 
-  const Item = ({ children, onClick, disabled, danger = false }) => (
+  const Item = ({ children, onClick, disabled, className }) => (
     <li
       role="menuitem"
-        className="dropdown-item"
+      className={`dropdown-item ${className || ""}`}
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled}
       onClick={() => {
@@ -97,7 +103,7 @@ export default function UsersActionsDropdown({
         }
       }}
       style={{
-       cursor: disabled ? "not-allowed" : "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
       }}
     >
@@ -107,11 +113,16 @@ export default function UsersActionsDropdown({
 
   const suspended = user?.status === "SUSPENDED";
   const toggleLabel = suspended ? "Activate user" : "Suspend user";
-  const toggleIcon = suspended ? <FaUserCheck className="dropdown-icon" /> : <FaUserSlash className="dropdown-icon" />;
+  const toggleIcon = suspended ? (
+    <FaUserCheck className="dropdown-icon" />
+  ) : (
+    <FaUserSlash className="dropdown-icon" />
+  );
 
+   const canDelete = false;
 
   return (
-       <div className="dropdown-container">
+    <div className="dropdown-container">
       <button
         ref={btnRef}
         className="dropdown-toggle"
@@ -130,7 +141,7 @@ export default function UsersActionsDropdown({
           <ul
             ref={menuRef}
             role="menu"
-             className="dropdown-menu"
+            className="dropdown-menu"
             style={{
               position: "fixed",
               top: pos.top,
@@ -156,16 +167,20 @@ export default function UsersActionsDropdown({
 
             {onToggleStatus && (
               <Tooltip content={toggleLabel}>
-                <Item onClick={() => onToggleStatus(user)} >
+                <Item
+                  onClick={() => onToggleStatus(user)}
+                  className={suspended ? "restore-hover" : "dlt-hover"}
+                >
                   {toggleIcon} {toggleLabel}
                 </Item>
               </Tooltip>
             )}
 
-            {onDelete && (
+            {canDelete && onDelete && (
               <Tooltip content="Delete user">
-                <Item onClick={() => onDelete(user)}  danger>
-                  <FaTrash className="dropdown-icon" /> Delete
+                <Item onClick={() => onDelete(user)} className="dlt-hover">
+                  <FaTrash className="dropdown-icon" style={{ color: "red" }} />{" "}
+                  Delete user
                 </Item>
               </Tooltip>
             )}

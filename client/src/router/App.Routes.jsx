@@ -35,7 +35,12 @@ const Profile = lazy(() => import("../pages/Profile/Profile"));
 const LeadsOps = lazy(() => import("../pages/Leads/LeadsOps"));
 const LeadDetails = lazy(() => import("../pages/Leads/LeadDetails"));
 const AdminAudit = lazy(() => import("../pages/Admin/AdminAudit"));
-const AdminUsers = lazy(() => import("../pages/Admin/UserManagement/UserManagement.jsx"));
+const AdminUsers = lazy(
+  () => import("../pages/Admin/UserManagement/UsersOps.jsx"),
+);
+const AdminUserDetails = lazy(
+  () => import("../pages/Admin/UserManagement/UserDetails.jsx"),
+);
 const ResetPassword = lazy(() => import("../pages/Auth/resetPassword"));
 
 // Error pages
@@ -119,6 +124,7 @@ export default function AppRoutes() {
             <Route index element={<AdminDashboard />} />
             <Route path="audit" element={<AdminAudit />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="users/:id" element={<AdminUserDetails />} />
             {/* Future admin pages 
             <Route path="billing" element={<div>Admin Billing (example)</div>} />
             <Route path="integrations" element={<div>Admin Integrations (example)</div>} />*/}

@@ -45,12 +45,13 @@ const userSchema = new mongoose.Schema({
   phoneOtpExpires: Date,
   phoneOtpAttempts: { type: Number, default: 0 },
 
-  // If you want email magic link:
-  emailVerifyVersion: { type: Number, default: 0 }, // token versioning (optional)
 
-  // lastLoginAt: Date,
-  // lastLoginIp: String,
-  // lastLoginUa: String,
+  emailVerifyVersion: { type: Number, default: 0 },
+
+  lastLoginAt: { type: Date, default: null },
+  lastLoginIp: { type: String, default: "" },
+  lastLoginUa: { type: String, default: "" },
+
   // failedLoginCount: { type: Number, default: 0 },
   // lastFailedAt: Date,
 

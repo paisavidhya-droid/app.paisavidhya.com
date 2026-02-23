@@ -25,15 +25,18 @@ export default function LeadsOps() {
     const params = new URLSearchParams(location.search);
     const shouldCreate = params.get("create") === "1";
     if (shouldCreate && !ops.createLeadOpen) {
-    ops.setCreateLeadOpen(true);
+      ops.setCreateLeadOpen(true);
 
-    // clean URL immediately so it does not re-trigger
-    params.delete("create");
-    navigate(
-      { pathname: location.pathname, search: params.toString() ? `?${params}` : "" },
-      { replace: true }
-    );
-  }
+      // clean URL immediately so it does not re-trigger
+      params.delete("create");
+      navigate(
+        {
+          pathname: location.pathname,
+          search: params.toString() ? `?${params}` : "",
+        },
+        { replace: true },
+      );
+    }
   }, [location.search, location.pathname, navigate, ops]);
 
   // assignable users for filter dropdown (safe to load on page mount)
@@ -54,13 +57,12 @@ export default function LeadsOps() {
 
   return (
     <div className="pv-container leads-page">
-<ModuleHeader
-      title="Leads"
-      subtitle="Callback requests and follow-ups."
-      
-      // backTo={false} // uncomment if you don't want Back button here
-    />
+      <ModuleHeader
+        title="Leads"
+        subtitle="Callback requests and follow-ups."
 
+        // backTo={false} // uncomment if you don't want Back button here
+      />
 
       <div style={{ marginBottom: 16 }}>
         <LeadsToolbar
@@ -95,7 +97,7 @@ export default function LeadsOps() {
           <div className="pv-empty">
             <div style={{ fontWeight: 800 }}>No leads found</div>
             <div className="pv-dim">
-              Try changing filters or clearing the phone.
+              Try changing filters or clearing the search.
             </div>
           </div>
         ) : (

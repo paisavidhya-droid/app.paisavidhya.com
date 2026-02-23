@@ -78,7 +78,7 @@ export default function ModuleHeader({
 
         <div className="mh-actions">
           {backTo !== false && (
-            <Button type="button" variant="ghost" onClick={onBack}>
+            <Button type="button" variant="ghost" onClick={onBack}style={{ padding: "12px" }}>
               <FaArrowLeft />
               {/* ←  */}
               Back
