@@ -1,6 +1,10 @@
 steps:
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    entrypoint: gcloud
+    dir: "server"
+    entrypoint: "gcloud"
     args: ["app", "deploy", "app.yaml", "--quiet"]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 timeout: "1200s"
