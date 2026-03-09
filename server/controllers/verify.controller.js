@@ -4,7 +4,7 @@ import { genOtp, hashOtp } from '../utils/auth/otp.js';
 import { sendOtpByPreference } from '../services/otpSender.js';
 
 export const sendPhoneOtp = async (req, res) => {
-    const userId = req.user?.id;               
+    const userId = req.user?._id;               
     const user = await User.findById(userId);
 
     if (!user || !user.phoneNumber) return res.status(400).json({ message: "Phone not found" });
@@ -26,7 +26,7 @@ export const sendPhoneOtp = async (req, res) => {
 
 export const verifyPhoneOtp = async (req, res) => {
     const { code } = req.body;
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
     if (!user || !user.phoneOtpHash) return res.status(400).json({ message: "Invalid or expired OTP" });
 
     if (user.phoneOtpExpires < Date.now()) {
@@ -66,7 +66,7 @@ import { buildVerifyEmailHTML, buildVerifyEmailText } from '../utils/auth/templa
 
 export const sendEmailVerifyLink = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
     if (!user || !user.email) return res.status(400).json({ message: "Email not found" });
 
     const expiresMinutes = 10;
@@ -155,7 +155,7 @@ export const verifyEmailToken = async (req, res) => {
 /*the below code is for mail sending with just link and plain text*/
 
 // export const sendEmailVerifyLink = async (req, res) => {
-//     const user = await User.findById(req.user.id);
+//     const user = await User.findById(req.user._id);
 //     if (!user || !user.email) return res.status(400).json({ message: "Email not found" });
 
 //     const token = jwt.sign(

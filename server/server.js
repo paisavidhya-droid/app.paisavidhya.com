@@ -1,5 +1,5 @@
 import express from "express";
-import 'dotenv/config';
+import "./config/env.js";
 import cors from "cors";
 import connectDb from "./db/conn.js";
 import errorMiddleware from './middlewares/errorMiddleware.js';
@@ -91,6 +91,7 @@ app.use(errorMiddleware);
 // Start the server
 connectDb().then(() => {
   app.listen(PORT, () => {
-    console.log(`----Server is running on port ${PORT}----`);
+    // console.log(`----Server is running on port ${PORT}----`);
+   console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`);
   });
 });

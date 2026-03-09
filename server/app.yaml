@@ -1,8 +1,9 @@
-runtime: nodejs20 
+# runtime: nodejs20 
+runtime: nodejs22
 
 env: standard  # Use the standard environment
 
-instance_class: F2  # Adjust based on your resource needs
+instance_class: F1  # Adjust based on your resource needs
 
 
 # Keep 1 warm instance in prod; set to 0 or 1 in staging depending on your need

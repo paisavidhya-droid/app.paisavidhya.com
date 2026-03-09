@@ -1,14 +1,19 @@
-
+// server\db\conn.js
 import mongoose from "mongoose";
 
 const connectDb = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI)
+        const uri = process.env.MONGODB_URI;
+
+        if (!uri) {
+            throw new Error("MONGODB_URI is missing");
+        }
+        await mongoose.connect(uri)
         console.log(`------ ✓ Connection Successful -------`);
 
     } catch (error) {
-        console.error("❌ Database Connection failed!",error);
-        process.exit(0);
+        console.error("❌ Database Connection failed!", error);
+        process.exit(1);
     }
 }
 

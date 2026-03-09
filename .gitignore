@@ -8,6 +8,12 @@ server/node_modules/
 client/.env
 server/.env
 
+client/.env.production
+client/.env.development
+
+server/.env.production
+server/.env.development
+
 # Build output
 dist/
 client/dist/
