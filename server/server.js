@@ -28,14 +28,27 @@ const PORT = process.env.PORT || 5000;
 // ✅ if behind Netlify/GAE/CDN and you use cookies/sessions
 app.set("trust proxy", 1);
 
+const allowedOrigins = [
+  process.env.APP_URL,
+  "http://localhost:5173",
+].filter(Boolean);
+
 const corsOptions = {
-  // origin: true, // reflects the request origin
-  // origin: process.env.FRONTEND_URL || "http://localhost:3000",
-  // origin: '*', 
-  credentials: true, // 🔥 required for cookies, auth headers
+  origin(origin, callback) {
+    // allow non-browser tools / curl / health checks
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true,
   optionsSuccessStatus: 204,
-  maxAge: 86400,             // ✅ cache preflight for 24 hours (in seconds)
+  maxAge: 86400,
 };
+
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
 
