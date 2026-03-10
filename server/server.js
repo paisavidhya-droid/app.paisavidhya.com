@@ -1,5 +1,5 @@
 import express from "express";
-import "./config/env.js";
+import { loadEnv } from "./config/env.js";
 import cors from "cors";
 import connectDb from "./db/conn.js";
 import errorMiddleware from './middlewares/errorMiddleware.js';
@@ -14,7 +14,7 @@ import orgRoutes from "./router/org.routes.js";
 import notifyRoutes from "./router/notify.routes.js";
 import adminRoutes from "./router/admin.routes.js";
 
-
+await loadEnv();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
