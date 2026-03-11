@@ -20,7 +20,7 @@ const app = express();
 async function startServer() {
   await loadEnv();
 
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 8080;
 
   app.set("trust proxy", 1);
 
