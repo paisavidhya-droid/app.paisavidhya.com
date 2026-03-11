@@ -23,6 +23,7 @@ handlers:
     # Put only non-secrets here; move to Secret Manager later
 env_variables:
   NODE_ENV: "production"
+  ENV_SECRET_NAME: backend-env
 
 
 

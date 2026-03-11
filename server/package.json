@@ -19,7 +19,7 @@
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.3.1",
     "expo-server-sdk": "^4.0.0",
     "express": "^5.1.0",
     "handlebars": "^4.7.8",

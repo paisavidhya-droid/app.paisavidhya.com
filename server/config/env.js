@@ -4,48 +4,74 @@
 
 // server/config/env.js
 
+// server/config/env.js
 import dotenv from "dotenv";
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
-const client = new SecretManagerServiceClient();
+function applyEnvString(envString) {
+  const lines = envString.split("\n");
 
-async function loadProdSecrets() {
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
 
-  const projectId = "paisavidhya-server";
+    if (!line || line.startsWith("#")) continue;
 
-  const [version] = await client.accessSecretVersion({
-    name: `projects/${projectId}/secrets/backend-env/versions/latest`,
-  });
+    const eqIndex = line.indexOf("=");
+    if (eqIndex === -1) continue;
 
-  const secretPayload = version.payload.data.toString("utf8");
+    const key = line.slice(0, eqIndex).trim();
+    let value = line.slice(eqIndex + 1).trim();
 
-  const parsed = dotenv.parse(secretPayload);
+    // remove wrapping quotes if present
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
 
-  for (const [key, value] of Object.entries(parsed)) {
     process.env[key] = value;
   }
-
-  console.log("✓ Production secrets loaded from Secret Manager");
-}
-
-function loadLocalEnv() {
-
-  dotenv.config({
-    path: ".env.development",
-    quiet: true,
-  });
-
-  console.log("✓ Local env loaded from .env.development");
 }
 
 export async function loadEnv() {
+  const isProduction =
+    process.env.NODE_ENV === "production" || process.env.GAE_ENV;
 
-  if (process.env.NODE_ENV === "production") {
-    await loadProdSecrets();
-  } else {
-    loadLocalEnv();
+  if (!isProduction) {
+    dotenv.config({
+      path:
+        process.env.NODE_ENV === "production"
+          ? ".env.production"
+          : ".env.development",
+    });
+    console.log("Loaded local env file");
+    return;
   }
 
+  const secretName = process.env.ENV_SECRET_NAME || "backend-env";
+  const projectId =
+    process.env.GOOGLE_CLOUD_PROJECT || process.env.GCLOUD_PROJECT;
+
+  if (!projectId) {
+    throw new Error("GOOGLE_CLOUD_PROJECT is missing");
+  }
+
+  const client = new SecretManagerServiceClient();
+
+  const [version] = await client.accessSecretVersion({
+    name: `projects/${projectId}/secrets/${secretName}/versions/latest`,
+  });
+
+  const payload = version.payload?.data?.toString();
+
+  if (!payload) {
+    throw new Error(`Secret ${secretName} has empty payload`);
+  }
+
+  applyEnvString(payload);
+
+  console.log(`Loaded env vars from Secret Manager: ${secretName}`);
 }
 
 
