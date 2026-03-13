@@ -77,7 +77,8 @@ export async function loadEnv() {
 
 
 
-
+// the below is old working code can be used it was changed bcz on g cloud the
+// env vars loading was required so the above new version is created. If server is not on gcp then the below version can be used
 
 // import dotenv from "dotenv";
 
