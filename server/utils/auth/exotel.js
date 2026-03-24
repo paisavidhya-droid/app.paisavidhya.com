@@ -55,6 +55,9 @@ async function sendSmsOtp(toE164, otp) {
       // ...(EXOTEL_SMS_TEMPLATE_ID ? { TemplateId: EXOTEL_SMS_TEMPLATE_ID } : {}),
     };
 
+    console.log(payload);
+    
+
     const url = `https://api.exotel.com/v1/Accounts/${EXOTEL_ACCOUNT_SID}/Sms/send.json`;
     // const { data } = await http.post(url, payload);
 
