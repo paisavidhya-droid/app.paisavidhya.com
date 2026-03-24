@@ -29,7 +29,7 @@ export const createOrg = async (req, res, next) => {
       name,
       slug,
       // shortCode: generated later via dedicated endpoint
-      createdBy: req.user.id,
+      createdBy: req.user._id,
     });
 
     res.status(201).json(org);

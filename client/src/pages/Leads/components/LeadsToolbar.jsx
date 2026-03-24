@@ -27,6 +27,7 @@ export default function LeadsToolbar({
   // create
   onCreate,
 }) {
+  const canDelete = import.meta.env.VITE_DLT_OPS === "1" || false;
   return (
     <div className="pv-col" style={{ gap: 12 }}>
       <LeadFilters
@@ -81,10 +82,15 @@ export default function LeadsToolbar({
                 </Button>
               )}
 
-              {/* <Button variant="danger" onClick={() => onBulkDelete(bulkDeleteIds)}>
-                <FaTrashAlt style={{ color: "white" }} />
-                Delete ({bulkDeleteIds.length}) ⚠
-              </Button> */}
+              {canDelete && (
+                <Button
+                  variant="danger"
+                  onClick={() => onBulkDelete(bulkDeleteIds)}
+                >
+                  <FaTrashAlt style={{ color: "white" }} />
+                  Delete ({bulkDeleteIds.length}) ⚠
+                </Button>
+              )}
 
               <Button onClick={() => onBulkTransfer(bulkTransferIds)}>
                 <FaExchangeAlt />

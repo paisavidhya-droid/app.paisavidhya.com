@@ -19,6 +19,7 @@ import {
   adminUpdateProfileByUserId,
 } from "../../../services/profileService";
 import toast from "react-hot-toast";
+import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 
 /* ---------- small helpers (same vibe as LeadDetails) ---------- */
 
@@ -254,7 +255,11 @@ export default function UserDetails() {
           gap: 12,
         }}
       >
-        <Button variant="ghost" onClick={() => navigate(-1)} style={{ padding: "12px" }}>
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          style={{ padding: "12px" }}
+        >
           <FaArrowLeft /> Back
         </Button>
 
@@ -424,8 +429,42 @@ export default function UserDetails() {
                   <span className="pv-dim">—</span>
                 )}
               </Row>
-              <Row label="Certificate ID">
+              {/* <Row label="Certificate ID">
                 {user?.pledge?.certificateId || "—"}
+              </Row> */}
+              <Row label="Certificate ID">
+                {user?.pledge?.certificateId ? (
+                  <div
+                    className="pv-row"
+                    style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}
+                  >
+                    <span>{user.pledge.certificateId}</span>
+
+                    <CopyButton
+                      value={user.pledge.certificateId}
+                      label="certificate id"
+                      size={14}
+                      successMessage="Certificate ID copied"
+                    />
+
+                    <Button
+                      variant="ghost"
+                      onClick={() =>
+                        window.open(
+                          `https://paisavidhya-server.el.r.appspot.com/api/certificates/${encodeURIComponent(
+                            user.pledge.certificateId,
+                          )}/pdf`,
+                          "_blank",
+                          "noopener,noreferrer",
+                        )
+                      }
+                    >
+                      View <FaArrowUpRightFromSquare />
+                    </Button>
+                  </div>
+                ) : (
+                  "—"
+                )}
               </Row>
               <Row label="Org (ref)">{user?.pledge?.org || "—"}</Row>
             </div>

@@ -26,6 +26,7 @@ export default function UsersToolbar({
 
   onCreate,
 }) {
+  const canDelete = import.meta.env.VITE_DLT_OPS === "1" || false;
   return (
     <div className="pv-col" style={{ gap: 12 }}>
       <UserFilters
@@ -82,15 +83,16 @@ export default function UsersToolbar({
                   Activate ({bulkActivateIds.length})
                 </Button>
               )}
-              {/* {bulkDeleteIds.length > 0 && (
+              {canDelete &&<> {bulkDeleteIds.length > 0 && (
                 <Button
                   onClick={() => onBulkDelete(bulkDeleteIds)}
                   className="dlt-hover"
+                  variant="danger"
                 >
                   <FaTrashAlt />
                   Delete ({bulkDeleteIds.length}) ⚠
                 </Button>
-              )} */}
+              )} </>}
             </div>
           ) : (
             <Button

@@ -119,7 +119,7 @@ export default function UsersActionsDropdown({
     <FaUserSlash className="dropdown-icon" />
   );
 
-   const canDelete = false;
+  const canDelete = import.meta.env.VITE_DLT_OPS === "1" || false;
 
   return (
     <div className="dropdown-container">

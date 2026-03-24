@@ -8,6 +8,7 @@ import {
   SearchNSelect,
   ActiveFilterPill,
 } from "../../../components";
+import DateRangeField from "../../../components/ui/filters/DateRangeField";
 
 const LEAD_INTERESTS = ["MutualFunds", "Insurance", "FinancialPlanning"];
 
@@ -145,6 +146,8 @@ export default function LeadFilters({
           <option value="followup">Follow-up due</option>
           <option value="activity">Recent activity</option>
         </Select>
+        <DateRangeField label="Created on" />
+        <DateRangeField label="Follow-up on" />
 
         {/* {(filters.status ||
           filters.assignedTo ||

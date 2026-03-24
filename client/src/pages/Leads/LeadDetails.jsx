@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Card, Button, Badge, Spinner, Tooltip, Modal, Alert, CopyButton } from "../../components";
+import {
+  Card,
+  Button,
+  Badge,
+  Spinner,
+  Tooltip,
+  Modal,
+  Alert,
+  CopyButton,
+} from "../../components";
 import StatusBadge from "../../components/ui/StatusBadge";
 import OutreachEditor from "./components/OutreachEditor";
 import { FaArrowLeft, FaPhoneAlt, FaEnvelope, FaRegCopy } from "react-icons/fa";
@@ -31,7 +40,15 @@ function RelTime({ date }) {
   const diff = d.getTime() - now.getTime();
   const days = Math.round(diff / (1000 * 60 * 60 * 24));
   const label =
-    days === 0 ? "Today" : days === 1 ? "Tomorrow" : days === -1 ? "Yesterday" : days > 1 ? `In ${days} days` : `${Math.abs(days)} days ago`;
+    days === 0
+      ? "Today"
+      : days === 1
+        ? "Tomorrow"
+        : days === -1
+          ? "Yesterday"
+          : days > 1
+            ? `In ${days} days`
+            : `${Math.abs(days)} days ago`;
 
   const dim = diff < 0 ? "var(--pv-danger, #d33)" : "var(--pv-dim)";
   return (
@@ -57,7 +74,9 @@ export default function LeadDetails() {
       const data = await getLeadById(id);
       setLead(data);
     } catch (e) {
-      setErr(e?.response?.data?.message || e?.message || "Failed to load lead.");
+      setErr(
+        e?.response?.data?.message || e?.message || "Failed to load lead.",
+      );
     } finally {
       setLoading(false);
     }
@@ -93,14 +112,24 @@ export default function LeadDetails() {
         </Button>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 900, fontSize: 18 }} className="pv-ellipsis">
+          <div
+            style={{ fontWeight: 900, fontSize: 18 }}
+            className="pv-ellipsis"
+          >
             {headerTitle}
           </div>
 
-          <div className="pv-row" style={{ gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+          <div
+            className="pv-row"
+            style={{ gap: 8, flexWrap: "wrap", marginTop: 6 }}
+          >
             <Badge>{lead?.source || "—"}</Badge>
             <StatusBadge status={lead?.outreach?.status || "New"} />
-            {lead?.consent ? <Badge>Consent: Yes</Badge> : <Badge variant="danger">Consent: No</Badge>}
+            {lead?.consent ? (
+              <Badge>Consent: Yes</Badge>
+            ) : (
+              <Badge variant="danger">Consent: No</Badge>
+            )}
 
             {assignedName ? (
               <Tooltip content={assignedEmail || assignedName}>
@@ -117,13 +146,19 @@ export default function LeadDetails() {
         {lead ? (
           <div className="pv-row" style={{ gap: 8 }}>
             {lead.phone ? (
-              <Button variant="ghost" onClick={() => window.open(`tel:${lead.phone}`)}>
+              <Button
+                variant="ghost"
+                onClick={() => window.open(`tel:${lead.phone}`)}
+              >
                 <FaPhoneAlt /> Call
               </Button>
             ) : null}
 
             {lead.email ? (
-              <Button variant="ghost" onClick={() => window.open(`mailto:${lead.email}`)}>
+              <Button
+                variant="ghost"
+                onClick={() => window.open(`mailto:${lead.email}`)}
+              >
                 <FaEnvelope /> Email
               </Button>
             ) : null}
@@ -135,7 +170,10 @@ export default function LeadDetails() {
 
       {loading && (
         <Card>
-          <div className="pv-row" style={{ justifyContent: "center", padding: 24 }}>
+          <div
+            className="pv-row"
+            style={{ justifyContent: "center", padding: 24 }}
+          >
             <Spinner size={28} />
           </div>
         </Card>
@@ -156,9 +194,17 @@ export default function LeadDetails() {
 
               <Row label="Phone">
                 {lead.phone ? (
-                  <div className="pv-row" style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <div
+                    className="pv-row"
+                    style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}
+                  >
                     <span className="pv-mono">{lead.phone}</span>
-                    <CopyButton value={lead.phone} label="phone" size={14} successMessage="Phone copied" />
+                    <CopyButton
+                      value={lead.phone}
+                      label="phone"
+                      size={14}
+                      successMessage="Phone copied"
+                    />
                   </div>
                 ) : (
                   "—"
@@ -167,9 +213,17 @@ export default function LeadDetails() {
 
               <Row label="Email">
                 {lead.email ? (
-                  <div className="pv-row" style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <div
+                    className="pv-row"
+                    style={{ gap: 8, alignItems: "center", flexWrap: "wrap" }}
+                  >
                     <span>{lead.email}</span>
-                    <CopyButton value={lead.email} label="email" size={14} successMessage="Email copied" />
+                    <CopyButton
+                      value={lead.email}
+                      label="email"
+                      size={14}
+                      successMessage="Email copied"
+                    />
                   </div>
                 ) : (
                   "—"
@@ -187,9 +241,17 @@ export default function LeadDetails() {
               </Row>
 
               <Row label="Lead ID">
-                <div className="pv-row" style={{ gap: 8, alignItems: "center" }}>
+                <div
+                  className="pv-row"
+                  style={{ gap: 8, alignItems: "center" }}
+                >
                   <span className="pv-mono">{lead._id}</span>
-                  <CopyButton value={lead._id} label="lead id" size={14} successMessage="Lead ID copied" />
+                  <CopyButton
+                    value={lead._id}
+                    label="lead id"
+                    size={14}
+                    successMessage="Lead ID copied"
+                  />
                 </div>
               </Row>
             </div>
@@ -219,7 +281,7 @@ export default function LeadDetails() {
           {/* Segmentation */}
           <Card title="Segmentation">
             <div className="pv-col" style={{ gap: 10 }}>
-              <Row label="Interests">
+              {/* <Row label="Interests">
                 {lead.interests?.length ? (
                   <div className="pv-row" style={{ gap: 8, flexWrap: "wrap" }}>
                     {lead.interests.map((x) => (
@@ -229,6 +291,9 @@ export default function LeadDetails() {
                 ) : (
                   "—"
                 )}
+              </Row> */}
+              <Row label="Interests">
+                {lead.interests ? <Badge>{lead.interests}</Badge> : "—"}
               </Row>
 
               <Row label="Tags">
@@ -259,7 +324,16 @@ export default function LeadDetails() {
             <div className="pv-col" style={{ gap: 10 }}>
               {lead.notes?.length ? (
                 lead.notes.map((n) => (
-                  <div key={n._id} className="pv-col" style={{ gap: 4, padding: 10, border: "1px solid var(--pv-border)", borderRadius: 10 }}>
+                  <div
+                    key={n._id}
+                    className="pv-col"
+                    style={{
+                      gap: 4,
+                      padding: 10,
+                      border: "1px solid var(--pv-border)",
+                      borderRadius: 10,
+                    }}
+                  >
                     <div style={{ whiteSpace: "pre-wrap" }}>{n.body}</div>
                     <div className="pv-dim" style={{ fontSize: 12 }}>
                       {n.at ? new Date(n.at).toLocaleString() : ""}
@@ -277,7 +351,9 @@ export default function LeadDetails() {
             <div className="pv-col" style={{ gap: 10 }}>
               <Row label="UTM Source">{lead.context?.utm?.source || "—"}</Row>
               <Row label="UTM Medium">{lead.context?.utm?.medium || "—"}</Row>
-              <Row label="UTM Campaign">{lead.context?.utm?.campaign || "—"}</Row>
+              <Row label="UTM Campaign">
+                {lead.context?.utm?.campaign || "—"}
+              </Row>
               <Row label="Page URL">{lead.context?.page?.url || "—"}</Row>
               <Row label="Referrer">{lead.context?.page?.referrer || "—"}</Row>
             </div>
@@ -286,15 +362,29 @@ export default function LeadDetails() {
           {/* System */}
           <Card title="System">
             <div className="pv-col" style={{ gap: 10 }}>
-              <Row label="Created At">{lead.createdAt ? new Date(lead.createdAt).toLocaleString() : "—"}</Row>
-              <Row label="Updated At">{lead.updatedAt ? new Date(lead.updatedAt).toLocaleString() : "—"}</Row>
+              <Row label="Created At">
+                {lead.createdAt
+                  ? new Date(lead.createdAt).toLocaleString()
+                  : "—"}
+              </Row>
+              <Row label="Updated At">
+                {lead.updatedAt
+                  ? new Date(lead.updatedAt).toLocaleString()
+                  : "—"}
+              </Row>
 
               {lead.archivedAt && (
                 <>
-                  <Row label="Archived At">{new Date(lead.archivedAt).toLocaleString()}</Row>
+                  <Row label="Archived At">
+                    {new Date(lead.archivedAt).toLocaleString()}
+                  </Row>
                   <Row label="Archived By">
                     {lead.archivedBy?.name ? (
-                      <Tooltip content={lead.archivedBy?.email || lead.archivedBy?.name}>
+                      <Tooltip
+                        content={
+                          lead.archivedBy?.email || lead.archivedBy?.name
+                        }
+                      >
                         <Badge>{lead.archivedBy.name}</Badge>
                       </Tooltip>
                     ) : (
@@ -309,7 +399,12 @@ export default function LeadDetails() {
       )}
 
       {/* Update Modal */}
-      <Modal isOpen={editOpen} onClose={() => setEditOpen(false)} title={`Update Outreach – ${lead?.name || ""}`} footer={null}>
+      <Modal
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={`Update Outreach – ${lead?.name || ""}`}
+        footer={null}
+      >
         {lead && (
           <OutreachEditor
             lead={lead}

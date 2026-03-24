@@ -1,6 +1,7 @@
 // src/pages/admin/users/components/UserFilters.jsx
 import { Card, Input, Select, Button } from "../../../../components";
 import { FaEraser } from "react-icons/fa";
+import DateRangeField from "../../../../components/ui/filters/DateRangeField";
 
 const ROLES = ["", "ADMIN", "STAFF", "CUSTOMER"];
 const STATUS = ["", "ACTIVE", "SUSPENDED"];
@@ -36,6 +37,16 @@ export default function UserFilters({ filters, setFilter, onClear }) {
             </option>
           ))}
         </Select>
+
+        <DateRangeField
+          label="Registration Date"
+          from={filters.from}
+          to={filters.to}
+          onChange={({ from, to }) => {
+            setFilter("from", from);
+            setFilter("to", to);
+          }}
+        />
 
         <div className="pv-col">
           <div style={{ opacity: "0" }}>.</div>

@@ -6,12 +6,13 @@ import { NavLink } from "react-router-dom";
 import { AvatarMenu } from "./AvatarMenu";
 import { useAuth } from "../hooks/useAuth";
 import { useDeviceSize } from "../context/DeviceSizeContext";
+import EnvBanner from "../components/common/EnvBanner";
 
 // export default function Navbar({ onOpenMobileSidebar, rightSlot }) {
 //   const [active, setActive] = useState("dashboard");
 
 export default function Navbar({ onOpenMobileSidebar }) {
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, isAdmin } = useAuth();
   const { isMobile } = useDeviceSize();
 
   return (
@@ -65,6 +66,8 @@ export default function Navbar({ onOpenMobileSidebar }) {
           ))}
         </div>
       )}
+
+      {isAdmin && !isMobile && <EnvBanner/>}
 
       {/* right: search + actions */}
       <div className="navbar__actions">

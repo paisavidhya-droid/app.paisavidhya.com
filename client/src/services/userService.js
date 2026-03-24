@@ -15,8 +15,8 @@ export const adminCreateUser = async (payload) => {
 /**
  * GET /api/users  (admin) – optional filters: ?role=STAFF&q=abc
  */
-export const getAllUsers = async ({ q = "", role = "", status = "", limit = 10, skip = 0 } = {}) => {
-  const params = { q, role, status, limit, skip };
+export const getAllUsers = async ({ q = "", role = "", status = "", from = "", to = "", limit = 10, skip = 0 } = {}) => {
+  const params = { q, role, status, from, to, limit, skip };
   const { data } = await axiosInstance.get(BASE, { params });
   return data; // { items, total, limit, skip }
 };

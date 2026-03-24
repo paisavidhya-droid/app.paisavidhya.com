@@ -30,6 +30,8 @@ export function useUsersOps({ limit = 10 } = {}) {
     q: list.filters.q || "",
     role: (list.filters.role || "").toUpperCase(),   // ADMIN/STAFF/CUSTOMER
     status: (list.filters.status || "").toUpperCase(), // ACTIVE/SUSPENDED
+    from: list.filters.from || "",
+    to: list.filters.to || "",
   });
 
   // derived paging from skip/limit (1-based UI page)
@@ -55,6 +57,8 @@ export function useUsersOps({ limit = 10 } = {}) {
         q: list.filters.q,
         role: list.filters.role,
         status: list.filters.status,
+        from: list.filters.from,
+        to: list.filters.to,
         limit: list.limit || limit,
         skip: list.skip || 0,
       }),
@@ -79,7 +83,7 @@ export function useUsersOps({ limit = 10 } = {}) {
 
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.q, filters.role, filters.status]);
+  }, [filters.q, filters.role, filters.status, filters.from, filters.to]);
 
   const setFilter = (key, value) => {
     setFilters((prev) => ({
@@ -88,7 +92,7 @@ export function useUsersOps({ limit = 10 } = {}) {
     }));
   };
 
-  const clearFilters = () => setFilters({ q: "", role: "", status: "" });
+  const clearFilters = () => setFilters({ q: "", role: "", status: "", from: "", to: "" });
 
   // ---- Selection ----
   const selectedCount = selectedIds.length;
@@ -145,6 +149,8 @@ export function useUsersOps({ limit = 10 } = {}) {
         q: list.filters.q,
         role: list.filters.role,
         status: list.filters.status,
+        from: list.filters.from,
+        to: list.filters.to,
         limit: lim,
         skip,
       }),
@@ -195,28 +201,28 @@ export function useUsersOps({ limit = 10 } = {}) {
   };
 
   const bulkDelete = async (ids) => {
-  if (!ids?.length) return;
+    if (!ids?.length) return;
 
-  const result = await Swal.fire({
-    title: `Delete ${ids.length} user(s)?`,
-    text: "This cannot be undone.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    confirmButtonText: "Yes, delete",
-  });
+    const result = await Swal.fire({
+      title: `Delete ${ids.length} user(s)?`,
+      text: "This cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Yes, delete",
+    });
 
-  if (!result.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-  try {
-    await Promise.all(ids.map((id) => dispatch(deleteUser(id)).unwrap()));
-    toast.success(`Deleted ${ids.length} user(s)`);
-    clearSelection();
-    refresh();
-  } catch (e) {
-    toast.error(String(e));
-  }
-};
+    try {
+      await Promise.all(ids.map((id) => dispatch(deleteUser(id)).unwrap()));
+      toast.success(`Deleted ${ids.length} user(s)`);
+      clearSelection();
+      refresh();
+    } catch (e) {
+      toast.error(String(e));
+    }
+  };
 
   const bulkSuspend = async (ids) => {
     if (!ids?.length) return;

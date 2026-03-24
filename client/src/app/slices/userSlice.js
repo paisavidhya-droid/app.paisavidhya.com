@@ -58,7 +58,7 @@ export const fetchUserById = createAsyncThunk(
     }
   }
 );
- 
+
 // Create user (admin)
 export const createUser = createAsyncThunk(
   "users/createUser",
@@ -71,6 +71,8 @@ export const createUser = createAsyncThunk(
         q: list.filters.q,
         role: list.filters.role,
         status: list.filters.status,
+        from: list.filters.from,
+        to: list.filters.to,
         limit: list.limit,
         skip: list.skip,
       }));
@@ -94,6 +96,8 @@ export const updateUser = createAsyncThunk(
         q: list.filters.q,
         role: list.filters.role,
         status: list.filters.status,
+        from: list.filters.from,
+        to: list.filters.to,
         limit: list.limit,
         skip: list.skip,
       }));
@@ -117,6 +121,8 @@ export const deleteUser = createAsyncThunk(
         q: list.filters.q,
         role: list.filters.role,
         status: list.filters.status,
+        from: list.filters.from,
+        to: list.filters.to,
         limit: list.limit,
         skip: list.skip,
       }));
@@ -140,7 +146,7 @@ const initialState = {
     total: 0,
     limit: 10,
     skip: 0,
-    filters: { q: "", role: "", status: "" },
+    filters: { q: "", role: "", status: "", from: "", to: "" },
     loading: false,
     error: null,
   },
@@ -181,6 +187,8 @@ const usersSlice = createSlice({
         q: payload?.q ?? state.list.filters.q,
         role: payload?.role ?? state.list.filters.role,
         status: payload?.status ?? state.list.filters.status,
+        from: payload?.from ?? state.list.filters.from,
+        to: payload?.to ?? state.list.filters.to,
       };
     },
     setUserListPage(state, { payload }) {
@@ -265,15 +273,15 @@ const usersSlice = createSlice({
       })
 
       /* --- create/update/delete just toggle loading via thunks if needed --- */
-    //   .addCase(createUser.pending, (state) => { /* optional: spinner in forms */ })
+      //   .addCase(createUser.pending, (state) => { /* optional: spinner in forms */ })
       .addCase(createUser.rejected, (state, { payload }) => {
         state.list.error = payload || "Failed to create user";
       })
-    //   .addCase(updateUser.pending, (state) => { /* optional */ })
+      //   .addCase(updateUser.pending, (state) => { /* optional */ })
       .addCase(updateUser.rejected, (state, { payload }) => {
         state.list.error = payload || "Failed to update user";
       })
-    //   .addCase(deleteUser.pending, (state) => { /* optional */ })
+      //   .addCase(deleteUser.pending, (state) => { /* optional */ })
       .addCase(deleteUser.rejected, (state, { payload }) => {
         state.list.error = payload || "Failed to delete user";
       });

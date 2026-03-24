@@ -33,6 +33,7 @@ import toast from "react-hot-toast";
 import { formatDisplayDate } from "../../utils/dateUtils";
 import { downloadAuditCsv } from "../../services/auditService";
 import ModuleHeader from "../../components/ui/moduleHeader/ModuleHeader";
+import DateRangeField from "../../components/ui/filters/DateRangeField";
 
 const ACTIONS = [
   "LOGIN_SUCCESS",
@@ -298,21 +299,13 @@ export default function AdminAudit() {
               dispatch(setFilter({ key: "userId", value: e.target.value }))
             }
           />
-          <label style={{ fontSize: 12, color: "var(--pv-dim)" }}>From</label>
-          <Input
-            type="date"
-            value={filters.from}
-            onChange={(e) =>
-              dispatch(setFilter({ key: "from", value: e.target.value }))
-            }
-          />
-          <label style={{ fontSize: 12, color: "var(--pv-dim)" }}>To</label>
-          <Input
-            type="date"
-            value={filters.to}
-            onChange={(e) =>
-              dispatch(setFilter({ key: "to", value: e.target.value }))
-            }
+          <DateRangeField
+            from={filters.from}
+            to={filters.to}
+            onChange={({ from, to }) => {
+              dispatch(setFilter({ key: "from", value: from }));
+              dispatch(setFilter({ key: "to", value: to }));
+            }}
           />
           <Select
             value={limit}
@@ -570,6 +563,7 @@ export default function AdminAudit() {
               RBAC enforced · PII masked in logs · Export with care
             </div>
           </Col>
+
           <Badge>Privacy-first</Badge>
         </Row>
       </Card>

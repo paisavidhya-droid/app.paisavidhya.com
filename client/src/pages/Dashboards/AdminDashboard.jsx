@@ -21,6 +21,7 @@ import Sparkline from "./components/Sparkline";
 import { FaArrowRotateRight } from "react-icons/fa6";
 import "./dashboard.css";
 import { useHealth } from "../../hooks/useHealth";
+import EnvBanner from "../../components/common/EnvBanner";
 
 const features = {
   // billing: true,
@@ -163,6 +164,7 @@ export default function AdminDashboard() {
           </>
         ) : (
           <>
+          
             <StatCard
               label="Total users"
               value={summary?.orgUsers ?? 0}
@@ -422,6 +424,20 @@ export default function AdminDashboard() {
               </div>
 
               <div className="pv-card" style={{ padding: 12 }}>
+                <div
+                  className="pv-row"
+                  style={{ justifyContent: "space-between" }}
+                >
+                  <span>Backend Env</span>
+                  <Badge>{health.data?.nodeEnv ?? "-"}</Badge>
+                </div>
+                <div
+                  className="pv-row"
+                  style={{ justifyContent: "space-between" }}
+                >
+                  <span>Env Loaded</span>
+                  <Badge>{health.data?.envLoaded ? "Yes" : "No"}</Badge>
+                </div>
                 <div
                   className="pv-row"
                   style={{ justifyContent: "space-between" }}

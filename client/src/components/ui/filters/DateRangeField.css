@@ -1,0 +1,396 @@
+/* ── DateRangeField.css ──────────────────────────────────────────────────── */
+
+/* label */
+.drf-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pv-dim);
+  margin-bottom: 7px;
+}
+
+/* ── trigger button ──────────────────────────────────────────────────────── */
+.drf-trigger {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px;
+  background: var(--pv-input-bg);
+  border: 1.5px solid var(--pv-input-border);
+  border-radius: var(--pv-radius);
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--pv-input-ink);
+  transition: border-color var(--pv-fast), box-shadow var(--pv-fast), background var(--pv-fast);
+  /* box-shadow: var(--pv-shadow); */
+  outline: none;
+}
+
+.drf-trigger:hover {
+  border-color: var(--pv-primary);
+  box-shadow: var(--pv-focus);
+}
+
+.drf-trigger--open {
+  border-color: var(--pv-primary) !important;
+  box-shadow: var(--pv-focus) !important;
+}
+
+.drf-trigger-icon {
+  color: var(--pv-primary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.drf-trigger-text {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.drf-trigger-text--placeholder {
+  color: var(--pv-input-placeholder);
+  font-weight: 400;
+}
+
+.drf-chevron {
+  flex-shrink: 0;
+  color: var(--pv-dim);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.drf-chevron--up {
+  transform: rotate(180deg);
+}
+
+/* clear × badge on trigger */
+.drf-clear-x {
+  position: absolute;
+  right: 30px;
+  top: 48%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pv-border);
+  color: var(--pv-dim);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--pv-fast), color var(--pv-fast);
+  z-index: 2;
+  margin-top: 12px; /* offset for label above */
+}
+
+.drf-clear-x:hover {
+  background: color-mix(in oklab, var(--pv-danger) 12%, var(--pv-surface));
+  color: var(--pv-danger);
+}
+
+/* ── dropdown panel ──────────────────────────────────────────────────────── */
+.drf-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 200;
+  width: 324px;
+  background: var(--pv-card);
+  border: 1.5px solid var(--pv-border);
+  border-radius: calc(var(--pv-radius) * 2.5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16), 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: drfSlideIn 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes drfSlideIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── preset chips ────────────────────────────────────────────────────────── */
+.drf-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 14px 0;
+}
+
+.drf-preset {
+  height: 28px;
+  padding: 0 11px;
+  border-radius: var(--pv-radius);
+  border: 1.5px solid var(--pv-border);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pv-dim);
+  cursor: pointer;
+  transition: border-color var(--pv-fast), color var(--pv-fast), background var(--pv-fast);
+  white-space: nowrap;
+}
+
+.drf-preset:hover {
+  border-color: var(--pv-primary);
+  color: var(--pv-primary);
+  background: color-mix(in oklab, var(--pv-primary) 6%, var(--pv-card));
+}
+
+.drf-preset--active {
+  border-color: var(--pv-primary);
+  background: var(--pv-primary);
+  color: var(--pv-primary-ink) !important;
+}
+
+/* ── calendar ────────────────────────────────────────────────────────────── */
+.drf-cal {
+  padding: 14px 14px 10px;
+}
+
+.drf-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.drf-cal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pv-text);
+}
+
+.drf-nav {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--pv-radius);
+  border: 1.5px solid var(--pv-border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pv-dim);
+  transition: border-color var(--pv-fast), color var(--pv-fast), background var(--pv-fast);
+}
+
+.drf-nav:hover {
+  border-color: var(--pv-primary);
+  color: var(--pv-primary);
+  background: color-mix(in oklab, var(--pv-primary) 6%, var(--pv-card));
+}
+
+/* grid */
+.drf-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.drf-day-label {
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--pv-dim);
+  padding: 4px 0 8px;
+  text-transform: uppercase;
+}
+
+/* day cell */
+.drf-day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+}
+
+.drf-day-inner {
+  width: 33px;
+  height: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--pv-text);
+  border-radius: var(--pv-radius);
+  transition: background var(--pv-fast), color var(--pv-fast), transform 0.1s;
+  position: relative;
+  z-index: 1;
+}
+
+.drf-day:hover .drf-day-inner {
+  background: color-mix(in oklab, var(--pv-primary) 10%, var(--pv-card));
+  color: var(--pv-primary);
+  transform: scale(1.06);
+}
+
+/* today dot */
+.drf-day--today .drf-day-inner::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--pv-primary);
+}
+
+/* selected (start / end) */
+.drf-day--selected .drf-day-inner {
+  background: var(--pv-primary);
+  color: var(--pv-primary-ink) !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--pv-primary) 40%, transparent);
+}
+
+.drf-day--selected:hover .drf-day-inner {
+  background: var(--pv-primary);
+  transform: scale(1.08);
+}
+
+/* range band */
+.drf-day--range {
+  background: color-mix(in oklab, var(--pv-primary) 10%, var(--pv-card));
+  border-radius: 0;
+}
+
+.drf-day--range .drf-day-inner {
+  color: var(--pv-primary);
+  font-weight: 600;
+}
+
+/* half-pills at range edges */
+.drf-day--start {
+  background: linear-gradient(
+    to right,
+    transparent 50%,
+    color-mix(in oklab, var(--pv-primary) 10%, var(--pv-card)) 50%
+  );
+}
+
+.drf-day--end {
+  background: linear-gradient(
+    to left,
+    transparent 50%,
+    color-mix(in oklab, var(--pv-primary) 10%, var(--pv-card)) 50%
+  );
+}
+
+.drf-day--start.drf-day--end {
+  background: transparent;
+}
+
+/* ── footer ──────────────────────────────────────────────────────────────── */
+.drf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--pv-border);
+  gap: 10px;
+}
+
+.drf-selected-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.drf-pill {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pv-badge-ink);
+  background: var(--pv-badge-bg);
+  border: 1px solid var(--pv-badge-border);
+  border-radius: var(--pv-radius);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.drf-arrow {
+  font-size: 12px;
+  color: var(--pv-dim);
+}
+
+.drf-hint {
+  font-size: 12px;
+  color: var(--pv-dim);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.drf-footer-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.drf-btn-clear {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--pv-radius);
+  border: 1.5px solid var(--pv-border);
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--pv-dim);
+  cursor: pointer;
+  transition: border-color var(--pv-fast), color var(--pv-fast), background var(--pv-fast);
+}
+
+.drf-btn-clear:hover {
+  border-color: var(--pv-danger);
+  color: var(--pv-danger);
+  background: color-mix(in oklab, var(--pv-danger) 8%, var(--pv-card));
+}
+
+.drf-btn-apply {
+  height: 34px;
+  padding: 0 18px;
+  border-radius: var(--pv-radius);
+  border: none;
+  background: var(--pv-primary);
+  color: var(--pv-primary-ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--pv-fast), box-shadow var(--pv-fast), transform var(--pv-fast);
+  box-shadow: 0 3px 10px color-mix(in oklab, var(--pv-primary) 35%, transparent);
+}
+
+.drf-btn-apply:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 14px color-mix(in oklab, var(--pv-primary) 45%, transparent);
+  transform: translateY(-1px);
+}
+
+.drf-btn-apply:active {
+  transform: translateY(0);
+  filter: brightness(0.97);
+}

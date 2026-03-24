@@ -153,7 +153,7 @@ const login = async (req, res, next) => {
 /** GET /api/auth/me  (auth) */
 const me = async (req, res, next) => {
   try {
-    const userId = req.auth?.sub || req.user?.id;
+    const userId = req.auth?.sub || req.user?._id;
     const user = await User.findById(userId).select("-password").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
     const profile = await Profile.findOne({ userId }).lean();
@@ -204,7 +204,8 @@ const adminCreate = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
   try {
     const {
-      q = "", role = "", status = "", limit = 10, skip = 0
+      q = "", role = "", status = "", from = "",
+      to = "", limit = 10, skip = 0
     } = req.query || {};
 
     const EXCLUDED_PHONES = ["1", "2", "3"];
@@ -221,6 +222,23 @@ const getAllUsers = async (req, res, next) => {
         { email: { $regex: q, $options: "i" } },
         { phoneNumber: { $regex: q, $options: "i" } },
       ];
+    }
+
+    // Registration date filter
+    if (from || to) {
+      filter.createdAt = {};
+
+      if (from) {
+        const start = new Date(from);
+        start.setHours(0, 0, 0, 0);
+        filter.createdAt.$gte = start;
+      }
+
+      if (to) {
+        const end = new Date(to);
+        end.setHours(23, 59, 59, 999);
+        filter.createdAt.$lte = end;
+      }
     }
 
     const [items, total] = await Promise.all([
@@ -240,7 +258,7 @@ const getById = async (req, res, next) => {
     if (!u) return res.status(404).json({ message: 'User not found' });
 
     // const isSelf = String(req.user.sub) === String(id); this should be deleted if things are wotking fine
-    const isSelf = String(req.user.id) === String(id);
+    const isSelf = String(req.user._id) === String(id);
     if (req.user.role !== 'ADMIN' && !isSelf) return res.status(403).json({ message: 'Forbidden' });
 
     res.json(u);
@@ -366,9 +384,10 @@ const listStaff = async (req, res, next) => {
 const listAssignableUsers = async (req, res, next) => {
   try {
     const limit = Number(req.query.limit || 200);
+    const EXCLUDED_PHONES = ["1", "2", "3"];
 
     const items = await User.find(
-      { role: { $in: ['ADMIN', 'STAFF'] }, status: 'ACTIVE' },
+      { role: { $in: ['ADMIN', 'STAFF'] }, status: 'ACTIVE',phoneNumber: { $nin: EXCLUDED_PHONES }, },
       { name: 1, email: 1, role: 1 } // minimal fields
     )
       .sort({ name: 1 })

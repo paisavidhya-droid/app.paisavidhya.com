@@ -143,7 +143,7 @@ export default function LeadActionsDropdown({
   const showClaim = isUnassigned && !isAdmin; // staff + unassigned
   const showTransfer = !isUnassigned || isAdmin; // assigned OR admin (even if unassigned)
 
-  const canDelete = false;
+  const canDelete = import.meta.env.VITE_DLT_OPS === "1" || false;
 
   // You can swap this “⋯” for an icon button if you have one.
   return (
@@ -268,7 +268,7 @@ export default function LeadActionsDropdown({
             {canDelete && (
               <Item
                 onClick={onDelete}
-                disabled={canDelete}
+                // disabled={canDelete}
                 className="dlt-hover"
               >
                 <FaTrash className="dropdown-icon" style={{ color: "red" }} />
